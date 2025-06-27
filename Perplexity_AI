@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Perplexity AI Interface Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Perplexity Calm -->
+    <!-- Application Structure Plan: The application is designed as a high-fidelity, interactive simulation of the Perplexity AI interface. This structure was chosen because it provides the most intuitive and engaging way to understand the platform's navigation and features, aligning with the goal of 'learning by doing'. The layout is a persistent two-panel design: a fixed left sidebar for primary navigation (mirroring the real app) and a dynamic main content area that updates based on user interaction. This non-linear structure allows users to freely explore features like 'Home', 'Discover', 'Spaces', and 'About Perplexity', in any order. User flow is driven by clicks, which trigger view changes and modals containing explanatory text derived directly from the source analysis, effectively making the application itself an interactive report. -->
+    <!-- Visualization & Content Choices: The application translates the source report's analysis into interactive components rather than static text or charts. 
+        - Report Info: Core Navigation (Sidebar) -> Goal: Demonstrate app structure -> Viz/Method: Interactive HTML/Tailwind sidebar -> Interaction: Clicks on 'Home', 'Discover', 'Spaces', 'About Perplexity' dynamically change the main content view, simulating navigation.
+        - Report Info: Search Bar Functions (Focus, Attach, Pro Toggle, Content Type, Microphone, Send) -> Goal: Explain precise search query controls -> Viz/Method: Clickable HTML buttons/icons embedded directly within the search bar's input field, matching the screenshot's layout. -> Interaction: Clicking these elements opens a modal with a detailed explanation of their function.
+        - Report Info: UX Principle (Visibility of System Status) -> Goal: Demonstrate responsive AI feedback -> Viz/Method: A CSS/JS "thinking" animation with text -> Interaction: Triggered upon clicking the search button to simulate the AI's process.
+        - Report Info: Content Discovery (Quick Access Buttons) -> Goal: Illustrate guided entry points -> Viz/Method: Interactive HTML buttons below the search bar -> Interaction: Clicking a button pre-fills the search bar and runs a simulated query, showing an immediate use case.
+        - Report Info: Perplexity Overview/Key Features -> Goal: Provide high-level understanding of the product -> Viz/Method: Dedicated 'About Perplexity' page with summarized text and feature list from the analysis -> Interaction: Navigation via sidebar link.
+        - Justification: This interactive simulation approach is superior to static charts or text for teaching a user interface, as it provides direct, hands-on experience with the navigation and features. The precise replication of the search bar layout enhances fidelity. The addition of an 'About' page enhances understanding by providing core contextual information about the product itself. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-icon {
+            width: 20px;
+            height: 20px;
+        }
+        .search-bar-icon {
+            width: 18px;
+            height: 18px;
+        }
+        .main-content-fade {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-overlay {
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .modal-content {
+            animation: slideUp 0.3s ease-in-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #18181b; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+        .tooltip {
+            position: absolute;
+            background-color: #3f3f46;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 60; /* Higher than modal overlay, but below modal content */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            pointer-events: none; /* Allows clicks through the tooltip area */
+            transform: translateY(-50%); /* For vertical centering */
+        }
+        .tooltip.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Custom styling for the squared focus button as seen in the screenshot */
+        .focus-button-active {
+            background-color: #3f3f46; /* A slightly darker gray to mimic selected state */
+            border-radius: 6px; /* Rounded corners for the box */
+            padding: 4px; /* Padding to create the box effect */
+        }
+        .search-inner-buttons {
+            display: flex;
+            align-items: center;
+            height: 100%; /* Ensure buttons fill the height of the container */
+            padding: 0 8px; /* Horizontal padding for spacing */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+    </style>
+</head>
+<body class="bg-[#09090b] text-gray-200">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="bg-[#18181b] w-64 p-4 flex flex-col justify-between border-r border-gray-700/50">
+            <div>
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-white">P</div>
+                        <span class="font-semibold text-lg">Perplexity</span>
+                    </div>
+                    <button data-nav="newThread" class="p-1 rounded-md hover:bg-gray-700" data-tooltip="Start a new conversation">
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    </button>
+                </div>
+                <nav class="space-y-2">
+                    <a href="#" data-nav="home" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer bg-gray-700 text-white font-semibold" data-tooltip="Go to Home screen">
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <span>Home</span>
+                    </a>
+                    <a href="#" data-nav="discover" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-700/50" data-tooltip="Explore trending topics and popular searches">
+                         <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 16.382V5.618a1 1 0 00-1.447-.894L15 7m-6 10v-5a1 1 0 011-1h4a1 1 0 011 1v5m-6 0h6"></path></svg>
+                        <span>Discover</span>
+                    </a>
+                    <a href="#" data-nav="spaces" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-700/50" data-tooltip="Organize your searches and collaborate in personalized spaces">
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <span>Spaces</span>
+                    </a>
+                    <a href="#" data-nav="about" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-700/50" data-tooltip="Learn more about Perplexity AI">
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>About Perplexity</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="space-y-2">
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer bg-blue-600/20 text-blue-400 hover:bg-blue-600/30" data-tooltip="Share Perplexity with your team">
+                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                    <span>Invite your team</span>
+                </a>
+                 <a href="#" data-nav="profile" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-700/50" data-tooltip="Manage your profile and subscription">
+                    <img src="https://placehold.co/32x32/7e22ce/ffffff?text=U" alt="User" class="w-6 h-6 rounded-full">
+                    <span class="flex-1">User Profile</span>
+                    <span class="text-xs font-bold bg-purple-600 text-white px-2 py-0.5 rounded-full">PRO</span>
+                </a>
+                <a href="#" data-nav="download" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-700/50" data-tooltip="Download Perplexity desktop or mobile apps">
+                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span>Download</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="flex-1 p-6 md:p-8 lg:p-12 overflow-y-auto">
+            <!-- Content will be dynamically injected here -->
+        </main>
+        
+        <!-- Utility Icons -->
+        <div class="absolute bottom-4 right-4 flex space-x-2">
+             <button data-nav="help" class="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors" data-tooltip="Access help and support">
+                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </button>
+             <button data-nav="settings" class="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors" data-tooltip="Adjust application settings and preferences">
+                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+        <div class="modal-overlay fixed inset-0"></div>
+        <div class="modal-content bg-[#18181b] rounded-xl shadow-2xl w-full max-w-lg p-6 relative border border-gray-700">
+            <h3 id="modal-title" class="text-xl font-bold text-white mb-3"></h3>
+            <p id="modal-body" class="text-gray-300 leading-relaxed"></p>
+            <button id="modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tooltip Element -->
+    <div id="tooltip" class="tooltip hidden"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainContent = document.getElementById('main-content');
+            const navItems = document.querySelectorAll('.nav-item');
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalClose = document.getElementById('modal-close');
+            const modalOverlay = document.querySelector('.modal-overlay');
+            const tooltipElement = document.getElementById('tooltip');
+
+            const content = {
+                home: `
+                    <div class="main-content-fade flex flex-col items-center justify-center h-full text-center">
+                        <div class="w-full max-w-2xl">
+                            <h1 class="text-5xl font-bold text-white mb-4">perplexity <span class="text-blue-500">pro</span></h1>
+                            <p class="text-gray-400 mb-8">
+                                Welcome to the interactive demo of Perplexity AI. This simulation allows you to explore the interface. Try typing a query, using the focus modes, or navigating with the sidebar.
+                            </p>
+                            
+                            <div class="relative mb-4">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-4 space-x-2 search-inner-buttons">
+                                    <button data-feature="focus" class="p-1 rounded-md hover:bg-gray-600 focus-button-active" data-tooltip="Narrow your search to specific sources (e.g., Academic, Social)">
+                                        <svg class="search-bar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    </button>
+                                    <button data-feature="attach" class="p-1 rounded-md hover:bg-gray-600" data-tooltip="Attach files (PDFs, images) to your query">
+                                        <svg class="search-bar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                    </button>
+                                     <button data-feature="proToggle" class="p-1 rounded-md hover:bg-gray-600" data-tooltip="Toggle Perplexity Pro features">
+                                        <svg class="search-bar-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-10H8V9h3V6h2v3h3v2h-3v3h-2v-3zm0 0"></path></svg>
+                                    </button>
+                                </div>
+                                <input type="text" id="search-input" class="w-full bg-[#27272a] border border-gray-600 rounded-full py-3 pr-40 pl-44 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ask anything or @ mention a Space">
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 space-x-1 search-inner-buttons">
+                                    <button data-feature="webFocusIndicator" class="p-1 rounded-md hover:bg-gray-600" data-tooltip="Current Focus: Web (Click to change)">
+                                        <svg class="search-bar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h2.5M21 11H9.455m0 0a2 2 0 01-2 2v1a2 2 0 002 2h2.5m-6-6h9.455m0 0a2 2 0 01-2 2v1a2 2 0 002 2h2.5m-6-6v2.5m-3.5 0h9.455m0 0a2 2 0 012 2v1a2 2 0 002 2h2.5m-6-6v2.5m-3.5 0h9.455"></path></svg>
+                                    </button>
+                                    <button data-feature="contentType" class="p-1 rounded-md hover:bg-gray-600" data-tooltip="Filter content type (e.g., Images, Videos)">
+                                        <svg class="search-bar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                                    </button>
+                                    <button data-feature="mic" class="p-1 rounded-md hover:bg-gray-600" data-tooltip="Use voice input for your query">
+                                        <svg class="search-bar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                                    </button>
+                                    <button id="search-button" class="p-2 bg-blue-500 rounded-full hover:bg-blue-600 ml-2" data-tooltip="Generate answer">
+                                        <svg class="search-bar-icon text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick access buttons below the search bar -->
+                            <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
+                                <button data-quick-search="Health" class="quick-search-btn bg-[#27272a] hover:bg-gray-600 text-sm font-medium px-4 py-2 rounded-full" data-tooltip="Ask about health topics">Health</button>
+                                <button data-quick-search="Campus" class="quick-search-btn bg-[#27272a] hover:bg-gray-600 text-sm font-medium px-4 py-2 rounded-full" data-tooltip="Get info related to campus life">Campus</button>
+                                <button data-quick-search="Perplexity 101" class="quick-search-btn bg-[#27272a] hover:bg-gray-600 text-sm font-medium px-4 py-2 rounded-full" data-tooltip="Learn the basics of Perplexity">Perplexity 101</button>
+                                <button data-quick-search="Study guide" class="quick-search-btn bg-[#27272a] hover:bg-gray-600 text-sm font-medium px-4 py-2 rounded-full" data-tooltip="Generate a study guide on a topic">Study guide</button>
+                                <button data-quick-search="Flashcards" class="quick-search-btn bg-[#27272a] hover:bg-gray-600 text-sm font-medium px-4 py-2 rounded-full" data-tooltip="Create flashcards for learning">Flashcards</button>
+                            </div>
+
+                            <div id="search-results" class="text-left"></div>
+                        </div>
+                    </div>
+                `,
+                discover: `
+                    <div class="main-content-fade">
+                        <h2 class="text-3xl font-bold mb-2">Discover</h2>
+                        <p class="text-gray-400 mb-8">The Discover section presents trending topics and popular user searches. It acts as a curated content hub, allowing you to explore what's new and interesting even without a specific question in mind, fostering serendipitous learning.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${Array(6).fill('').map((_, i) => `
+                            <div class="bg-[#18181b] p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/50 cursor-pointer transition-all">
+                                <h3 class="font-semibold text-lg mb-2">Trending Topic ${i+1}</h3>
+                                <p class="text-gray-400 text-sm">A brief summary of a popular or trending topic currently being discussed and searched for on the platform.</p>
+                            </div>`).join('')}
+                        </div>
+                    </div>
+                `,
+                spaces: `
+                    <div class="main-content-fade">
+                        <h2 class="text-3xl font-bold mb-2">Spaces</h2>
+                        <p class="text-400 mb-8">Spaces are personalized, collaborative environments for organizing your searches, files, and conversations. You can create a Space for any project or topic to build a tailored knowledge hub, set custom AI instructions, and invite team members to view or contribute.</p>
+                        <div class="flex items-center gap-4 mb-8">
+                           <button data-feature="createSpace" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg" data-tooltip="Create a new knowledge space">Create a Space</button>
+                           <button data-feature="exploreTemplates" class="bg-[#27272a] hover:bg-gray-600 font-semibold px-4 py-2 rounded-lg" data-tooltip="Explore pre-built space templates">Explore Templates</button>
+                        </div>
+                        <div class="space-y-4">
+                            ${['Project Phoenix', 'Q3 Market Research', 'Personal Reading List'].map(name => `
+                            <div class="bg-[#18181b] p-4 rounded-lg flex items-center justify-between border border-gray-700/50 cursor-pointer">
+                                <span class="font-medium">${name}</span>
+                                <div class="flex items-center -space-x-2">
+                                    <img src="https://placehold.co/24x24/7e22ce/ffffff?text=U" class="rounded-full border-2 border-[#18181b]">
+                                    <img src="https://placehold.co/24x24/16a34a/ffffff?text=A" class="rounded-full border-2 border-[#18181b]">
+                                    <img src="https://placehold.co/24x24/d97706/ffffff?text=B" class="rounded-full border-2 border-[#18181b]">
+                                </div>
+                            </div>`).join('')}
+                        </div>
+                    </div>
+                `,
+                about: `
+                    <div class="main-content-fade">
+                        <h2 class="text-3xl font-bold mb-4">About Perplexity AI</h2>
+                        <p class="text-gray-300 mb-6 leading-relaxed">
+                            Perplexity AI redefines information retrieval by providing direct, synthesized answers to complex questions, rather than just lists of links. It enhances result relevance by filtering irrelevant information and reduces cognitive load, saving users time.
+                        </p>
+                        <p class="text-gray-300 mb-6 leading-relaxed">
+                            A key differentiator is its commitment to transparency and trustworthiness: every answer is accompanied by numbered footnotes linking directly to reputable sources. This allows users to easily verify information or delve deeper, building strong credibility.
+                        </p>
+                        <h3 class="text-2xl font-bold text-white mb-3 mt-8">Key Capabilities</h3>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2 ml-4">
+                            <li><strong>Real-time Information Retrieval:</strong> Provides access to the most current and relevant information.</li>
+                            <li><strong>Multimodal Capabilities:</strong> Supports uploading various file types (images, PDFs) as part of queries for rich context.</li>
+                            <li><strong>Focus Modes:</strong> Allows narrowing searches to specific sources like Academic, Social, or Writing assistance.</li>
+                            <li><strong>Choice of Language Models:</strong> Perplexity Pro offers advanced LLMs such as GPT-4o and Claude 3.5 Sonnet.</li>
+                            <li><strong>Spaces:</strong> Personalized, collaborative environments for organizing searches and files by topic or project.</li>
+                            <li><strong>AI Copilot:</strong> Actively guides users through query formulation and refinement.</li>
+                        </ul>
+                        <h3 class="text-2xl font-bold text-white mb-3 mt-8">UI/UX Principles in Practice</h3>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2 ml-4">
+                            <li><strong>Visibility of System Status:</strong> Provides clear, real-time progress indicators like "Thinking..." and "Considering sources."</li>
+                            <li><strong>User-Friendly Language:</strong> Employs natural, conversational language, avoiding technical jargon.</li>
+                            <li><strong>User Control & Freedom:</strong> Allows editing prompts and deleting responses, providing an "emergency exit."</li>
+                            <li><strong>Error Prevention:</strong> Proactively asks users to refine vague queries, preventing common search failures.</li>
+                        </ul>
+                    </div>
+                `,
+            };
+
+            const featureModals = {
+                focus: {
+                    title: "Focus Modes",
+                    body: "The 'Focus' feature lets you narrow your search to specific sources, like Academic papers, Social media, or Writing assistance. This enhances result relevance by filtering out irrelevant information and is a key tool for efficient, high-quality research."
+                },
+                attach: {
+                    title: "Attachment Capabilities",
+                    body: "You can attach files like PDFs, images, and text documents to your query. Perplexity's AI will analyze the contents of the file and use it as context to provide a highly relevant and detailed answer. This is a powerful feature for research and data analysis."
+                },
+                proToggle: {
+                    title: "Perplexity Pro Toggle",
+                    body: "This button simulates the activation of Perplexity Pro features. For Pro users, this enhances search capabilities, provides deeper insights, and often gives access to advanced AI models for more comprehensive responses."
+                },
+                webFocusIndicator: {
+                    title: "Current Focus: Web",
+                    body: "This icon indicates that your current search focus is set to 'Web', meaning Perplexity will search across the entire internet. While not always an interactive button in the actual UI, in this demo it serves to highlight the active focus mode."
+                },
+                contentType: {
+                    title: "Content Type Filter / Labs",
+                    body: "This feature allows you to filter search results by content type (e.g., images, videos) or may lead to 'Labs' features which include experimental tools or content-specific searches. It helps refine your search to specific media or data types."
+                },
+                mic: {
+                    title: "Voice Input",
+                    body: "This allows you to ask your questions using your voice, offering a convenient, hands-free way to interact with the AI."
+                },
+                 profile: {
+                    title: "User Profile & Pro",
+                    body: "From here, you can manage account settings and preferences. The 'PRO' badge indicates a premium subscription, which unlocks advanced features like access to top-tier AI models (GPT-4o, Claude 3.5), unlimited file uploads, and the AI Copilot for guided searches."
+                },
+                download: {
+                    title: "Download Apps",
+                    body: "Perplexity offers mobile apps for iOS and Android, allowing you to sync your search history and continue your research across all your devices."
+                },
+                help: {
+                    title: "Help Center",
+                    body: "Access support documentation, frequently asked questions, and tutorials to get the most out of Perplexity."
+                },
+                settings: {
+                    title: "Settings",
+                    body: "Configure your user preferences, manage privacy settings like Incognito Mode, and control other platform-wide settings."
+                },
+                newThread: {
+                    title: "New Thread",
+                    body: "Clicking this starts a fresh conversation, clearing any previous context. This is useful when you want to ask about a completely unrelated topic."
+                },
+                createSpace: {
+                    title: "Create a New Space",
+                    body: "This button simulates the process of creating a new 'Space' in Perplexity. Spaces are personalized knowledge hubs where you can organize your searches, files, and conversations by topic or project. You can set custom AI instructions and invite collaborators."
+                },
+                exploreTemplates: {
+                    title: "Explore Space Templates",
+                    body: "Perplexity offers a gallery of pre-configured 'Space' templates for various topics or use cases. This feature helps you quickly set up a structured knowledge environment without starting from scratch, demonstrating the versatility of Spaces."
+                }
+            };
+
+            function renderContent(view) {
+                mainContent.innerHTML = content[view] || content.home;
+                addEventListenersToDynamicContent();
+                addTooltipListeners(); // Add tooltip listeners after content is rendered
+            }
+
+            function setActiveNav(view) {
+                navItems.forEach(item => {
+                    item.classList.remove('bg-gray-700', 'text-white', 'font-semibold');
+                    item.classList.add('hover:bg-gray-700/50');
+                    if (item.dataset.nav === view) {
+                        item.classList.add('bg-gray-700', 'text-white', 'font-semibold');
+                        item.classList.remove('hover:bg-gray-700/50');
+                    }
+                });
+            }
+            
+            function showModal(title, body) {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = body;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                hideTooltip(); // Hide tooltip when modal opens
+            }
+
+            function hideModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+            
+            modalClose.addEventListener('click', hideModal);
+            modalOverlay.addEventListener('click', hideModal);
+
+            function simulateSearch(query) {
+                const resultsContainer = document.getElementById('search-results');
+                if (!resultsContainer) return;
+
+                resultsContainer.innerHTML = `
+                    <div class="mt-8 p-6 bg-[#18181b] rounded-xl border border-gray-700/50">
+                        <div class="flex items-center space-x-3 text-gray-400 text-sm mb-4">
+                            <div class="loader ease-linear rounded-full border-2 border-t-2 border-gray-500 h-5 w-5"></div>
+                            <span id="thinking-text">Thinking...</span>
+                        </div>
+                        <div class="space-y-2 h-24 bg-gray-800/50 animate-pulse rounded-lg"></div>
+                    </div>
+                `;
+                
+                let thinkingState = 0;
+                const thinkingTexts = ["Thinking...", "Considering sources...", "Summarizing...", "Generating answer..."];
+                const thinkingTextElement = document.getElementById('thinking-text');
+
+                const thinkingInterval = setInterval(() => {
+                    thinkingState = (thinkingState + 1) % thinkingTexts.length;
+                    if(thinkingTextElement) thinkingTextElement.textContent = thinkingTexts[thinkingState];
+                }, 1000);
+
+                setTimeout(() => {
+                    clearInterval(thinkingInterval);
+                    resultsContainer.innerHTML = `
+                        <div class="mt-8 p-6 bg-[#18181b] rounded-xl border border-gray-700/50 main-content-fade">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-semibold text-lg">Answer</h4>
+                                <div class="flex items-center space-x-2 text-sm text-gray-400">
+                                    <span>Sources:</span>
+                                    <span class="bg-gray-700 w-5 h-5 flex items-center justify-center rounded-full text-xs">1</span>
+                                    <span class="bg-gray-700 w-5 h-5 flex items-center justify-center rounded-full text-xs">2</span>
+                                    <span class="bg-gray-700 w-5 h-5 flex items-center justify-center rounded-full text-xs">3</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-300 leading-relaxed">
+                                This is a simulated response for your query: <strong class="text-white">"${query}"</strong>. Perplexity provides direct, synthesized answers powered by advanced AI models. It understands the full context of your question to deliver a comprehensive response. <sup class="text-blue-400 cursor-pointer">1</sup>
+                                <br><br>
+                                A key differentiator is the citation of sources, which allows you to verify information and delve deeper into topics, fostering trust and credibility. <sup class="text-blue-400 cursor-pointer">2, 3</sup> You can ask follow-up questions to continue the conversation naturally.
+                            </p>
+                            <div class="mt-6 border-t border-gray-700/50 pt-4">
+                               <p class="text-sm text-gray-400">Try asking a follow-up question or exploring a related topic.</p>
+                            </div>
+                        </div>
+                    `;
+                }, 4000);
+            }
+
+            function showTooltip(element, text) {
+                if (modal.classList.contains('flex')) return; // Don't show tooltip if modal is open
+                tooltipElement.textContent = text;
+                const rect = element.getBoundingClientRect();
+                // Position tooltip to the right of the element, centered vertically
+                tooltipElement.style.left = `${rect.right + 10}px`; 
+                tooltipElement.style.top = `${rect.top + rect.height / 2}px`;
+                tooltipElement.classList.add('visible');
+            }
+
+            function hideTooltip() {
+                tooltipElement.classList.remove('visible');
+            }
+
+            function addTooltipListeners() {
+                document.querySelectorAll('[data-tooltip]').forEach(element => {
+                    element.addEventListener('mouseover', (e) => {
+                        showTooltip(e.currentTarget, e.currentTarget.dataset.tooltip);
+                    });
+                    element.addEventListener('mouseout', hideTooltip);
+                    element.addEventListener('click', hideTooltip); // Hide tooltip on click as well
+                });
+            }
+
+            function addEventListenersToDynamicContent() {
+                document.querySelectorAll('[data-feature]').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        const feature = e.currentTarget.dataset.feature;
+                        if (featureModals[feature]) {
+                            showModal(featureModals[feature].title, featureModals[feature].body);
+                        }
+                    });
+                });
+                
+                const searchButton = document.getElementById('search-button');
+                const searchInput = document.getElementById('search-input');
+                if (searchButton && searchInput) {
+                    searchButton.addEventListener('click', () => {
+                        const query = searchInput.value.trim();
+                        if (query) {
+                            simulateSearch(query);
+                        } else {
+                            showModal("No Query", "Please type a question in the search bar before searching.");
+                        }
+                    });
+
+                    searchInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            searchButton.click();
+                        }
+                    });
+                }
+                
+                document.querySelectorAll('.quick-search-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const query = btn.dataset.quickSearch;
+                        searchInput.value = query;
+                        simulateSearch(query);
+                    });
+                });
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const view = e.currentTarget.dataset.nav;
+
+                    if (content[view]) {
+                        setActiveNav(view);
+                        renderContent(view);
+                    } else if (featureModals[view]) {
+                        showModal(featureModals[view].title, featureModals[view].body);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('[data-nav="help"], [data-nav="settings"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const view = e.currentTarget.dataset.nav;
+                     if (featureModals[view]) {
+                        showModal(featureModals[view].title, featureModals[view].body);
+                    }
+                });
+            });
+
+            // Initial load
+            renderContent('home');
+        });
+    </script>
+</body>
+</html>
