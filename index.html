@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Resources Hub</title>
+    <title>AI Hub</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
         * {
@@ -157,8 +157,8 @@
             box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
         }
 
-        /* Recent Files */
-        .recent-files {
+        /* Repository Files */
+        .repository-files {
             margin-bottom: 3rem;
         }
 
@@ -330,20 +330,20 @@
     <div class="container">
         <header>
             <div class="logo">
-                <i class="fas fa-code"></i>
+                <i class="fas fa-brain"></i>
                 <h1>AI Hub</h1>
             </div>
-            <p class="tagline">Your centralized hub for AI resource</p>
+            <p class="tagline">Centralized hub for AI resources</p>
         </header>
 
         <!-- Stats Section -->
         <section class="stats">
             <div class="stat-card">
-                <span class="stat-number">0</span>
+                <span class="stat-number">1</span>
                 <span class="stat-label">Total Files</span>
             </div>
             <div class="stat-card">
-                <span class="stat-number">0</span>
+                <span class="stat-number">1</span>
                 <span class="stat-label">HTML Files</span>
             </div>
             <div class="stat-card">
@@ -356,16 +356,26 @@
             </div>
         </section>
 
-        <!-- Upload Section -->
-        <section class="upload-section" id="uploadZone">
-            <i class="fas fa-cloud-upload-alt upload-icon"></i>
-            <div class="upload-text">Drop HTML or code files here</div>
-            <div class="upload-subtext">Supports HTML, CSS, JavaScript, Python, and other text-based code files</div>
-            <input type="file" id="fileInput" class="file-input" multiple accept=".html,.htm,.css,.js,.py,.txt,.md,.json,.xml,.php,.java,.cpp,.c,.cs,.rb,.go,.rs,.ts,.jsx,.tsx,.vue,.scss,.sass,.less,.yaml,.yml">
-            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                <i class="fas fa-plus"></i>
-                Choose Files
-            </button>
+        <!-- Repository Files -->
+        <section class="repository-files">
+            <h2 class="section-title">
+                <i class="fas fa-folder-open"></i>
+                Repository Files
+            </h2>
+            <div class="file-list" id="repositoryList">
+                <div class="file-item">
+                    <div class="file-icon html"><i class="fab fa-html5"></i></div>
+                    <div class="file-info">
+                        <div class="file-name">index.html</div>
+                        <div class="file-meta">2.3 KB • Main landing page</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action" title="View"><i class="fas fa-eye"></i></button>
+                        <button class="file-action" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- Recent Files -->
@@ -422,128 +432,36 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 HTML & Code Hub. Open source repository for web development.</p>
+            <p>&copy; 2025 AI Hub. Open source repository for web development.</p>
         </div>
     </footer>
 
     <script>
-        let fileData = [];
-
-        // File upload handling
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
-        const fileList = document.getElementById('fileList');
-
-        // Drag and drop functionality
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('dragover');
-        });
-
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('dragover');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('dragover');
-            handleFiles(e.dataTransfer.files);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
-
-        function handleFiles(files) {
-            Array.from(files).forEach(file => {
-                addFileToList(file);
-                updateCounters();
+        // Simple interactions for repository files
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers for file actions
+            const fileActions = document.querySelectorAll('.file-action');
+            
+            fileActions.forEach(action => {
+                action.addEventListener('click', function(e) {
+                    const actionType = this.getAttribute('title');
+                    const fileName = this.closest('.file-item').querySelector('.file-name').textContent;
+                    
+                    // Simulate different actions
+                    switch(actionType) {
+                        case 'View':
+                            console.log(`Viewing ${fileName}`);
+                            break;
+                        case 'Edit':
+                            console.log(`Editing ${fileName}`);
+                            break;
+                        case 'Download':
+                            console.log(`Downloading ${fileName}`);
+                            break;
+                    }
+                });
             });
-        }
-
-        function addFileToList(file) {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'file-item';
-            
-            const fileType = getFileType(file.name);
-            const fileSize = formatFileSize(file.size);
-            
-            fileItem.innerHTML = `
-                <div class="file-icon ${fileType}"><i class="${getFileIcon(file.name)}"></i></div>
-                <div class="file-info">
-                    <div class="file-name">${file.name}</div>
-                    <div class="file-meta">${fileSize} • Just uploaded</div>
-                </div>
-                <div class="file-actions">
-                    <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
-                    <button class="file-action" title="Share"><i class="fas fa-share"></i></button>
-                    <button class="file-action" title="Delete" onclick="removeFile(this)"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-            
-            fileList.insertBefore(fileItem, fileList.firstChild);
-            fileData.push(file);
-        }
-
-        function getFileType(filename) {
-            const ext = filename.split('.').pop().toLowerCase();
-            if (['html', 'htm'].includes(ext)) return 'html';
-            if (['css', 'scss', 'sass', 'less'].includes(ext)) return 'css';
-            if (['js', 'jsx', 'ts', 'tsx'].includes(ext)) return 'js';
-            if (['py'].includes(ext)) return 'python';
-            return 'code';
-        }
-
-        function getFileIcon(filename) {
-            const ext = filename.split('.').pop().toLowerCase();
-            if (['html', 'htm'].includes(ext)) return 'fab fa-html5';
-            if (['css', 'scss', 'sass', 'less'].includes(ext)) return 'fab fa-css3-alt';
-            if (['js', 'jsx'].includes(ext)) return 'fab fa-js-square';
-            if (['ts', 'tsx'].includes(ext)) return 'fab fa-js-square';
-            if (ext === 'py') return 'fab fa-python';
-            if (['json', 'xml'].includes(ext)) return 'fas fa-code';
-            if (['md'].includes(ext)) return 'fab fa-markdown';
-            if (['php'].includes(ext)) return 'fab fa-php';
-            if (['java'].includes(ext)) return 'fab fa-java';
-            if (['vue'].includes(ext)) return 'fab fa-vuejs';
-            return 'fas fa-file-code';
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-        }
-
-        function removeFile(button) {
-            const fileItem = button.closest('.file-item');
-            fileItem.remove();
-            updateCounters();
-        }
-
-        function updateCounters() {
-            const fileItems = document.querySelectorAll('.file-item');
-            const totalFiles = fileItems.length;
-            
-            let htmlCount = 0, cssCount = 0, jsCount = 0;
-            
-            fileItems.forEach(item => {
-                const fileName = item.querySelector('.file-name').textContent;
-                const ext = fileName.split('.').pop().toLowerCase();
-                
-                if (['html', 'htm'].includes(ext)) htmlCount++;
-                else if (['css', 'scss', 'sass', 'less'].includes(ext)) cssCount++;
-                else if (['js', 'jsx', 'ts', 'tsx'].includes(ext)) jsCount++;
-            });
-            
-            const statNumbers = document.querySelectorAll('.stat-number');
-            statNumbers[0].textContent = totalFiles;
-            statNumbers[1].textContent = htmlCount;
-            statNumbers[2].textContent = cssCount;
-            statNumbers[3].textContent = jsCount;
-        }
+        });
     </script>
 </body>
 </html>
