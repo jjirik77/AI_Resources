@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resources Hub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #e6edf3;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #21262d 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 3rem 0 2rem;
+            text-align: center;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #58a6ff, #79c0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #f0f6fc, #58a6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: #8b949e;
+            margin-bottom: 3rem;
+        }
+
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(22, 27, 34, 0.8);
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: #58a6ff;
+            box-shadow: 0 5px 15px rgba(88, 166, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #58a6ff;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: rgba(13, 17, 23, 0.8);
+            border: 2px dashed #30363d;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #58a6ff;
+            background: rgba(22, 27, 34, 0.8);
+        }
+
+        .upload-section.dragover {
+            border-color: #2ea043;
+            background: rgba(46, 160, 67, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #58a6ff;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-subtext {
+            color: #8b949e;
+            margin-bottom: 2rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #238636, #2ea043);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+        }
+
+        /* Recent Files */
+        .recent-files {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #f0f6fc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-list {
+            background: rgba(22, 27, 34, 0.6);
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            overflow: hidden;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #30363d;
+            transition: all 0.3s ease;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .file-icon {
+            width: 40px;
+            text-align: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .file-icon.pdf { color: #f85149; }
+        .file-icon.doc { color: #2188ff; }
+        .file-icon.data { color: #2ea043; }
+        .file-icon.code { color: #ffa500; }
+
+        .file-info {
+            flex-grow: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .file-meta {
+            font-size: 0.85rem;
+            color: #8b949e;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .file-action {
+            background: none;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .file-action:hover {
+            color: #58a6ff;
+        }
+
+        /* Quick Links */
+        .quick-links {
+            margin-bottom: 3rem;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .link-card {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-card:hover {
+            transform: translateY(-3px);
+            border-color: #58a6ff;
+            box-shadow: 0 8px 25px rgba(88, 166, 255, 0.1);
+        }
+
+        .link-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #58a6ff, transparent);
+            transition: left 0.5s ease;
+        }
+
+        .link-card:hover::before {
+            left: 100%;
+        }
+
+        .link-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #58a6ff;
+        }
+
+        .link-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .link-description {
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .upload-section {
+                padding: 2rem 1rem;
+            }
+            
+            .file-item {
+                padding: 1rem;
+            }
+            
+            .file-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <h1>AI Resources</h1>
+            </div>
+            <p class="tagline">Your centralized hub for AI tools, datasets, and documentation</p>
+        </header>
+
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="stat-card">
+                <span class="stat-number" data-target="247">0</span>
+                <span class="stat-label">Total Files</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-target="45">0</span>
+                <span class="stat-label">Datasets</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-target="123">0</span>
+                <span class="stat-label">Models</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-target="89">0</span>
+                <span class="stat-label">Scripts</span>
+            </div>
+        </section>
+
+        <!-- Upload Section -->
+        <section class="upload-section" id="uploadZone">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <div class="upload-text">Drop files here or click to upload</div>
+            <div class="upload-subtext">Supports AI models, datasets, documentation, and code files</div>
+            <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.py,.ipynb,.csv,.json,.md,.txt,.pkl,.h5,.onnx">
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-plus"></i>
+                Choose Files
+            </button>
+        </section>
+
+        <!-- Recent Files -->
+        <section class="recent-files">
+            <h2 class="section-title">
+                <i class="fas fa-clock"></i>
+                Recent Files
+            </h2>
+            <div class="file-list" id="fileList">
+                <div class="file-item">
+                    <div class="file-icon pdf"><i class="fas fa-file-pdf"></i></div>
+                    <div class="file-info">
+                        <div class="file-name">transformer_architecture.pdf</div>
+                        <div class="file-meta">2.3 MB • Uploaded 2 hours ago</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
+                        <button class="file-action" title="Share"><i class="fas fa-share"></i></button>
+                        <button class="file-action" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon data"><i class="fas fa-database"></i></div>
+                    <div class="file-info">
+                        <div class="file-name">sentiment_dataset.csv</div>
+                        <div class="file-meta">15.7 MB • Uploaded 1 day ago</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
+                        <button class="file-action" title="Share"><i class="fas fa-share"></i></button>
+                        <button class="file-action" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon code"><i class="fas fa-code"></i></div>
+                    <div class="file-info">
+                        <div class="file-name">neural_network.py</div>
+                        <div class="file-meta">45 KB • Uploaded 3 days ago</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
+                        <button class="file-action" title="Share"><i class="fas fa-share"></i></button>
+                        <button class="file-action" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Links -->
+        <section class="quick-links">
+            <h2 class="section-title">
+                <i class="fas fa-external-link-alt"></i>
+                Quick Links
+            </h2>
+            <div class="links-grid">
+                <a href="#" class="link-card">
+                    <div class="link-icon"><i class="fas fa-book"></i></div>
+                    <div class="link-title">Documentation</div>
+                    <div class="link-description">Complete guides and API references</div>
+                </a>
+                <a href="#" class="link-card">
+                    <div class="link-icon"><i class="fab fa-github"></i></div>
+                    <div class="link-title">GitHub Repository</div>
+                    <div class="link-description">Source code and issue tracking</div>
+                </a>
+                <a href="#" class="link-card">
+                    <div class="link-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="link-title">Tutorials</div>
+                    <div class="link-description">Step-by-step learning materials</div>
+                </a>
+                <a href="#" class="link-card">
+                    <div class="link-icon"><i class="fas fa-users"></i></div>
+                    <div class="link-title">Community</div>
+                    <div class="link-description">Join discussions and get help</div>
+                </a>
+                <a href="#" class="link-card">
+                    <div class="link-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="link-title">Benchmarks</div>
+                    <div class="link-description">Performance metrics and comparisons</div>
+                </a>
+                <a href="#" class="link-card">
+                    <div class="link-icon"><i class="fas fa-tools"></i></div>
+                    <div class="link-title">Tools</div>
+                    <div class="link-description">Utilities and helper applications</div>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 AI Resources Hub. Open source repository for AI development.</p>
+        </div>
+    </footer>
+
+    <script>
+        let fileData = [];
+
+        // Animate counters
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const increment = target / 50;
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    if (current < target) {
+                        current += increment;
+                        counter.textContent = Math.floor(current);
+                    } else {
+                        counter.textContent = target;
+                        clearInterval(timer);
+                    }
+                }, 30);
+            });
+        }
+
+        // File upload handling
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+
+        // Drag and drop functionality
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                addFileToList(file);
+                updateCounters();
+            });
+        }
+
+        function addFileToList(file) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            
+            const fileType = getFileType(file.name);
+            const fileSize = formatFileSize(file.size);
+            
+            fileItem.innerHTML = `
+                <div class="file-icon ${fileType}"><i class="${getFileIcon(file.name)}"></i></div>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-meta">${fileSize} • Just uploaded</div>
+                </div>
+                <div class="file-actions">
+                    <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
+                    <button class="file-action" title="Share"><i class="fas fa-share"></i></button>
+                    <button class="file-action" title="Delete" onclick="removeFile(this)"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            
+            fileList.insertBefore(fileItem, fileList.firstChild);
+            fileData.push(file);
+        }
+
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (['pdf'].includes(ext)) return 'pdf';
+            if (['doc', 'docx'].includes(ext)) return 'doc';
+            if (['csv', 'json', 'pkl', 'h5'].includes(ext)) return 'data';
+            if (['py', 'ipynb', 'js', 'html'].includes(ext)) return 'code';
+            return 'data';
+        }
+
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'pdf') return 'fas fa-file-pdf';
+            if (['doc', 'docx'].includes(ext)) return 'fas fa-file-word';
+            if (['csv', 'json'].includes(ext)) return 'fas fa-database';
+            if (['py', 'ipynb'].includes(ext)) return 'fas fa-code';
+            if (['pkl', 'h5', 'onnx'].includes(ext)) return 'fas fa-brain';
+            return 'fas fa-file';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function removeFile(button) {
+            const fileItem = button.closest('.file-item');
+            fileItem.remove();
+            updateCounters();
+        }
+
+        function updateCounters() {
+            const totalFiles = document.querySelectorAll('.file-item').length;
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers[0].textContent = totalFiles;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            animateCounters();
+        });
+
+        // Add click handlers for file actions
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.file-action')) {
+                const action = e.target.closest('.file-action');
+                const icon = action.querySelector('i');
+                
+                if (icon.classList.contains('fa-download')) {
+                    // Handle download
+                    console.log('Download file');
+                } else if (icon.classList.contains('fa-share')) {
+                    // Handle share
+                    console.log('Share file');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
