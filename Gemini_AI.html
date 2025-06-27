@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Gemini AI Interface Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Gemini Dark Mode -->
+    <!-- Application Structure Plan: The application is designed as a high-fidelity, interactive simulation of the Google Gemini AI web interface, specifically replicating the layout from the provided screenshot. This structure provides the most intuitive way for users to understand the platform's navigation and features by 'learning by doing'. The layout is a persistent two-panel design: a fixed left sidebar for primary navigation (New Chat icon, Settings icon, Gemini brand with model selection) and a dynamic main content area for the chat simulation or home screen. User flow is driven by clicks on UI elements, which trigger either view changes (loading new content into the main area) or modals containing explanatory text derived from the source analysis. This non-linear exploration path allows users to engage with features in any order they choose. The prompt bar at the bottom is designed to match the screenshot's specific layout, including direct feature buttons for "Video", "Deep Research", and "Canvas". -->
+    <!-- Visualization & Content Choices: The application translates the source report's analysis of the Gemini UI into interactive components rather than static text, with a strong focus on replicating the provided screenshot.
+        - Report Info: Core Navigation (Sidebar) -> Goal: Demonstrate primary app navigation -> Viz/Method: Interactive HTML/Tailwind sidebar with clickable icons (Home, New Chat, About Gemini, Settings). -> Interaction: Clicks on these icons dynamically change the main content view or open modals, simulating navigation within the app. The Gemini branding and model dropdown are visually represented and now interactive via the "2.5 Flash" text.
+        - Report Info: Home Screen Content -> Goal: Replicate the central greeting message -> Viz/Method: Centered "Hello, User" text. -> Interaction: This is the default view.
+        - Report Info: Prompt Bar Controls (Prompting, Multimodal Input, Direct Features, Sending) -> Goal: Explain the core conversational workflow and new specific features -> Viz/Method: A fully interactive prompt bar at the bottom, with a plus icon for attachments, and direct buttons for "Video", "Deep Research", and "Canvas", along with a microphone icon. -> Interaction: Clicking these elements opens modals explaining their functions. Typing in the input field enables the send button. Clicking 'Send' triggers a simulated AI response sequence, including a "thinking" animation.
+        - Report Info: Response Handling (Editing, Copying, Feedback - inherited from previous version for completeness) -> Goal: Show how users can interact with AI-generated content -> Viz/Method: Icons appearing below each simulated AI response (when in chat view). -> Interaction: Clicking icons for 'Edit', 'Copy', 'Share', or 'Feedback' opens modals with detailed explanations of their purpose, demonstrating user control and feedback loops.
+        - Report Info: Key Gemini Features (Gems, Double Check, Workspace Integration - retained for conceptual understanding, but not directly visible in the recreated screenshot's sidebar) -> Goal: Provide high-level understanding of advanced capabilities -> Viz/Method: Dedicated views for 'Gems' and 'Settings' (accessible via settings icon), and contextual elements for specific features in prompt bar. -> Interaction: Navigating to the 'Gems' view shows how custom AI experts are organized. Clicking direct feature buttons in the prompt bar (e.g., Deep Research) opens corresponding explanatory modals.
+        - Justification: This interactive simulation approach provides a direct, hands-on experience, which is superior to static documentation for teaching a complex user interface. It allows users to actively explore and understand the purpose of each button and feature in context, specifically aligning with the visual layout provided in the screenshot. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Roboto', 'Google Sans', sans-serif; background-color: #131314; }
+        .sidebar-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+        .prompt-bar-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+        .main-content-fade { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-overlay { animation: fadeIn 0.2s ease-in-out; }
+        .modal-content { animation: slideUp 0.3s ease-in-out; }
+        @keyframes slideUp { from { transform: translateY(20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #202124; }
+        ::-webkit-scrollbar-thumb { background: #444746; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #585a59; }
+        .tooltip {
+            position: absolute;
+            background-color: #3c4043;
+            color: #e8eaed;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 60;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            pointer-events: none;
+            transform: translateY(-120%);
+        }
+        .tooltip.visible { opacity: 1; visibility: visible; }
+        .gemini-gradient-text {
+            background: -webkit-linear-gradient(45deg, #4285F4, #9B72F9, #F4B400, #DB4437);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .loader-dots div {
+            animation: loader-dots 1.4s infinite ease-in-out both;
+        }
+        .loader-dots .dot1 { animation-delay: -0.32s; }
+        .loader-dots .dot2 { animation-delay: -0.16s; }
+        @keyframes loader-dots {
+            0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); }
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="bg-[#1e1f20] w-20 p-4 flex flex-col justify-between items-center border-r border-gray-700/50">
+            <div>
+                <div class="flex flex-col items-center mb-6">
+                    <div class="flex items-center space-x-2 p-2 mb-4">
+                        <button data-nav="home" class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-700/50" data-tooltip="Go to home page">
+                            <span class="sidebar-icon text-2xl">✨</span>
+                        </button>
+                    </div>
+                     <button data-nav="newChat" class="p-2 rounded-full hover:bg-gray-700/50" data-tooltip="Start a new chat">
+                        <div class="sidebar-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div class="space-y-1">
+                 <button data-nav="aboutGemini" class="p-2 rounded-full hover:bg-gray-700/50" data-tooltip="Learn more about Gemini">
+                    <div class="sidebar-icon">ℹ️</div>
+                </button>
+                 <button data-nav="settings" class="p-2 rounded-full hover:bg-gray-700/50" data-tooltip="Manage settings and preferences">
+                    <div class="sidebar-icon">⚙️</div>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="flex-1 flex flex-col p-2 sm:p-4 md:p-6 lg:p-8 overflow-y-auto">
+            <!-- Content will be dynamically injected here -->
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+        <div class="modal-overlay fixed inset-0"></div>
+        <div class="modal-content bg-[#282A2C] rounded-xl shadow-2xl w-full max-w-lg p-6 relative border border-gray-700">
+            <h3 id="modal-title" class="text-xl font-bold text-white mb-3"></h3>
+            <p id="modal-body" class="text-gray-300 leading-relaxed"></p>
+            <button id="modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tooltip Element -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainContent = document.getElementById('main-content');
+            const navItems = document.querySelectorAll('[data-nav]'); // Select all data-nav items for general listeners
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalClose = document.getElementById('modal-close');
+            const modalOverlay = document.querySelector('.modal-overlay');
+            const tooltipElement = document.getElementById('tooltip');
+
+            const pageContent = {
+                home: `
+                    <div class="flex-1 flex flex-col items-center justify-center text-center main-content-fade">
+                        <h1 class="text-5xl font-medium text-gray-400 mb-2">Hello, User</h1>
+                    </div>
+                `,
+                chat: `<div id="chat-container" class="w-full max-w-4xl mx-auto flex-1 flex flex-col">
+                        <div id="chat-output" class="flex-1 space-y-8 overflow-y-auto p-2">
+                            <!-- Chat messages will be appended here -->
+                        </div>
+                       </div>`,
+                gems: `
+                    <div class="main-content-fade p-4">
+                        <h2 class="text-3xl font-bold mb-2">Explore Gems</h2>
+                        <p class="text-gray-400 mb-8">Gems are custom AI experts you can create for specific tasks or topics. By providing custom instructions and knowledge files, you can tailor Gemini's responses to fit your exact needs. This view simulates how your collection of personal and team Gems might be organized.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="bg-[#1e1f20] p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/50 cursor-pointer transition-all">
+                                <div class="flex items-center space-x-3 mb-3">
+                                    <span class="text-2xl">🚀</span>
+                                    <h3 class="font-semibold text-lg">Marketing Assistant</h3>
+                                </div>
+                                <p class="text-gray-400 text-sm">Helps draft campaign briefs, write ad copy, and brainstorm content ideas.</p>
+                            </div>
+                            <div class="bg-[#1e1f20] p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/50 cursor-pointer transition-all">
+                                <div class="flex items-center space-x-3 mb-3">
+                                    <span class="text-2xl">💻</span>
+                                    <h3 class="font-semibold text-lg">Code Reviewer</h3>
+                                </div>
+                                <p class="text-gray-400 text-sm">Analyzes code snippets, suggests improvements, and explains complex logic.</p>
+                            </div>
+                            <div class="bg-[#1e1f20] p-6 rounded-xl border border-gray-700/50 hover:border-blue-500/50 cursor-pointer transition-all">
+                                <div class="flex items-center space-x-3 mb-3">
+                                    <span class="text-2xl">🍽️</span>
+                                    <h3 class="font-semibold text-lg">Recipe Generator</h3>
+                                </div>
+                                <p class="text-gray-400 text-sm">Creates recipes based on ingredients you have on hand.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                settings: `
+                    <div class="main-content-fade p-4 max-w-2xl mx-auto">
+                        <h2 class="text-3xl font-bold mb-6">Settings</h2>
+                        <div class="space-y-6">
+                            <div class="bg-[#1e1f20] p-6 rounded-xl border border-gray-700/50">
+                                <h3 class="text-lg font-semibold mb-2">Theme</h3>
+                                <div class="flex items-center justify-between">
+                                    <p class="text-gray-400">Switch between light and dark themes.</p>
+                                    <button class="px-4 py-2 bg-gray-600 rounded-lg" data-feature="toggleTheme">Toggle Theme</button>
+                                </div>
+                            </div>
+                            <div class="bg-[#1e1f20] p-6 rounded-xl border border-gray-700/50">
+                                <h3 class="text-lg font-semibold mb-2">Personalization</h3>
+                                <p class="text-gray-400 mb-4">Gemini can provide more relevant responses by using information from your Google Workspace apps and Search history. You have full control over this data.</p>
+                                <button class="text-blue-400 hover:underline" data-feature="manageData">Manage Data & Privacy</button>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                aboutGemini: `
+                    <div class="main-content-fade p-4 max-w-4xl mx-auto">
+                        <h2 class="text-3xl font-bold mb-4">About Google Gemini AI</h2>
+                        <p class="text-gray-300 mb-6 leading-relaxed">
+                            Google Gemini is a cutting-edge family of multimodal AI models, engineered to understand and generate content across text, code, images, audio, and video. It powers Google's AI chatbot and integrates deeply into numerous Google applications and services, serving as a central pillar in Google's AI strategy. Designed for user-friendliness, it aims to enhance productivity and creativity for diverse users.
+                        </p>
+                        <h3 class="text-2xl font-bold text-white mb-3 mt-8">Key Capabilities</h3>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2 ml-4">
+                            <li><strong>Multimodal Interactions:</strong> Understands and generates content from text, images, audio, and video inputs.</li>
+                            <li><strong>Natural Language Processing:</strong> Engages in conversations, proofreads, drafts various documents, and translates content.</li>
+                            <li><strong>Code Generation & Assistance:</strong> Understands, explains, and generates code in over 20 programming languages (e.g., Python, Java, C++, Go).</li>
+                            <li><strong>Real-time Voice Conversation:</strong> Features "Gemini Live" for free-flowing voice interactions, even accommodating interruptions.</li>
+                            <li><strong>Agentic AI & Tool Use:</strong> Equipped to take action, interact with external tools like Google Search and APIs, and execute multi-step tasks.</li>
+                            <li><strong>Deep Research:</strong> Conducts extensive online research, synthesizes information, and generates comprehensive, cited reports.</li>
+                            <li><strong>Canvas Integration:</strong> Transforms AI-generated content into interactive applications, games, infographics, quizzes, or web pages, and can generate underlying code.</li>
+                            <li><strong>Double Check:</strong> Verifies AI responses against Google Search results, promoting transparency and trustworthiness.</li>
+                            <li><strong>Seamless Ecosystem Integration:</strong> Deeply embedded in Google Workspace (Gmail, Docs, Sheets, etc.) and Chrome for contextual AI assistance.</li>
+                            <li><strong>Personalization:</strong> Tailors responses based on user's Search history, remembered preferences, and past chats (optional).</li>
+                        </ul>
+                    </div>
+                `,
+            };
+
+            const featureModals = {
+                modelSelector: {
+                    title: "Gemini Model Selection",
+                    body: "This selector allows you to choose between different versions of the Gemini AI model, each optimized for different tasks or offering varying capabilities. For example, 'Flash' models are fast and efficient for quick interactions, while 'Pro' models offer more advanced reasoning and understanding for complex tasks, often requiring a premium subscription."
+                },
+                profile: { title: "User Account", body: "From here, you can manage your Google Account settings, view your subscription plan (e.g., Gemini Advanced), and sign out. This ensures seamless integration with your Google ecosystem." },
+                newChat: { title: "New Chat", body: "Clicking this starts a fresh conversation, clearing any previous context from the current chat. This is useful when you want to ask about a completely unrelated topic without confusing the AI." },
+                attachFile: { title: "Attach Files & Images", body: "Gemini is multimodal, meaning you can upload files like images, documents (PDFs, text), or spreadsheets. The AI will analyze the file's content and use it as context to provide a highly relevant and detailed answer. This is a powerful feature for data analysis, research, and creative tasks." },
+                videoFeature: { title: "Video Input", body: "This feature simulates the ability to interact with video content. In a real Gemini session, you could upload videos or link to them, and Gemini could answer questions, summarize, or analyze content within the video." },
+                deepResearch: { title: "Deep Research", body: "The Deep Research feature allows Gemini to conduct extensive online research on a given topic, synthesizing information from multiple sources into a comprehensive, cited report. This saves hours of manual research time." },
+                canvasFeature: { title: "Canvas Integration", body: "Canvas in Gemini allows you to transform AI-generated content (like Deep Research reports) into interactive formats such as web pages, infographics, quizzes, or even functional code. It's a powerful tool for bringing ideas to life." },
+                mic: { title: "Voice Input", body: "Use your voice to ask questions instead of typing. This allows for a more natural, hands-free way to interact with Gemini. The 'Gemini Live' feature takes this further, enabling real-time, free-flowing conversations." },
+                edit: { title: "Edit Prompt", body: "You can revise a prompt you've already sent. After editing, Gemini will generate a new response based on your updated query. This gives you fine-grained control over the conversation." },
+                copy: { title: "Copy Response", body: "Quickly copy the AI's response to your clipboard. This is especially useful for code snippets, generated text, or any content you want to use in other applications." },
+                share: { title: "Share & Export", body: "Share your conversation with others by creating a public link. You can also export responses directly to Google Docs or as a draft in Gmail, streamlining your workflow." },
+                feedback: { title: "Provide Feedback", body: "Rating responses with a thumbs up or down helps Google improve Gemini. Good responses are used as positive examples, while problematic ones are used to refine the model's safety and accuracy." },
+                doubleCheck: { title: "Double Check with Google", body: "This feature verifies Gemini's statements by cross-referencing them with Google Search results. It highlights sentences that are supported by sources (green) and those that may differ or are unverified (orange), promoting transparency and trust." },
+                help: { title: "Help & Support", body: "Access documentation, tutorials, and frequently asked questions to learn more about Gemini's features and how to get the most out of them." },
+                settings: { title: "Settings", body: "Here you can manage your preferences, including theme (light/dark mode), language, and personalization settings. You can also control how your data, such as chat history and Workspace information, is used to tailor the Gemini experience." },
+                toggleTheme: { title: "Theme Toggled", body: "The visual theme has been updated. This is a simulation; in the actual application, you can choose between light, dark, or system-default themes." },
+                manageData: { title: "Manage Data & Privacy", body: "This action would take you to your Google Account's 'My Activity' page, where you can review and delete your Gemini chat history and manage how your data is used for personalization." },
+            };
+            
+            let currentView = 'home';
+            let chatHistory = {
+                1: [
+                    { from: 'user', text: 'What are some must-see places for a 10-day trip to Japan for a first-time visitor?' },
+                    { from: 'ai', text: 'For a first-time 10-day trip to Japan, a classic route focusing on Tokyo, Kyoto, and a day trip or two is highly recommended. Here’s a sample itinerary:\n\n* **Tokyo (4 days):** Explore the vibrant mix of modern and traditional. Visit Senso-ji Temple in Asakusa, see the Shibuya Crossing, and explore the gardens of the Imperial Palace.\n* **Kyoto (4 days):** Immerse yourself in traditional culture. Visit Fushimi Inari Shrine, Kinkaku-ji (Golden Pavilion), and the Arashiyama Bamboo Grove.\n* **Day Trips (2 days):** Consider a trip to Hakone for views of Mount Fuji or to Nara to see the friendly deer.' }
+                ],
+                2: [
+                    { from: 'user', text: 'Brainstorm some blog post ideas about sustainable living.' },
+                    { from: 'ai', text: 'Of course! Here are a few blog post ideas on sustainable living, categorized by theme:\n\n**Beginner-Focused:**\n* "10 Easy Swaps for a More Eco-Friendly Kitchen"\n* "A Beginner\'s Guide to Composting (Even in an Apartment)"\n\n**Deeper Dives:**\n* "The Truth About \'Zero Waste\': A Realistic Approach"\n* "How to Create a Sustainable Wardrobe Without Buying New Clothes"' }
+                ],
+            };
+
+            function renderContent(view, chatId = null) {
+                currentView = view;
+                mainContent.innerHTML = ''; // Clear previous content
+
+                let contentHtml = pageContent[view] || pageContent.home;
+                
+                // Add top header for chat views or home
+                let topHeaderHtml = '';
+                if (view === 'chat' || view === 'newChat') {
+                    topHeaderHtml = `
+                        <div class="flex justify-between items-center w-full max-w-4xl mx-auto mb-4">
+                            <h2 class="text-xl font-medium text-gray-200">New Chat</h2>
+                            <button data-nav="newChat" class="p-2 rounded-full hover:bg-gray-700/50" data-tooltip="Start a new chat">
+                                <div class="sidebar-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
+                                </div>
+                            </button>
+                        </div>
+                    `;
+                } else if (view === 'home') {
+                    topHeaderHtml = `
+                        <div class="flex items-center w-full max-w-4xl mx-auto mb-4">
+                            <span class="text-2xl font-medium">Gemini</span>
+                            <span class="text-sm text-gray-400 ml-2 cursor-pointer" data-feature="modelSelector" data-tooltip="Change Gemini model (e.g., Flash, Pro)">2.5 Flash ▼</span>
+                        </div>
+                    `;
+                }
+
+                mainContent.innerHTML = topHeaderHtml + contentHtml;
+                
+                // Add the prompt bar for home and chat views
+                if(view === 'chat' || view === 'home'){
+                    const promptBarContainer = document.createElement('div');
+                    promptBarContainer.className = 'w-full max-w-4xl mx-auto py-4 flex-grow-0'; // flex-grow-0 to keep it at bottom
+                    promptBarContainer.innerHTML = `
+                        <div class="relative bg-[#1e1f20] rounded-2xl flex flex-col p-4 shadow-lg">
+                            <textarea type="text" id="prompt-input" class="w-full bg-transparent text-gray-200 placeholder-gray-500 focus:outline-none resize-none overflow-hidden h-10 leading-tight" placeholder="Ask Gemini" rows="1"></textarea>
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="flex space-x-2">
+                                    <button data-feature="attachFile" class="p-2 rounded-full hover:bg-gray-600" data-tooltip="Attach files">
+                                        <div class="prompt-bar-icon text-gray-400">➕</div>
+                                    </button>
+                                    <button data-feature="videoFeature" class="px-3 py-2 rounded-full hover:bg-gray-600 text-gray-400 font-medium text-sm" data-tooltip="Interact with video content">Video</button>
+                                    <button data-feature="deepResearch" class="px-3 py-2 rounded-full hover:bg-gray-600 text-gray-400 font-medium text-sm" data-tooltip="Conduct deep research online">🔍 Deep Research</button>
+                                    <button data-feature="canvasFeature" class="px-3 py-2 rounded-full hover:bg-gray-600 text-gray-400 font-medium text-sm" data-tooltip="Transform content into interactive apps">🖼️ Canvas</button>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button data-feature="mic" class="p-2 rounded-full hover:bg-gray-600" data-tooltip="Use microphone">
+                                        <div class="prompt-bar-icon text-gray-400">🎤</div>
+                                    </button>
+                                    <button id="send-button" class="p-2 bg-gray-700 rounded-full hover:bg-gray-600 disabled:opacity-50" data-tooltip="Submit prompt" disabled>
+                                        <div class="prompt-bar-icon text-gray-400">⬆️</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    mainContent.appendChild(promptBarContainer);
+                }
+                
+                if(view === 'chat' && chatId) {
+                     loadChat(chatId);
+                } else if (view === 'newChat') {
+                    // Start a truly new chat, clear history if necessary or keep it empty
+                    document.getElementById('chat-output').innerHTML = '';
+                }
+                
+                addEventListenersToDynamicContent();
+                addTooltipListeners();
+
+                // Adjust textarea height
+                const promptInput = document.getElementById('prompt-input');
+                if (promptInput) {
+                    promptInput.addEventListener('input', () => {
+                        promptInput.style.height = 'auto';
+                        promptInput.style.height = (promptInput.scrollHeight) + 'px';
+                        document.getElementById('send-button').disabled = promptInput.value.trim() === '';
+                    });
+                     // Initial adjust in case of pre-filled content (not applicable here, but good practice)
+                    promptInput.style.height = 'auto';
+                    promptInput.style.height = (promptInput.scrollHeight) + 'px';
+                }
+            }
+            
+            function loadChat(chatId) {
+                const chatOutput = document.getElementById('chat-output');
+                if(!chatOutput) return;
+                chatOutput.innerHTML = '';
+                chatHistory[chatId].forEach(msg => appendMessage(msg.from, msg.text));
+            }
+
+            function appendMessage(from, text, isTyping = false) {
+                const chatOutput = document.getElementById('chat-output');
+                if(!chatOutput) return;
+
+                const messageId = `msg-${Date.now()}`;
+                const messageWrapper = document.createElement('div');
+                messageWrapper.id = messageId;
+                messageWrapper.className = 'main-content-fade';
+                
+                let messageHtml;
+                if (from === 'user') {
+                    messageHtml = `
+                        <div class="flex items-start gap-4">
+                            <img src="https://placehold.co/40x40/89b4f8/1e1f20?text=U" alt="User" class="w-10 h-10 rounded-full">
+                            <div class="flex-1">
+                                <p class="font-bold text-gray-200">You</p>
+                                <p class="text-gray-300 whitespace-pre-wrap">${text}</p>
+                            </div>
+                        </div>`;
+                } else { // AI
+                    const thinkingHtml = isTyping ? `
+                        <div class="flex items-center space-x-2 text-gray-400 loader-dots">
+                            <div class="w-2 h-2 bg-blue-400 rounded-full dot1"></div>
+                            <div class="w-2 h-2 bg-purple-400 rounded-full dot2"></div>
+                            <div class="w-2 h-2 bg-orange-400 rounded-full dot3"></div>
+                        </div>` : '';
+
+                    messageHtml = `
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xl">✨</div>
+                            <div class="flex-1">
+                                <p class="font-bold gemini-gradient-text">Gemini</p>
+                                <div class="text-gray-300 whitespace-pre-wrap">${isTyping ? thinkingHtml : text}</div>
+                                ${!isTyping ? `
+                                <div class="flex items-center space-x-4 mt-3 text-gray-400">
+                                    <button data-feature="feedback" data-tooltip="Good response" class="hover:text-white">👍</button>
+                                    <button data-feature="feedback" data-tooltip="Bad response" class="hover:text-white">👎</button>
+                                    <button data-feature="share" data-tooltip="Share & export" class="hover:text-white">📤</button>
+                                    <button data-feature="doubleCheck" data-tooltip="Double-check with Google" class="hover:text-white">🇬</button>
+                                </div>` : ''}
+                            </div>
+                        </div>`;
+                }
+                
+                messageWrapper.innerHTML = messageHtml;
+                chatOutput.appendChild(messageWrapper);
+                chatOutput.scrollTop = chatOutput.scrollHeight;
+                return messageId;
+            }
+
+            function simulateSearch() {
+                const promptInput = document.getElementById('prompt-input');
+                const query = promptInput.value.trim();
+                if (!query) return;
+
+                if(currentView !== 'chat') {
+                    // Change view to chat and then simulate search
+                    renderContent('chat');
+                    // Use a small timeout to allow DOM to update before appending messages
+                    setTimeout(() => {
+                        appendMessage('user', query);
+                        promptInput.value = '';
+                        document.getElementById('send-button').disabled = true;
+
+                        const thinkingMessageId = appendMessage('ai', '', true);
+
+                        setTimeout(() => {
+                            const thinkingMessage = document.getElementById(thinkingMessageId);
+                            if (thinkingMessage) {
+                                const simulatedResponse = "This is a simulated response from Gemini. In a real session, I would provide a detailed, context-aware answer based on my training data and access to Google Search for real-time information. You can interact with the buttons below this message to learn more about my features.";
+                                thinkingMessage.innerHTML = appendMessage('ai', simulatedResponse).innerHTML;
+                                addEventListenersToDynamicContent();
+                                addTooltipListeners();
+                            }
+                        }, 2500); // Simulate AI thinking time
+                    }, 100);
+                    return;
+                }
+
+                appendMessage('user', query);
+                promptInput.value = '';
+                document.getElementById('send-button').disabled = true;
+
+                const thinkingMessageId = appendMessage('ai', '', true);
+
+                setTimeout(() => {
+                    const thinkingMessage = document.getElementById(thinkingMessageId);
+                    if (thinkingMessage) {
+                        const simulatedResponse = "This is a simulated response from Gemini. In a real session, I would provide a detailed, context-aware answer based on my training data and access to Google Search for real-time information. You can interact with the buttons below this message to learn more about my features.";
+                        thinkingMessage.innerHTML = appendMessage('ai', simulatedResponse).innerHTML;
+                        addEventListenersToDynamicContent();
+                        addTooltipListeners();
+                    }
+                }, 2500);
+            }
+
+
+            function showModal(title, body) {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = body;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function hideModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            modalClose.addEventListener('click', hideModal);
+            modalOverlay.addEventListener('click', hideModal);
+
+            function showTooltip(element, text) {
+                if (modal.classList.contains('flex')) return;
+                tooltipElement.textContent = text;
+                const rect = element.getBoundingClientRect();
+                tooltipElement.style.left = `${rect.left}px`;
+                tooltipElement.style.top = `${rect.top}px`;
+                tooltipElement.classList.add('visible');
+            }
+
+            function hideTooltip() {
+                tooltipElement.classList.remove('visible');
+            }
+
+            function addTooltipListeners() {
+                document.querySelectorAll('[data-tooltip]').forEach(element => {
+                    element.addEventListener('mouseenter', e => showTooltip(e.currentTarget, e.currentTarget.dataset.tooltip));
+                    element.addEventListener('mouseleave', hideTooltip);
+                    element.addEventListener('click', hideTooltip);
+                });
+            }
+
+            function addEventListenersToDynamicContent() {
+                document.querySelectorAll('[data-feature]').forEach(el => {
+                    el.addEventListener('click', e => {
+                        const feature = e.currentTarget.dataset.feature;
+                        if (featureModals[feature]) {
+                            showModal(featureModals[feature].title, featureModals[feature].body);
+                        }
+                    });
+                });
+                
+                const sendButton = document.getElementById('send-button');
+                const promptInput = document.getElementById('prompt-input');
+                if (sendButton && promptInput) {
+                    promptInput.addEventListener('input', () => {
+                        sendButton.disabled = promptInput.value.trim() === '';
+                    });
+                    sendButton.addEventListener('click', simulateSearch);
+                    promptInput.addEventListener('keypress', e => {
+                        if (e.key === 'Enter' && !e.shiftKey) { // Allow Shift+Enter for new line
+                            e.preventDefault();
+                            sendButton.click();
+                        }
+                    });
+                }
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const view = e.currentTarget.dataset.nav;
+                    
+                    if (view === 'loadChat') {
+                        const chatId = e.currentTarget.dataset.chatId;
+                        renderContent('chat', chatId);
+                    } else if (pageContent[view]) {
+                        renderContent(view);
+                    } else if (featureModals[view]) {
+                        showModal(featureModals[view].title, featureModals[view].body);
+                    }
+                });
+            });
+
+            // Initial load
+            renderContent('home');
+        });
+    </script>
+</body>
+</html>
