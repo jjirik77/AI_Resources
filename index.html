@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Resources Hub</title>
+    <title>HTML & Code Resources Hub</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
         * {
@@ -201,9 +201,10 @@
             font-size: 1.2rem;
         }
 
-        .file-icon.pdf { color: #f85149; }
-        .file-icon.doc { color: #2188ff; }
-        .file-icon.data { color: #2ea043; }
+        .file-icon.html { color: #e34c26; }
+        .file-icon.css { color: #1572b6; }
+        .file-icon.js { color: #f7df1e; }
+        .file-icon.python { color: #3776ab; }
         .file-icon.code { color: #ffa500; }
 
         .file-info {
@@ -329,10 +330,10 @@
     <div class="container">
         <header>
             <div class="logo">
-                <i class="fas fa-brain"></i>
-                <h1>AI Resources</h1>
+                <i class="fas fa-code"></i>
+                <h1>HTML & Code Hub</h1>
             </div>
-            <p class="tagline">Your centralized hub for AI tools, datasets, and documentation</p>
+            <p class="tagline">Your centralized hub for HTML and code file management</p>
         </header>
 
         <!-- Stats Section -->
@@ -343,24 +344,24 @@
             </div>
             <div class="stat-card">
                 <span class="stat-number">0</span>
-                <span class="stat-label">Datasets</span>
+                <span class="stat-label">HTML Files</span>
             </div>
             <div class="stat-card">
                 <span class="stat-number">0</span>
-                <span class="stat-label">Models</span>
+                <span class="stat-label">CSS Files</span>
             </div>
             <div class="stat-card">
                 <span class="stat-number">0</span>
-                <span class="stat-label">Scripts</span>
+                <span class="stat-label">JS Files</span>
             </div>
         </section>
 
         <!-- Upload Section -->
         <section class="upload-section" id="uploadZone">
             <i class="fas fa-cloud-upload-alt upload-icon"></i>
-            <div class="upload-text">Drop files here or click to upload</div>
-            <div class="upload-subtext">Supports AI models, datasets, documentation, and code files</div>
-            <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.py,.ipynb,.csv,.json,.md,.txt,.pkl,.h5,.onnx">
+            <div class="upload-text">Drop HTML or code files here</div>
+            <div class="upload-subtext">Supports HTML, CSS, JavaScript, Python, and other text-based code files</div>
+            <input type="file" id="fileInput" class="file-input" multiple accept=".html,.htm,.css,.js,.py,.txt,.md,.json,.xml,.php,.java,.cpp,.c,.cs,.rb,.go,.rs,.ts,.jsx,.tsx,.vue,.scss,.sass,.less,.yaml,.yml">
             <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
                 <i class="fas fa-plus"></i>
                 Choose Files
@@ -386,34 +387,34 @@
             </h2>
             <div class="links-grid">
                 <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fas fa-book"></i></div>
-                    <div class="link-title">Documentation</div>
-                    <div class="link-description">Complete guides and API references</div>
+                    <div class="link-icon"><i class="fab fa-html5"></i></div>
+                    <div class="link-title">HTML Reference</div>
+                    <div class="link-description">Complete HTML elements and attributes guide</div>
+                </a>
+                <a href="#" class="link-card">
+                    <div class="link-icon"><i class="fab fa-css3-alt"></i></div>
+                    <div class="link-title">CSS Documentation</div>
+                    <div class="link-description">Styling properties and selectors reference</div>
+                </a>
+                <a href="#" class="link-card">
+                    <div class="link-icon"><i class="fab fa-js-square"></i></div>
+                    <div class="link-title">JavaScript Guide</div>
+                    <div class="link-description">Modern JavaScript tutorials and examples</div>
                 </a>
                 <a href="#" class="link-card">
                     <div class="link-icon"><i class="fab fa-github"></i></div>
-                    <div class="link-title">GitHub Repository</div>
-                    <div class="link-description">Source code and issue tracking</div>
-                </a>
-                <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="link-title">Tutorials</div>
-                    <div class="link-description">Step-by-step learning materials</div>
-                </a>
-                <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fas fa-users"></i></div>
-                    <div class="link-title">Community</div>
-                    <div class="link-description">Join discussions and get help</div>
-                </a>
-                <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fas fa-chart-line"></i></div>
-                    <div class="link-title">Benchmarks</div>
-                    <div class="link-description">Performance metrics and comparisons</div>
+                    <div class="link-title">Code Repository</div>
+                    <div class="link-description">Version control and collaboration</div>
                 </a>
                 <a href="#" class="link-card">
                     <div class="link-icon"><i class="fas fa-tools"></i></div>
-                    <div class="link-title">Tools</div>
-                    <div class="link-description">Utilities and helper applications</div>
+                    <div class="link-title">Developer Tools</div>
+                    <div class="link-description">Code formatters and validators</div>
+                </a>
+                <a href="#" class="link-card">
+                    <div class="link-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="link-title">Code Snippets</div>
+                    <div class="link-description">Reusable code examples and templates</div>
                 </a>
             </div>
         </section>
@@ -421,7 +422,7 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 AI Resources Hub. Open source repository for AI development.</p>
+            <p>&copy; 2025 HTML & Code Hub. Open source repository for web development.</p>
         </div>
     </footer>
 
@@ -486,21 +487,26 @@
 
         function getFileType(filename) {
             const ext = filename.split('.').pop().toLowerCase();
-            if (['pdf'].includes(ext)) return 'pdf';
-            if (['doc', 'docx'].includes(ext)) return 'doc';
-            if (['csv', 'json', 'pkl', 'h5'].includes(ext)) return 'data';
-            if (['py', 'ipynb', 'js', 'html'].includes(ext)) return 'code';
-            return 'data';
+            if (['html', 'htm'].includes(ext)) return 'html';
+            if (['css', 'scss', 'sass', 'less'].includes(ext)) return 'css';
+            if (['js', 'jsx', 'ts', 'tsx'].includes(ext)) return 'js';
+            if (['py'].includes(ext)) return 'python';
+            return 'code';
         }
 
         function getFileIcon(filename) {
             const ext = filename.split('.').pop().toLowerCase();
-            if (ext === 'pdf') return 'fas fa-file-pdf';
-            if (['doc', 'docx'].includes(ext)) return 'fas fa-file-word';
-            if (['csv', 'json'].includes(ext)) return 'fas fa-database';
-            if (['py', 'ipynb'].includes(ext)) return 'fas fa-code';
-            if (['pkl', 'h5', 'onnx'].includes(ext)) return 'fas fa-brain';
-            return 'fas fa-file';
+            if (['html', 'htm'].includes(ext)) return 'fab fa-html5';
+            if (['css', 'scss', 'sass', 'less'].includes(ext)) return 'fab fa-css3-alt';
+            if (['js', 'jsx'].includes(ext)) return 'fab fa-js-square';
+            if (['ts', 'tsx'].includes(ext)) return 'fab fa-js-square';
+            if (ext === 'py') return 'fab fa-python';
+            if (['json', 'xml'].includes(ext)) return 'fas fa-code';
+            if (['md'].includes(ext)) return 'fab fa-markdown';
+            if (['php'].includes(ext)) return 'fab fa-php';
+            if (['java'].includes(ext)) return 'fab fa-java';
+            if (['vue'].includes(ext)) return 'fab fa-vuejs';
+            return 'fas fa-file-code';
         }
 
         function formatFileSize(bytes) {
@@ -518,8 +524,25 @@
         }
 
         function updateCounters() {
-            const totalFiles = document.querySelectorAll('.file-item').length;
-            document.querySelector('.stat-number').textContent = totalFiles;
+            const fileItems = document.querySelectorAll('.file-item');
+            const totalFiles = fileItems.length;
+            
+            let htmlCount = 0, cssCount = 0, jsCount = 0;
+            
+            fileItems.forEach(item => {
+                const fileName = item.querySelector('.file-name').textContent;
+                const ext = fileName.split('.').pop().toLowerCase();
+                
+                if (['html', 'htm'].includes(ext)) htmlCount++;
+                else if (['css', 'scss', 'sass', 'less'].includes(ext)) cssCount++;
+                else if (['js', 'jsx', 'ts', 'tsx'].includes(ext)) jsCount++;
+            });
+            
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers[0].textContent = totalFiles;
+            statNumbers[1].textContent = htmlCount;
+            statNumbers[2].textContent = cssCount;
+            statNumbers[3].textContent = jsCount;
         }
     </script>
 </body>
