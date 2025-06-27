@@ -338,19 +338,19 @@
         <!-- Stats Section -->
         <section class="stats">
             <div class="stat-card">
-                <span class="stat-number" data-target="247">0</span>
+                <span class="stat-number">0</span>
                 <span class="stat-label">Total Files</span>
             </div>
             <div class="stat-card">
-                <span class="stat-number" data-target="45">0</span>
+                <span class="stat-number">0</span>
                 <span class="stat-label">Datasets</span>
             </div>
             <div class="stat-card">
-                <span class="stat-number" data-target="123">0</span>
+                <span class="stat-number">0</span>
                 <span class="stat-label">Models</span>
             </div>
             <div class="stat-card">
-                <span class="stat-number" data-target="89">0</span>
+                <span class="stat-number">0</span>
                 <span class="stat-label">Scripts</span>
             </div>
         </section>
@@ -374,42 +374,7 @@
                 Recent Files
             </h2>
             <div class="file-list" id="fileList">
-                <div class="file-item">
-                    <div class="file-icon pdf"><i class="fas fa-file-pdf"></i></div>
-                    <div class="file-info">
-                        <div class="file-name">transformer_architecture.pdf</div>
-                        <div class="file-meta">2.3 MB • Uploaded 2 hours ago</div>
-                    </div>
-                    <div class="file-actions">
-                        <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
-                        <button class="file-action" title="Share"><i class="fas fa-share"></i></button>
-                        <button class="file-action" title="Delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-                <div class="file-item">
-                    <div class="file-icon data"><i class="fas fa-database"></i></div>
-                    <div class="file-info">
-                        <div class="file-name">sentiment_dataset.csv</div>
-                        <div class="file-meta">15.7 MB • Uploaded 1 day ago</div>
-                    </div>
-                    <div class="file-actions">
-                        <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
-                        <button class="file-action" title="Share"><i class="fas fa-share"></i></button>
-                        <button class="file-action" title="Delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-                <div class="file-item">
-                    <div class="file-icon code"><i class="fas fa-code"></i></div>
-                    <div class="file-info">
-                        <div class="file-name">neural_network.py</div>
-                        <div class="file-meta">45 KB • Uploaded 3 days ago</div>
-                    </div>
-                    <div class="file-actions">
-                        <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
-                        <button class="file-action" title="Share"><i class="fas fa-share"></i></button>
-                        <button class="file-action" title="Delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
+                <!-- Files will appear here when uploaded -->
             </div>
         </section>
 
@@ -462,26 +427,6 @@
 
     <script>
         let fileData = [];
-
-        // Animate counters
-        function animateCounters() {
-            const counters = document.querySelectorAll('.stat-number');
-            counters.forEach(counter => {
-                const target = parseInt(counter.getAttribute('data-target'));
-                const increment = target / 50;
-                let current = 0;
-                
-                const timer = setInterval(() => {
-                    if (current < target) {
-                        current += increment;
-                        counter.textContent = Math.floor(current);
-                    } else {
-                        counter.textContent = target;
-                        clearInterval(timer);
-                    }
-                }, 30);
-            });
-        }
 
         // File upload handling
         const uploadZone = document.getElementById('uploadZone');
@@ -574,30 +519,8 @@
 
         function updateCounters() {
             const totalFiles = document.querySelectorAll('.file-item').length;
-            const statNumbers = document.querySelectorAll('.stat-number');
-            statNumbers[0].textContent = totalFiles;
+            document.querySelector('.stat-number').textContent = totalFiles;
         }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            animateCounters();
-        });
-
-        // Add click handlers for file actions
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.file-action')) {
-                const action = e.target.closest('.file-action');
-                const icon = action.querySelector('i');
-                
-                if (icon.classList.contains('fa-download')) {
-                    // Handle download
-                    console.log('Download file');
-                } else if (icon.classList.contains('fa-share')) {
-                    // Handle share
-                    console.log('Share file');
-                }
-            }
-        });
     </script>
 </body>
 </html>
