@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Hub</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <title>AI Educational Library</title>
     <style>
         * {
             margin: 0;
@@ -13,455 +12,307 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: #e6edf3;
-            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #21262d 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8f2ff 0%, #f5f7fa 100%);
             min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+            box-shadow: 0 4px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            font-weight: 300;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 2rem;
         }
 
-        /* Header */
-        header {
-            padding: 3rem 0 2rem;
+        .intro-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: -50px auto 3rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.8);
             text-align: center;
+            position: relative;
+            z-index: 10;
         }
 
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 1rem;
-        }
-
-        .logo i {
-            font-size: 2.5rem;
-            background: linear-gradient(45deg, #58a6ff, #79c0ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .logo h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #f0f6fc, #58a6ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .tagline {
+        .intro-card p {
             font-size: 1.1rem;
-            color: #8b949e;
+            line-height: 1.7;
+            color: #555;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section {
             margin-bottom: 3rem;
         }
 
-        /* Stats Section */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 1.5rem;
-            background: rgba(22, 27, 34, 0.8);
-            border-radius: 12px;
-            border: 1px solid #30363d;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: #58a6ff;
-            box-shadow: 0 5px 15px rgba(88, 166, 255, 0.1);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #58a6ff;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: #8b949e;
-            font-size: 0.9rem;
-        }
-
-        /* Upload Section */
-        .upload-section {
-            background: rgba(13, 17, 23, 0.8);
-            border: 2px dashed #30363d;
-            border-radius: 12px;
-            padding: 3rem;
-            text-align: center;
-            margin-bottom: 3rem;
-            transition: all 0.3s ease;
-        }
-
-        .upload-section:hover {
-            border-color: #58a6ff;
-            background: rgba(22, 27, 34, 0.8);
-        }
-
-        .upload-section.dragover {
-            border-color: #2ea043;
-            background: rgba(46, 160, 67, 0.1);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            color: #58a6ff;
-            margin-bottom: 1rem;
-        }
-
-        .upload-text {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-
-        .upload-subtext {
-            color: #8b949e;
-            margin-bottom: 2rem;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .upload-btn {
-            background: linear-gradient(45deg, #238636, #2ea043);
+        .section-header {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
             color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
-        }
-
-        /* Repository Files */
-        .repository-files {
-            margin-bottom: 3rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: #f0f6fc;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .file-list {
-            background: rgba(22, 27, 34, 0.6);
+            padding: 1.5rem 2rem;
             border-radius: 12px;
-            border: 1px solid #30363d;
-            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.25);
         }
 
-        .file-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #30363d;
-            transition: all 0.3s ease;
-        }
-
-        .file-item:last-child {
-            border-bottom: none;
-        }
-
-        .file-item:hover {
-            background: rgba(88, 166, 255, 0.05);
-        }
-
-        .file-icon {
-            width: 40px;
-            text-align: center;
-            margin-right: 15px;
-            font-size: 1.2rem;
-        }
-
-        .file-icon.html { color: #e34c26; }
-        .file-icon.css { color: #1572b6; }
-        .file-icon.js { color: #f7df1e; }
-        .file-icon.python { color: #3776ab; }
-        .file-icon.code { color: #ffa500; }
-
-        .file-info {
-            flex-grow: 1;
-        }
-
-        .file-name {
+        .section-header h2 {
+            font-size: 2.2rem;
             font-weight: 600;
-            margin-bottom: 0.2rem;
         }
 
-        .file-meta {
-            font-size: 0.85rem;
-            color: #8b949e;
-        }
-
-        .file-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .file-action {
-            background: none;
-            border: none;
-            color: #8b949e;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 4px;
-            transition: color 0.3s ease;
-        }
-
-        .file-action:hover {
-            color: #58a6ff;
-        }
-
-        /* Quick Links */
-        .quick-links {
-            margin-bottom: 3rem;
-        }
-
-        .links-grid {
+        .resources-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
-        .link-card {
-            background: rgba(22, 27, 34, 0.8);
-            border: 1px solid #30363d;
+        .resource-card {
+            background: white;
             border-radius: 12px;
-            padding: 1.5rem;
-            text-decoration: none;
-            color: inherit;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border: 1px solid #e8f2ff;
             transition: all 0.3s ease;
+            cursor: pointer;
             position: relative;
             overflow: hidden;
         }
 
-        .link-card:hover {
-            transform: translateY(-3px);
-            border-color: #58a6ff;
-            box-shadow: 0 8px 25px rgba(88, 166, 255, 0.1);
-        }
-
-        .link-card::before {
+        .resource-card::before {
             content: '';
             position: absolute;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #58a6ff, transparent);
-            transition: left 0.5s ease;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4a90e2, #357abd);
         }
 
-        .link-card:hover::before {
-            left: 100%;
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            border-color: #4a90e2;
         }
 
-        .link-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: #58a6ff;
-        }
-
-        .link-title {
-            font-size: 1.1rem;
+        .resource-card h3 {
+            color: #4a90e2;
+            font-size: 1.4rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
         }
 
-        .link-description {
-            color: #8b949e;
-            font-size: 0.9rem;
+        .resource-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem 0;
-            border-top: 1px solid #30363d;
-            color: #8b949e;
+        .resource-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        /* Responsive */
+        .tag {
+            background: #e8f2ff;
+            color: #4a90e2;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .resource-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4a90e2;
+            border: 2px solid #4a90e2;
+        }
+
+        .btn-secondary:hover {
+            background: #4a90e2;
+            color: white;
+        }
+
+
+
+        .category-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            background: white;
+            color: #666;
+            border: 2px solid #e8f2ff;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
         @media (max-width: 768px) {
-            .upload-section {
-                padding: 2rem 1rem;
+            .header h1 {
+                font-size: 2.5rem;
             }
             
-            .file-item {
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .container {
                 padding: 1rem;
             }
             
-            .file-actions {
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .category-filter {
                 flex-direction: column;
-                gap: 5px;
+                align-items: center;
             }
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>AI Educational Library</h1>
+        <p>Empowering Education Through AI Learning Tools</p>
+    </div>
+
     <div class="container">
-        <header>
-            <div class="logo">
-                <i class="fas fa-brain"></i>
-                <h1>AI Hub</h1>
-            </div>
-            <p class="tagline">Centralized hub for AI resources</p>
-        </header>
+        <div class="intro-card">
+            <p>Welcome to our comprehensive collection of AI-generated teaching and learning resources.</p>
+        </div>
 
-        <!-- Stats Section -->
-        <section class="stats">
-            <div class="stat-card">
-                <span class="stat-number">1</span>
-                <span class="stat-label">Total Files</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">1</span>
-                <span class="stat-label">HTML Files</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">0</span>
-                <span class="stat-label">CSS Files</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">0</span>
-                <span class="stat-label">JS Files</span>
-            </div>
-        </section>
 
-        <!-- Repository Files -->
-        <section class="repository-files">
-            <h2 class="section-title">
-                <i class="fas fa-folder-open"></i>
-                Repository Files
-            </h2>
-            <div class="file-list" id="repositoryList">
-                <div class="file-item">
-                    <div class="file-icon html"><i class="fab fa-html5"></i></div>
-                    <div class="file-info">
-                        <div class="file-name">index.html</div>
-                        <div class="file-meta">2.3 KB • Main landing page</div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>LLM Interface</h2>
+            </div>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <h3>Perplexity AI</h3>
+                    <p>Comprehensive interactive guide to show Proplexity AI interface</p>
+                    <div class="resource-tags">
+                        <span class="tag">Perplexity</span>
                     </div>
-                    <div class="file-actions">
-                        <button class="file-action" title="View"><i class="fas fa-eye"></i></button>
-                        <button class="file-action" title="Edit"><i class="fas fa-edit"></i></button>
-                        <button class="file-action" title="Download"><i class="fas fa-download"></i></button>
+                    <div class="resource-actions">
+                        <a href="https://jjirik77.github.io/AI_Resources/Perplexity_AI.html" class="btn btn-primary">View Code</a>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Recent Files -->
-        <section class="recent-files">
-            <h2 class="section-title">
-                <i class="fas fa-clock"></i>
-                Recent Files
-            </h2>
-            <div class="file-list" id="fileList">
-                <!-- Files will appear here when uploaded -->
-            </div>
-        </section>
-
-        <!-- Quick Links -->
-        <section class="quick-links">
-            <h2 class="section-title">
-                <i class="fas fa-external-link-alt"></i>
-                Quick Links
-            </h2>
-            <div class="links-grid">
-                <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fab fa-html5"></i></div>
-                    <div class="link-title">HTML Reference</div>
-                    <div class="link-description">Complete HTML elements and attributes guide</div>
-                </a>
-                <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fab fa-css3-alt"></i></div>
-                    <div class="link-title">CSS Documentation</div>
-                    <div class="link-description">Styling properties and selectors reference</div>
-                </a>
-                <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fab fa-js-square"></i></div>
-                    <div class="link-title">JavaScript Guide</div>
-                    <div class="link-description">Modern JavaScript tutorials and examples</div>
-                </a>
-                <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fab fa-github"></i></div>
-                    <div class="link-title">Code Repository</div>
-                    <div class="link-description">Version control and collaboration</div>
-                </a>
-                <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fas fa-tools"></i></div>
-                    <div class="link-title">Developer Tools</div>
-                    <div class="link-description">Code formatters and validators</div>
-                </a>
-                <a href="#" class="link-card">
-                    <div class="link-icon"><i class="fas fa-book-open"></i></div>
-                    <div class="link-title">Code Snippets</div>
-                    <div class="link-description">Reusable code examples and templates</div>
-                </a>
-            </div>
-        </section>
+        </div>
     </div>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 AI Hub. Open source repository for web development.</p>
-        </div>
-    </footer>
-
     <script>
-        // Simple interactions for repository files
+        // Simple filter functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Add click handlers for file actions
-            const fileActions = document.querySelectorAll('.file-action');
+            const resourceCards = document.querySelectorAll('.resource-card');
             
-            fileActions.forEach(action => {
-                action.addEventListener('click', function(e) {
-                    const actionType = this.getAttribute('title');
-                    const fileName = this.closest('.file-item').querySelector('.file-name').textContent;
+            resourceCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Add ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(74, 144, 226, 0.3)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.left = '50%';
+                    ripple.style.top = '50%';
+                    ripple.style.width = '20px';
+                    ripple.style.height = '20px';
+                    ripple.style.marginLeft = '-10px';
+                    ripple.style.marginTop = '-10px';
                     
-                    // Simulate different actions
-                    switch(actionType) {
-                        case 'View':
-                            console.log(`Viewing ${fileName}`);
-                            break;
-                        case 'Edit':
-                            console.log(`Editing ${fileName}`);
-                            break;
-                        case 'Download':
-                            console.log(`Downloading ${fileName}`);
-                            break;
-                    }
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
                 });
             });
         });
+
+        // Add CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
