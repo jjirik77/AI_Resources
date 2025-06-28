@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive ChatGPT Interface Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: The application maintains its two-column layout. The sidebar includes New Chat, Search chats, Library, GPTs, and Sora, with an interactive Chats toggle. The main conversation area features a top bar for model selection and chat actions, now including a user account button in the upper right. The input area groups "Attach Files" (paperclip icon) and "Tools" (wrench icon) together on the left side of the text input, followed by voice input and send button. This structure provides clearer functionality and aligns more closely with user expectations for distinct multimodal input and tool access. -->
+    <!-- Visualization & Content Choices: Report Info: The user requested to add an account button in the upper right corner of the interface. Goal: To integrate this new button and its explanatory functionality into the existing UI. Viz/Presentation Method: All UI components are built using structured HTML and Tailwind CSS. Unicode icons are used for clarity. Interaction: Vanilla JavaScript handles event listeners for all buttons. A new event listener is added for the account button, triggering a modal with its specific explanation. The Tools menu remains open when individual tool explanations are displayed. All other existing interactions (chat history, search, model selection, message display) are preserved. LocalStorage continues to manage persistent data. Justification: This update directly addresses the user's request for a common UI element, enhancing the simulator's completeness and clarity by providing a functional representation of user account access. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: #f1f5f9; /* Tailwind slate-100 equivalent */
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* Tailwind slate-300 equivalent */
+            border-radius: 4px;
+        }
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* Tailwind slate-500 equivalent */
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: #1e293b; /* Tailwind slate-900 equivalent */
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #475569; /* Tailwind slate-700 equivalent */
+            border-radius: 3px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* Tailwind slate-600 equivalent */
+        }
+        .highlight-on-copy {
+            transition: background-color 0.3s ease;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* Custom style for the chat options menu (context menu) */
+        .chat-options-menu {
+            position: absolute;
+            bottom: calc(100% + 10px); /* Position above the input field */
+            /* Adjusted to align with the new position of the Tools button */
+            left: 50px; /* Adjust this value to align with the wrench button */
+            width: fit-content;
+            min-width: 250px;
+            max-width: 90%;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 8px;
+            z-index: 10;
+        }
+        .dark .chat-options-menu {
+            background-color: #334155; /* Tailwind slate-700 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Specific styles for the combined model/title dropdown in header */
+        #model-dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+        #model-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            color: inherit;
+            font-weight: 600;
+        }
+        #model-dropdown-btn:hover {
+            background-color: #f1f5f9; /* Tailwind slate-100 */
+            color: #1e293b; /* Tailwind slate-900 */
+        }
+        .dark #model-dropdown-btn:hover {
+            background-color: #475569; /* Tailwind slate-700 */
+            color: #cbd5e1; /* Tailwind slate-300 */
+        }
+        #model-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            z-index: 20;
+            min-width: 150px;
+            text-align: left;
+        }
+        .dark #model-options {
+            background-color: #334155; /* Tailwind slate-700 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+        #model-options button {
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.25rem;
+            color: #1e293b; /* slate-900 */
+        }
+        .dark #model-options button {
+            color: #cbd5e1; /* slate-300 */
+        }
+        #model-options button:hover {
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        .dark #model-options button:hover {
+            background-color: #475569; /* slate-700 */
+        }
+        #model-options button.selected {
+            background-color: #eff6ff; /* blue-50 */
+            font-weight: 600;
+            color: #2563eb; /* blue-600 */
+        }
+        .dark #model-options button.selected {
+            background-color: #1e3a8a; /* blue-900 */
+            color: #bfdbfe; /* blue-200 */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-slate-200">
+
+    <div id="app-container" class="flex h-screen w-screen overflow-hidden">
+        
+        <aside id="sidebar" class="bg-slate-900 text-white w-64 p-2 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out sidebar overflow-y-auto">
+            <div class="sidebar-header mb-4">
+                <button id="new-chat-btn" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-700 transition-colors">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>New chat</span>
+                    </span>
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+            </div>
+            <nav id="sidebar-nav-main" class="flex-grow">
+                <ul class="space-y-1 mb-4">
+                    <li>
+                        <button id="search-chats-sidebar-btn" class="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 cursor-pointer text-sm">
+                            <i class="fa-solid fa-search"></i>
+                            <span>Search chats</span>
+                        </button>
+                    </li>
+                    <div id="sidebar-search-area" class="px-2 py-1 hidden">
+                        <div class="relative">
+                            <input type="text" id="chat-search-input" placeholder="Search..." class="w-full pl-8 pr-8 py-1 rounded-md bg-slate-800 text-white border border-slate-700 focus:outline-none focus:border-blue-500 text-sm">
+                            <i class="fa-solid fa-magnifying-glass absolute left-2 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <button id="clear-search-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hidden">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <li>
+                        <button id="library-btn" class="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 cursor-pointer text-sm">
+                            <i class="fa-solid fa-book"></i>
+                            <span>Library</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="gpts-sidebar-btn" class="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 cursor-pointer text-sm">
+                            <i class="fa-solid fa-puzzle-piece"></i>
+                            <span>GPTs</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="sora-sidebar-btn" class="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 cursor-pointer text-sm">
+                            <i class="fa-solid fa-film"></i>
+                            <span>Sora</span>
+                        </button>
+                    </li>
+                </ul>
+                <!-- Chats heading now interactive -->
+                <div id="chats-heading-toggle" class="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-slate-700 cursor-pointer">
+                    <p class="text-xs text-slate-500 font-semibold select-none">Chats</p>
+                    <i id="chats-toggle-icon" class="fa-solid fa-chevron-down text-xs text-slate-500"></i>
+                </div>
+                <ul id="chat-list" class="space-y-1 mt-1">
+                    <!-- Chat history items will be dynamically loaded/cleared by JS -->
+                    <p class="text-xs text-slate-500 px-2 mt-2">No recent chats. Start a new one!</p>
+                </ul>
+            </nav>
+            <div class="sidebar-footer pt-2 border-t border-slate-700">
+                <button id="settings-sidebar-btn" class="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 cursor-pointer text-sm mb-1">
+                    <div class="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center font-bold text-white">U</div>
+                    <span class="font-semibold">Settings</span>
+                </button>
+            </div>
+        </aside>
+
+        <main id="chat-area" class="flex-1 flex flex-col bg-white dark:bg-slate-800 transition-all duration-300 ease-in-out">
+            <header class="chat-header flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+                 <button id="sidebar-toggle-btn" class="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 mr-2">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div id="model-dropdown-container" class="relative">
+                    <button id="model-dropdown-btn" class="flex items-center">
+                        <span id="current-model-display">ChatGPT</span>
+                        <i class="fa-solid fa-caret-down"></i>
+                    </button>
+                    <div id="model-options" class="hidden">
+                        <button data-model-id="gpt-3.5" class="model-option selected">3.5</button>
+                        <button data-model-id="gpt-4o" class="model-option">4o (Plus Only)</button>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="share-chat-btn" class="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200" title="Share Chat">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </button>
+                    <button id="more-options-btn" class="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200" title="More Options">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </button>
+                    <!-- New: Account/User Profile button -->
+                    <button id="account-button" class="p-2 rounded-full text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700" title="Access Account Settings">
+                        <i class="fa-solid fa-circle-user text-xl"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div id="message-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 chat-container">
+                <div id="welcome-screen" class="flex flex-col items-center justify-center h-full text-center">
+                    <div class="w-16 h-16 bg-slate-900 dark:bg-white rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-robot text-3xl text-white dark:text-slate-900"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-slate-600 dark:text-slate-300">How can I help you today?</h1>
+                </div>
+            </div>
+            
+            <div id="typing-indicator" class="px-6 py-2 text-slate-500 italic hidden">
+                <span>ChatGPT is typing...</span>
+            </div>
+
+            <footer class="chat-input-area p-4 md:p-6 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+                <div class="max-w-4xl mx-auto">
+                    <div class="relative flex items-end bg-slate-100 dark:bg-slate-700 rounded-xl p-2">
+                        <!-- Grouped Attach Files and Tools Buttons -->
+                        <button id="attach-files-button" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-600" title="Attach photos or files">
+                            <i class="fa-solid fa-paperclip"></i>
+                        </button>
+                        <button id="toggle-tools-button" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-600 mr-1" title="Access advanced tools">
+                            <i class="fa-solid fa-wrench"></i> 
+                        </button>
+                        <textarea id="prompt-input" rows="1" placeholder="Message ChatGPT..." class="flex-1 bg-transparent p-2 resize-none focus:outline-none placeholder-slate-400 dark:placeholder-slate-500 max-h-40 overflow-y-auto"></textarea>
+                        <button id="voice-input-btn" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-600 mr-1" title="Use voice input">
+                             <i class="fa-solid fa-microphone"></i>
+                        </button>
+                        <button id="send-btn" class="p-2 rounded-full bg-blue-500 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors" title="Send message">
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
+
+                        <!-- Chat Options Menu (now triggered by toggle-tools-button) -->
+                        <div id="chat-options-menu" class="chat-options-menu hidden">
+                            <ul class="flex flex-col space-y-1">
+                                <li>
+                                    <button class="chat-option-item w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm">
+                                        <i class="fa-solid fa-image w-5"></i> Create an image
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="chat-option-item w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm">
+                                        <i class="fa-solid fa-globe w-5"></i> Search the web
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="chat-option-item w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm">
+                                        <i class="fa-solid fa-code w-5"></i> Write or code
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="chat-option-item w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm">
+                                        <i class="fa-solid fa-flask w-5"></i> Run deep research
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="chat-option-item w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm">
+                                        <i class="fa-solid fa-brain w-5"></i> Think for longer
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="chat-option-item w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm">
+                                        <i class="fa-solid fa-tools w-5"></i> + Tools
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="text-xs text-center text-slate-400 dark:text-slate-500 mt-2">ChatGPT can make mistakes. Check important info.</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Modals for simulated interactions -->
+    <div id="simulated-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+            <h3 class="text-lg font-semibold mb-4 text-slate-800 dark:text-slate-100" id="modal-title"></h3>
+            <p class="text-slate-600 dark:text-slate-300 mb-6" id="modal-message"></p>
+            <button id="modal-close-btn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">Close</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+            const newChatBtn = document.getElementById('new-chat-btn');
+            const chatList = document.getElementById('chat-list'); 
+            const sidebarNavMain = document.getElementById('sidebar-nav-main'); 
+
+            const messageContainer = document.getElementById('message-container');
+            const promptInput = document.getElementById('prompt-input');
+            const sendBtn = document.getElementById('send-btn');
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const typingIndicator = document.getElementById('typing-indicator');
+
+            // Top Bar elements
+            const modelDropdownContainer = document.getElementById('model-dropdown-container');
+            const modelDropdownBtn = document.getElementById('model-dropdown-btn');
+            const currentModelDisplay = document.getElementById('current-model-display');
+            const modelOptions = document.getElementById('model-options');
+            const modelOptionButtons = document.querySelectorAll('.model-option');
+            const shareChatBtn = document.getElementById('share-chat-btn');
+            const moreOptionsBtn = document.getElementById('more-options-btn');
+            const accountButton = document.getElementById('account-button'); // New element
+
+            // Input Area elements
+            const attachFilesButton = document.getElementById('attach-files-button'); 
+            const toggleToolsButton = document.getElementById('toggle-tools-button'); 
+            const voiceInputBtn = document.getElementById('voice-input-btn');
+            const chatOptionsMenu = document.getElementById('chat-options-menu');
+            const chatOptionItems = document.querySelectorAll('.chat-option-item'); 
+
+            // Sidebar specific buttons
+            const searchChatsSidebarBtn = document.getElementById('search-chats-sidebar-btn');
+            const sidebarSearchArea = document.getElementById('sidebar-search-area'); 
+            const chatSearchInput = document.getElementById('chat-search-input'); 
+            const clearSearchBtn = document.getElementById('clear-search-btn'); 
+            const libraryBtn = document.getElementById('library-btn');
+            const gptsSidebarBtn = document.getElementById('gpts-sidebar-btn'); 
+            const soraSidebarBtn = document.getElementById('sora-sidebar-btn'); 
+            const chatsHeadingToggle = document.getElementById('chats-heading-toggle'); 
+            const chatsToggleIcon = document.getElementById('chats-toggle-icon'); 
+            const settingsSidebarBtn = document.getElementById('settings-sidebar-btn');
+
+            const simulatedModal = document.getElementById('simulated-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            let chatHistory = [];
+            let activeChatId = null;
+            let currentModel = 'gpt-3.5'; // Default model
+            let isChatsListExpanded = true; // State for Chats list visibility
+
+            const simulatedResponses = {
+                "gpt-3.5": {
+                    "hello": "Hello! As a simulated GPT-3.5, I can provide concise answers. How can I assist you?",
+                    "help": "I can help with a variety of tasks. For example, I can generate code snippets or create lists. Try asking for 'a javascript function' or 'a grocery list'.",
+                    "javascript function": "Sure, here's a simple JavaScript function:\n```javascript\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\n\nconsole.log(greet('World'));\n```\nThis function takes a name as an argument and returns a greeting.",
+                    "grocery list": "Here is a sample grocery list:\n- Milk\n- Bread\n- Eggs\n- Cheese\n- Apples",
+                    "default": "That's an interesting question. As a simulated GPT-3.5, my capabilities are limited to pre-defined responses, but I'll do my best to provide a relevant answer."
+                },
+                "gpt-4o": {
+                    "hello": "Greetings! I am a simulated GPT-4o. I can offer more detailed and structured responses. What can I help you with today?",
+                    "help": "As a more advanced model simulation, I can provide comprehensive help. You could ask me for a 'React component example' to see a more complex code block, or ask for 'a recipe for pasta' to see a more structured list. I can also help with image descriptions.",
+                    "react component example": "Certainly. Here is an example of a functional React component using hooks. It's a simple counter:\n```javascript\nimport React, { useState } from 'react';\n\nfunction Counter() {\n  return (\n    <div>\n      <p>You clicked {count} times</p>\n      <button onClick={() => setCount(count + 1)}>\n        Click me\n      </button>\n    </div>\n  );\n}\n\nexport default Counter;\n```\nThis component demonstrates the `useState` hook to manage state within a functional component.",
+                    "recipe for pasta": "Of course! Here is a simple and delicious recipe for Garlic Butter Pasta:\n\n### Ingredients:\n* 1 lb spaghetti or your favorite pasta\n* 6 cloves garlic, minced\n* 1/2 cup unsalted butter\n* 1/4 cup chopped fresh parsley\n* 1/2 cup grated Parmesan cheese\n* Salt and freshly ground black pepper to taste\n* Red pepper flakes (optional)\n\n### Instructions:\n1.  **Cook the pasta:** Bring a large pot of salted water to a boil. Cook pasta according to package package directions.\n2.  **Make the sauce:** While the pasta is cooking, melt the butter in a large skillet over medium heat. Add the minced garlic and cook until fragrant, about 1-2 minutes. Be careful not to burn it.\n3.  **Combine:** Drain the pasta, reserving about 1/2 cup of pasta water. Add the cooked pasta to the skillet with the garlic butter. Toss to combine.\n4.  **Finish and serve:** Stir in the Parmesan cheese and parsley. If the pasta seems too dry, add a splash of the reserved pasta water. Season with salt, pepper, and red pepper flakes if desired. Serve immediately.",
+                    "create an image": "Processing image\n\nLots of people are creating images right now, so this might take a bit. We'll notify you when your image is ready.\n\n<div class='flex items-center justify-center p-4 rounded-lg bg-slate-200 dark:bg-slate-600 text-slate-500 dark:text-slate-400 text-sm italic my-4'>[Simulated Image: A serene landscape with a river and mountains under a blue sky]</div>\n\n<button class='download-image-btn mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors'>Download Image</button>",
+                    "search the web": "Searching the web for current information on your query...\n\n_Simulated Search Results:_\n1.  **OpenAI Blog:** Latest advancements in AI research, including new model releases.\n2.  **TechCrunch:** Analysis of the impact of generative AI on various industries.\n3.  **Wikipedia:** Overview of large language models and their applications.\n\nThis information is current as of my last simulated update.",
+                    "write or code": "I can help you write or generate code. What specific task do you have in mind? For example, I can write a Python script for data analysis or generate HTML for a simple webpage.",
+                    "run deep research": "Running a deep dive into your topic... This involves synthesizing information from various simulated sources. What specific aspects are you interested in?",
+                    "think for longer": "I'm engaging in a more elaborate thought process to refine my understanding and response. Please bear with me as I consider all angles. This allows for more nuanced and comprehensive answers.",
+                    "+ tools": "I'm ready to utilize simulated tools for your request. What kind of tool do you need? (e.g., a calculator, a data visualizer, a translator)",
+                    "default": "Thank you for your query. As a GPT-4o simulation, I aim to provide thorough and well-structured information. While my knowledge is based on a fixed set of simulated responses, I will attempt to address your question comprehensively."
+                }
+            };
+
+            const showModal = (title, message) => {
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                simulatedModal.classList.remove('hidden');
+            };
+
+            modalCloseBtn.addEventListener('click', () => {
+                simulatedModal.classList.add('hidden');
+            });
+
+            const saveHistory = () => {
+                localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+                localStorage.setItem('activeChatId', activeChatId);
+                localStorage.setItem('currentModel', currentModel);
+                localStorage.setItem('isChatsListExpanded', isChatsListExpanded);
+            };
+
+            const loadHistory = () => {
+                const savedHistory = localStorage.getItem('chatHistory');
+                const savedActiveId = localStorage.getItem('activeChatId');
+                const savedModel = localStorage.getItem('currentModel');
+                const savedChatsListExpanded = localStorage.getItem('isChatsListExpanded');
+
+                if (savedHistory) {
+                    chatHistory = JSON.parse(savedHistory);
+                    activeChatId = savedActiveId ? savedActiveId : (chatHistory.length > 0 ? chatHistory[0].id : null);
+                    if (savedModel) {
+                        currentModel = savedModel;
+                    }
+                    if (savedChatsListExpanded !== null) {
+                        isChatsListExpanded = savedChatsListExpanded === 'true';
+                    }
+                    renderChatList();
+                    updateModelDisplay(currentModel);
+                    if (activeChatId) {
+                        loadChat(activeChatId);
+                    }
+                } else {
+                    chatHistory = []; 
+                    renderChatList();
+                }
+            };
+            
+            const renderChatList = (searchTerm = '') => {
+                chatList.innerHTML = ''; 
+
+                const filteredChatHistory = chatHistory.filter(chat => 
+                    chat.title.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+
+                if (searchTerm.length > 0) {
+                    chatList.classList.remove('hidden'); 
+                    chatsToggleIcon.classList.remove('fa-chevron-right');
+                    chatsToggleIcon.classList.add('fa-chevron-down'); 
+                } else if (isChatsListExpanded) {
+                    chatList.classList.remove('hidden');
+                    chatsToggleIcon.classList.remove('fa-chevron-right');
+                    chatsToggleIcon.classList.add('fa-chevron-down');
+                } else {
+                    chatList.classList.add('hidden');
+                    chatsToggleIcon.classList.remove('fa-chevron-down');
+                    chatsToggleIcon.classList.add('fa-chevron-right');
+                }
+
+                const sortedChatHistory = [...filteredChatHistory].sort((a, b) => {
+                    const idA = a.id.startsWith('chat_') ? parseInt(a.id.split('_')[1]) : 0;
+                    const idB = b.id.startsWith('chat_') ? parseInt(b.id.split('_')[1]) : 0;
+                    return idB - idA;
+                });
+                
+                if (sortedChatHistory.length === 0 && searchTerm.length === 0) {
+                     chatList.innerHTML = '<p class="text-xs text-slate-500 px-2 mt-2">No recent chats. Start a new one!</p>';
+                } else if (sortedChatHistory.length === 0 && searchTerm.length > 0) {
+                     chatList.innerHTML = '<p class="text-xs text-slate-500 px-2 mt-2">No matching chats found.</p>';
+                } else {
+                    sortedChatHistory.forEach(chat => {
+                        const li = createChatListItem(chat);
+                        chatList.appendChild(li);
+                    });
+                }
+
+                document.querySelectorAll('.chat-history-item').forEach(btn => {
+                    if (btn.dataset.chatId === activeChatId) {
+                        btn.classList.add('bg-slate-700');
+                    } else {
+                        btn.classList.remove('bg-slate-700');
+                    }
+                });
+            };
+
+            const createChatListItem = (chat) => {
+                const li = document.createElement('li');
+                const btn = document.createElement('button');
+                btn.className = `chat-history-item w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 transition-colors text-sm truncate group flex items-center justify-between`;
+                btn.innerHTML = `
+                    <span class="flex items-center gap-3 truncate"><i class="fa-solid fa-message"></i><span class="truncate">${chat.title}</span></span>
+                    <div class="chat-actions hidden group-hover:flex items-center gap-1">
+                        <button class="edit-chat-title-btn p-1 rounded-md hover:bg-slate-600" title="Edit chat title" data-chat-id="${chat.id}"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button class="delete-chat-btn p-1 rounded-md hover:bg-slate-600" title="Delete chat" data-chat-id="${chat.id}"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </div>
+                `;
+                btn.dataset.chatId = chat.id;
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (e.target.closest('.edit-chat-title-btn') || e.target.closest('.delete-chat-btn')) {
+                        return;
+                    }
+                    activeChatId = chat.id;
+                    loadChat(chat.id);
+                    renderChatList();
+                });
+
+                btn.querySelector('.edit-chat-title-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const chatIdToEdit = e.currentTarget.dataset.chatId;
+                    const chatToEdit = chatHistory.find(c => c.id === chatIdToEdit);
+                    if (chatToEdit) {
+                        const newTitle = prompt('Edit chat title:', chatToEdit.title);
+                        if (newTitle !== null && newTitle.trim() !== '') {
+                            chatToEdit.title = newTitle.trim();
+                            saveHistory();
+                            renderChatList();
+                        }
+                    }
+                });
+
+                btn.querySelector('.delete-chat-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const chatIdToDelete = e.currentTarget.dataset.chatId;
+                    const chatToEdit = chatHistory.find(c => c.id === chatIdToDelete); // Use chatToEdit to get title for confirmation
+                    if (chatToEdit && confirm(`Are you sure you want to delete "${chatToEdit.title}"? This action is usually permanent.`)) {
+                        chatHistory = chatHistory.filter(c => c.id !== chatIdToDelete);
+                        if (activeChatId === chatIdToDelete) {
+                            activeChatId = chatHistory.length > 0 ? chatHistory[0].id : null;
+                        }
+                        saveHistory();
+                        renderChatList();
+                        if (activeChatId) {
+                            loadChat(activeChatId);
+                        } else {
+                            startNewChat();
+                        }
+                    }
+                });
+                li.appendChild(btn);
+                return li;
+            };
+
+
+            const loadChat = (chatId) => {
+                const chat = chatHistory.find(c => c.id === chatId);
+                if (chat) {
+                    activeChatId = chatId;
+                    messageContainer.innerHTML = '';
+                    chat.messages.forEach(msg => addMessageToUI(msg.sender, msg.content, false, msg.id));
+                    welcomeScreen.classList.add('hidden');
+                    scrollToBottom();
+                }
+            };
+
+            const startNewChat = () => {
+                activeChatId = null;
+                messageContainer.innerHTML = '';
+                welcomeScreen.classList.remove('hidden');
+                promptInput.value = '';
+                sendBtn.disabled = true;
+                promptInput.style.height = 'auto'; 
+                renderChatList();
+                chatOptionsMenu.classList.add('hidden'); 
+            };
+
+            const addMessageToUI = (sender, content, isStreaming, messageId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`) => {
+                const messageWrapper = document.createElement('div');
+                messageWrapper.className = `flex gap-4 ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+                messageWrapper.dataset.messageId = messageId;
+                messageWrapper.dataset.sender = sender;
+                
+                const icon = document.createElement('div');
+                icon.className = `w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-bold ${sender === 'user' ? 'bg-blue-500 text-white' : 'bg-slate-900 dark:bg-white'}`;
+                icon.innerHTML = sender === 'user' ? 'U' : `<i class="fa-solid fa-robot ${sender === 'user' ? '' : 'text-white dark:text-slate-900'}"></i>`;
+                
+                const messageContentArea = document.createElement('div');
+                messageContentArea.className = `max-w-xl flex flex-col`;
+
+                const messageBubble = document.createElement('div');
+                messageBubble.className = `p-4 rounded-xl ${sender === 'user' ? 'bg-blue-500 text-white rounded-br-none' : 'bg-slate-100 dark:bg-slate-700 rounded-bl-none'}`;
+                
+                if (sender === 'ai') {
+                    const renderedContent = renderMarkdown(content);
+                    messageBubble.innerHTML = renderedContent;
+                } else {
+                    const p = document.createElement('p');
+                    p.textContent = content;
+                    messageBubble.appendChild(p);
+                }
+                
+                messageContentArea.appendChild(messageBubble);
+
+                if (sender === 'ai') {
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'flex items-center gap-2 mt-2 ml-auto text-slate-500 dark:text-slate-400 text-sm';
+                    
+                    const regenerateBtn = document.createElement('button');
+                    regenerateBtn.className = 'p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center gap-1';
+                    regenerateBtn.innerHTML = '<i class="fa-solid fa-arrow-rotate-right"></i> Regenerate';
+                    regenerateBtn.title = 'Regenerate response';
+                    regenerateBtn.addEventListener('click', () => showModal('Regenerate Response', 'Requests ChatGPT to generate an alternative or revised response to your last prompt.'));
+
+                    const likeBtn = document.createElement('button');
+                    likeBtn.className = 'p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600';
+                    likeBtn.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>';
+                    likeBtn.title = 'Like';
+                    likeBtn.addEventListener('click', () => showModal('Feedback', 'Provides feedback to OpenAI on the quality and helpfulness of the AI\'s response. You liked this response!'));
+
+                    const dislikeBtn = document.createElement('button');
+                    dislikeBtn.className = 'p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600';
+                    dislikeBtn.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>';
+                    dislikeBtn.title = 'Dislike';
+                    dislikeBtn.addEventListener('click', () => showModal('Feedback', 'Provides feedback to OpenAI on the quality and helpfulness of the AI\'s response. You disliked this response!'));
+
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600';
+                    copyBtn.innerHTML = '<i class="fa-regular fa-clipboard"></i>';
+                    copyBtn.title = 'Copy';
+                    copyBtn.addEventListener('click', () => {
+                        const textToCopy = messageBubble.innerText;
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            showModal('Copied!', 'Copies the AI\'s generated response (including text and code) to your clipboard, preserving formatting.');
+                        }).catch(err => {
+                            showModal('Error', 'Failed to copy response.');
+                            console.error('Failed to copy: ', err);
+                        });
+                    });
+
+                    actionsDiv.appendChild(regenerateBtn);
+                    actionsDiv.appendChild(likeBtn);
+                    actionsDiv.appendChild(dislikeBtn);
+                    actionsDiv.appendChild(copyBtn);
+                    messageContentArea.appendChild(actionsDiv);
+                } else { 
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'flex items-center gap-2 mt-2 mr-auto text-slate-500 dark:text-slate-400 text-sm';
+
+                    const editPromptBtn = document.createElement('button');
+                    editPromptBtn.className = 'p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center gap-1';
+                    editPromptBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Edit';
+                    editPromptBtn.title = 'Edit prompt';
+                    editPromptBtn.addEventListener('click', () => showModal('Edit Prompt', 'Allows you to modify your previously sent prompt, letting you refine your query and potentially get a new AI response.'));
+                    actionsDiv.appendChild(editPromptBtn);
+                    messageContentArea.appendChild(actionsDiv);
+                }
+
+
+                if (sender === 'user') {
+                    messageWrapper.appendChild(messageContentArea);
+                    messageWrapper.appendChild(icon);
+                } else {
+                    messageWrapper.appendChild(icon);
+                    messageWrapper.appendChild(messageContentArea);
+                }
+                
+                messageContainer.appendChild(messageWrapper);
+                if(isStreaming) {
+                    scrollToBottom();
+                }
+
+                if (sender === 'ai') {
+                    attachCodeCopyListeners(messageBubble);
+                }
+            };
+
+            const simulateRegenerateResponse = (messageId) => {
+                const chat = chatHistory.find(c => c.id === activeChatId);
+                if (!chat) return;
+
+                const messageIndex = chat.messages.findIndex(m => m.id === messageId);
+                if (messageIndex === -1 || chat.messages[messageIndex].sender !== 'ai') return;
+
+                const messageElement = messageContainer.querySelector(`[data-message-id="${messageId}"]`);
+                if (messageElement) {
+                    messageElement.remove();
+                }
+                chat.messages.splice(messageIndex, 1);
+
+                typingIndicator.classList.remove('hidden');
+                scrollToBottom();
+
+                setTimeout(() => {
+                    typingIndicator.classList.add('hidden');
+                    const model = currentModel;
+                    const lastUserPrompt = chat.messages.length > 0 ? chat.messages[chat.messages.length -1].content : '';
+                    const promptKey = lastUserPrompt.toLowerCase().includes('hello') ? 'hello' 
+                                    : lastUserPrompt.toLowerCase().includes('help') ? 'help'
+                                    : lastUserPrompt.toLowerCase().includes('react component') ? 'react component example'
+                                    : lastUserPrompt.toLowerCase().includes('javascript function') ? 'javascript function'
+                                    : lastUserPrompt.toLowerCase().includes('recipe') ? 'recipe for pasta'
+                                    : lastUserPrompt.toLowerCase().includes('image') ? 'create an image'
+                                    : lastUserPrompt.toLowerCase().includes('web') ? 'search the web'
+                                    : lastUserPrompt.toLowerCase().includes('code') || lastUserPrompt.toLowerCase().includes('write') ? 'write or code'
+                                    : lastUserPrompt.toLowerCase().includes('research') ? 'run deep research'
+                                    : lastUserPrompt.toLowerCase().includes('think') ? 'think for longer'
+                                    : lastUserPrompt.toLowerCase().includes('tool') ? '+ tools'
+                                    : 'default';
+
+                    const response = simulatedResponses[model][promptKey];
+                    
+                    let currentChat = chatHistory.find(c => c.id === activeChatId);
+                    if (currentChat) {
+                        currentChat.messages.push({ sender: 'ai', content: response, id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}` });
+                        addMessageToUI('ai', response, true);
+                        saveHistory();
+                    }
+                }, 1500 + Math.random() * 1000);
+            };
+
+            const simulateEditPrompt = (messageId) => {
+                const chat = chatHistory.find(c => c.id === activeChatId);
+                if (!chat) return;
+
+                const messageIndex = chat.messages.findIndex(m => m.id === messageId);
+                if (messageIndex === -1 || chat.messages[messageIndex].sender !== 'user') return;
+
+                const oldContent = chat.messages[messageIndex].content;
+                const newContent = prompt('Edit your prompt:', oldContent);
+
+                if (newContent !== null && newContent.trim() !== '') {
+                    chat.messages[messageIndex].content = newContent.trim();
+                    if (messageIndex === chat.messages.length - 1) {
+                        promptInput.value = newContent.trim();
+                    }
+                    saveHistory();
+                    loadChat(activeChatId); 
+                }
+            };
+
+
+            const handleSendMessage = () => {
+                const prompt = promptInput.value.trim();
+                if (!prompt) return;
+
+                welcomeScreen.classList.add('hidden');
+                chatOptionsMenu.classList.add('hidden'); 
+                
+                let currentChat = chatHistory.find(c => c.id === activeChatId);
+                if (!currentChat) {
+                    activeChatId = `chat_${Date.now()}`;
+                    currentChat = { id: activeChatId, title: prompt.substring(0, 30), messages: [] };
+                    chatHistory.push(currentChat);
+                }
+                
+                currentChat.messages.push({ sender: 'user', content: prompt, id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}` });
+                addMessageToUI('user', prompt, true);
+
+                promptInput.value = '';
+                sendBtn.disabled = true;
+                promptInput.style.height = 'auto'; 
+
+
+                renderChatList();
+                saveHistory();
+                simulateAIResponse(prompt);
+            };
+
+            const simulateAIResponse = (prompt) => {
+                typingIndicator.classList.remove('hidden');
+                scrollToBottom();
+
+                setTimeout(() => {
+                    typingIndicator.classList.add('hidden');
+                    const model = currentModel;
+                    const promptKey = prompt.toLowerCase().includes('hello') ? 'hello' 
+                                    : prompt.toLowerCase().includes('help') ? 'help'
+                                    : prompt.toLowerCase().includes('react component') ? 'react component example'
+                                    : prompt.toLowerCase().includes('javascript function') ? 'javascript function'
+                                    : prompt.toLowerCase().includes('recipe') ? 'recipe for pasta'
+                                    : prompt.toLowerCase().includes('image') ? 'create an image'
+                                    : prompt.toLowerCase().includes('web') ? 'search the web'
+                                    : prompt.toLowerCase().includes('code') || prompt.toLowerCase().includes('write') ? 'write or code'
+                                    : prompt.toLowerCase().includes('research') ? 'run deep research'
+                                    : prompt.toLowerCase().includes('think') ? 'think for longer'
+                                    : prompt.toLowerCase().includes('tool') ? '+ tools'
+                                    : 'default';
+
+                    const response = simulatedResponses[model][promptKey];
+                    
+                    let currentChat = chatHistory.find(c => c.id === activeChatId);
+                    if (currentChat) {
+                        currentChat.messages.push({ sender: 'ai', content: response, id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}` });
+                        addMessageToUI('ai', response, true);
+                        saveHistory();
+                    }
+                }, 1500 + Math.random() * 1000);
+            };
+
+            const renderMarkdown = (text) => {
+                let html = text;
+                html = html.replace(/```javascript\n([\s\S]*?)\n```/g, (match, code) => {
+                    return `<div class="code-block bg-slate-800 rounded-lg my-2">
+                                <div class="flex justify-between items-center px-4 py-2 bg-slate-900 rounded-t-lg">
+                                    <span class="text-xs text-slate-400">JavaScript</span>
+                                    <button class="copy-code-btn text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                                        <i class="fa-regular fa-clipboard"></i> Copy code
+                                    </button>
+                                </div>
+                                <pre class="p-4 overflow-x-auto text-sm text-white"><code class="language-javascript highlight-on-copy">${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
+                            </div>`;
+                });
+                html = html.replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold my-2">$1</h3>');
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/^\* (.*$)/gim, '<li class="ml-4">$1</li>')
+                           .replace(/^(?:\*|\d+\.) .*$/gm, (match) => {
+                                if (match.startsWith('*')) {
+                                    return `<li>${match.substring(2)}</li>`;
+                                }
+                                return `<li>${match.substring(match.indexOf('.') + 2)}</li>`;
+                           });
+                html = html.replace(/(<ul>[\s\S]*?<\/ul>)|(<ol>[\s\S]*?<\/ol>)/g, (match, ul, ol) => {
+                    if (ul) return `<ul class="list-disc list-inside space-y-1 my-2">${ul}</ul>`;
+                    if (ol) return `<ol class="list-decimal list-inside space-y-1 my-2">${ol}</ol>`;
+                    return match;
+                });
+                html = html.split('\n').map(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine === '' || trimmedLine.startsWith('<') || trimmedLine.startsWith('&lt;') ||
+                        trimmedLine.match(/^(?:<h[1-6]|<div|<p|<ul|<ol|<li)/i)) {
+                        return line; 
+                    }
+                    return `<p>${line}</p>`;
+                }).join('');
+
+                return html;
+            };
+
+            const attachCodeCopyListeners = (container) => {
+                container.querySelectorAll('.copy-code-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const codeBlock = button.closest('.code-block');
+                        const codeElement = codeBlock.querySelector('code');
+                        const textToCopy = codeElement.innerText;
+                        
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            button.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                            codeElement.classList.add('bg-slate-700');
+                            setTimeout(() => {
+                                button.innerHTML = '<i class="fa-regular fa-clipboard"></i> Copy code';
+                                codeElement.classList.remove('bg-slate-700');
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy: ', err);
+                            button.textContent = 'Failed';
+                        });
+                    });
+                });
+            };
+
+            const scrollToBottom = () => {
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            };
+            
+            promptInput.addEventListener('input', () => {
+                sendBtn.disabled = promptInput.value.trim().length === 0;
+                promptInput.style.height = 'auto';
+                promptInput.style.height = (promptInput.scrollHeight) + 'px';
+
+                if (promptInput.value.trim().length === 0) {
+                    voiceInputBtn.classList.remove('hidden');
+                    sendBtn.classList.remove('bg-blue-500', 'text-white');
+                    sendBtn.classList.add('bg-slate-300', 'text-slate-600', 'dark:bg-slate-600', 'dark:text-slate-300');
+                } else {
+                    voiceInputBtn.classList.add('hidden');
+                    sendBtn.classList.add('bg-blue-500', 'text-white');
+                    sendBtn.classList.remove('bg-slate-300', 'text-slate-600', 'dark:bg-slate-600', 'dark:text-slate-300');
+                }
+            });
+            
+            promptInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                // If click is not inside chatOptionsMenu, toggleToolsButton, promptInput, modelOptions, modelDropdownBtn, sidebarSearchArea, or searchChatsSidebarBtn
+                // AND the click is NOT inside a chat-option-item (to allow modal to close without closing menu)
+                if (!chatOptionsMenu.contains(e.target) && !toggleToolsButton.contains(e.target) && !promptInput.contains(e.target) && !modelOptions.contains(e.target) && !modelDropdownBtn.contains(e.target) && !sidebarSearchArea.contains(e.target) && !searchChatsSidebarBtn.contains(e.target) && !e.target.closest('.chat-option-item')) {
+                    chatOptionsMenu.classList.add('hidden');
+                    modelOptions.classList.add('hidden'); 
+                    if (chatSearchInput.value.trim() === '') {
+                        sidebarSearchArea.classList.add('hidden');
+                    }
+                }
+            });
+
+            sendBtn.addEventListener('click', handleSendMessage);
+            newChatBtn.addEventListener('click', () => showModal('New Chat', 'Starts a brand new conversation, clearing the current AI context to give you a fresh start for a new topic.'));
+
+            sidebarToggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('w-64');
+                sidebar.classList.toggle('w-0');
+                sidebar.classList.toggle('p-2');
+                sidebar.classList.toggle('p-0');
+                if (sidebar.classList.contains('w-0')) {
+                    sidebar.style.overflow = 'hidden';
+                } else {
+                    sidebar.style.overflow = 'auto';
+                }
+            });
+
+            modelDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                modelOptions.classList.toggle('hidden');
+                showModal('Model Selection', 'Allows you to select the AI model for the current conversation. Different models offer varying levels of capability and features.');
+            });
+
+            modelOptionButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const newModel = button.dataset.modelId;
+                    if (newModel === 'gpt-4o' && currentModel === 'gpt-3.5') {
+                        showModal('ChatGPT Plus Feature', 'GPT-4o is an advanced multimodal model with enhanced reasoning and image generation capabilities. It is a Plus-only feature. Please renew your subscription to access it.');
+                        return; 
+                    }
+                    currentModel = newModel;
+                    updateModelDisplay(currentModel);
+                    modelOptions.classList.add('hidden');
+                    saveHistory();
+                    showModal('Model Selected', `You selected ChatGPT ${newModel === 'gpt-3.5' ? '3.5' : '4o'}.`);
+                });
+            });
+
+            const updateModelDisplay = (modelId) => {
+                const displayModel = modelId === 'gpt-3.5' ? '3.5' : '4o';
+                currentModelDisplay.textContent = `ChatGPT ${displayModel}`;
+                modelOptionButtons.forEach(btn => {
+                    if (btn.dataset.modelId === modelId) {
+                        btn.classList.add('selected');
+                    } else {
+                        btn.classList.remove('selected');
+                    }
+                });
+            };
+
+            searchChatsSidebarBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                sidebarSearchArea.classList.toggle('hidden');
+                if (!sidebarSearchArea.classList.contains('hidden')) {
+                    chatSearchInput.focus();
+                    showModal('Search Chats', 'Toggles the search bar in the sidebar, allowing you to find specific conversations by title. Start typing to filter your chat history.');
+                } else {
+                    chatSearchInput.value = ''; 
+                    renderChatList(); 
+                    clearSearchBtn.classList.add('hidden'); 
+                }
+            });
+
+            chatSearchInput.addEventListener('input', () => {
+                const searchTerm = chatSearchInput.value.trim();
+                renderChatList(searchTerm);
+                if (searchTerm.length > 0) {
+                    clearSearchBtn.classList.remove('hidden');
+                } else {
+                    clearSearchBtn.classList.add('hidden');
+                }
+            });
+
+            clearSearchBtn.addEventListener('click', () => {
+                chatSearchInput.value = '';
+                renderChatList();
+                clearSearchBtn.classList.add('hidden');
+                chatSearchInput.focus();
+                showModal('Search Cleared', 'Your search query has been cleared, and your full chat history is now displayed.');
+            });
+
+            libraryBtn.addEventListener('click', () => showModal('Library', 'Accesses your saved prompts, custom instructions, and other resources.'));
+            gptsSidebarBtn.addEventListener('click', () => showModal('GPTs', 'Explores and manages custom versions of ChatGPT, tailored for specific tasks or topics.'));
+            soraSidebarBtn.addEventListener('click', () => { 
+                showModal(
+                    'Sora: Text-to-Video Model',
+                    'Sora is OpenAI\'s state-of-the-art AI model that generates realistic and imaginative videos from text instructions. It can create complex scenes with multiple characters, specific motion, and accurate details of the subject and background.'
+                );
+            });
+            
+            chatsHeadingToggle.addEventListener('click', () => {
+                if (chatSearchInput.value.trim().length === 0) {
+                    isChatsListExpanded = !isChatsListExpanded;
+                    renderChatList(); 
+                    saveHistory();
+                    showModal('Chats List Toggle', `Your chat history is now ${isChatsListExpanded ? 'expanded' : 'collapsed'}.`);
+                } else {
+                    showModal('Search Active', 'The chat list cannot be collapsed while a search is active. Clear your search to toggle the list.');
+                }
+            });
+
+            settingsSidebarBtn.addEventListener('click', () => showModal('Settings', 'Accesses your account settings, custom instructions, data controls, theme preferences, and subscription details.'));
+            
+            shareChatBtn.addEventListener('click', () => showModal('Share Chat', 'Generates a shareable link to the current conversation, allowing others to view or continue the chat.'));
+            moreOptionsBtn.addEventListener('click', () => showModal('More Options', 'Displays additional actions for the current chat, such as archiving, deleting, or exporting the conversation.'));
+
+            // New: Account button functionality
+            accountButton.addEventListener('click', () => {
+                showModal('Account Settings', 'Access your personal account information, subscription status, security settings, and profile details.');
+            });
+
+            attachFilesButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showModal('Attach Files', 'This would open a file browser to upload photos or documents for AI analysis or processing.');
+            });
+
+            toggleToolsButton.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                chatOptionsMenu.classList.toggle('hidden');
+            });
+
+            chatOptionItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation(); 
+                    const action = item.textContent.trim();
+
+                    if (action.includes('Create an image')) {
+                        if (currentModel === 'gpt-3.5') {
+                            showModal('Feature Not Available', 'Image generation requires a Plus-enabled model (e.g., GPT-4o).');
+                            return;
+                        }
+                        promptInput.value = 'Create an image'; 
+                        sendBtn.disabled = false;
+                        promptInput.focus();
+                        showModal('Create an Image', 'Initiates the image generation process based on your prompt. (Requires GPT-4o or equivalent model)');
+                    } else if (action.includes('Search the web')) {
+                        promptInput.value = 'Search the web';
+                        sendBtn.disabled = false;
+                        promptInput.focus();
+                        showModal('Search the Web', 'Allows ChatGPT to access and integrate up-to-date information from the internet for a more informed response.');
+                    } else if (action.includes('Write or code')) {
+                        promptInput.value = 'Write or code';
+                        sendBtn.disabled = false;
+                        promptInput.focus();
+                        showModal('Write or Code', 'Triggers a mode optimized for generating or refining text and code snippets.');
+                    } else if (action.includes('Run deep research')) {
+                        promptInput.value = 'Run deep research';
+                        sendBtn.disabled = false;
+                        promptInput.focus();
+                        showModal('Run Deep Research', 'Instructs ChatGPT to perform a comprehensive analysis by synthesizing information from various simulated sources.');
+                    } else if (action.includes('Think for longer')) {
+                        promptInput.value = 'Think for longer';
+                        sendBtn.disabled = false;
+                        promptInput.focus();
+                        showModal('Think for Longer', 'Prompts ChatGPT to engage in a more elaborate thought process to refine its understanding and provide a more nuanced response.');
+                    } else if (action.includes('+ Tools')) {
+                        promptInput.value = '+ tools';
+                        sendBtn.disabled = false;
+                        promptInput.focus();
+                        showModal('Additional Tools', 'Expands ChatGPT\'s capabilities by integrating with specialized tools like a calculator, data visualizer, or translator.');
+                    } else {
+                        showModal(action, `You clicked "${action}". This action is simulated and would trigger a specific AI mode or tool.`);
+                        promptInput.value = `Simulate: ${action}`;
+                        sendBtn.disabled = false;
+                        promptInput.focus();
+                    }
+                });
+            });
+
+            voiceInputBtn.addEventListener('click', () => showModal('Voice Input', 'Activates voice mode, allowing you to speak your prompts instead of typing.'));
+
+            localStorage.removeItem('chatHistory');
+            localStorage.removeItem('activeChatId');
+            localStorage.removeItem('searchQuery');
+            localStorage.removeItem('isChatsListExpanded'); 
+
+            loadHistory();
+            if (!activeChatId) {
+                startNewChat();
+            }
+
+        });
+    </script>
+</body>
+</html>
