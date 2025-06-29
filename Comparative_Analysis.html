@@ -1,1 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Comparison</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for better readability and specific overrides */
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter for a modern look */
+        }
+        /* Basic table styling for readability, will be enhanced by Tailwind */
+        table {
+            border-collapse: collapse;
+            width: 100%; /* Ensure tables can expand horizontally */
+            min-width: 900px; /* Minimum width to prevent excessive squishing on desktop before scroll */
+        }
+        th, td {
+            border: 1px solid #e2e8f0; /* Light gray border */
+            padding: 0.75rem 1rem; /* Tailwind p-3 p-4 */
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f8fafc; /* Light blue-gray for headers */
+            font-weight: 600; /* Tailwind font-semibold */
+            color: #2d3748; /* Darker text for headers */
+        }
+        /* No specific mobile table reformatting for side-by-side tables.
+           Instead, rely on overflow-x-auto for horizontal scrolling. */
+        @media (max-width: 768px) {
+            .tab-button {
+                padding: 0.5rem 0.75rem; /* Smaller padding for mobile tabs */
+                font-size: 0.9rem; /* Smaller font size for mobile tabs */
+            }
+            table {
+                min-width: 700px; /* Adjust min-width for mobile for scrollable tables */
+            }
+        }
+
+        /* Active tab button styling for main tabs */
+        .tab-button.active {
+            background-color: #2563eb; /* bg-blue-600 */
+            color: #ffffff; /* text-white */
+            border-bottom: 2px solid #2563eb; /* Matching border for active tab */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for active tab */
+        }
+
+        /* Specific styling for speed explanation buttons */
+        .speed-toggle-button {
+            @apply inline-flex items-center justify-center px-5 py-2 text-base font-semibold rounded-full transition-all duration-200 ease-in-out;
+            /* Using a prominent blue for default, and indigo for active */
+            @apply bg-blue-700 text-white shadow-md hover:bg-blue-800 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
+            margin-right: 0.75rem;
+            margin-bottom: 0.75rem;
+            min-width: 140px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .speed-toggle-button.active {
+            @apply bg-indigo-600 text-white shadow-lg hover:bg-indigo-700;
+        }
+        .speed-explanation {
+            display: none; /* Hidden by default */
+        }
+        .speed-explanation.active {
+            display: block; /* Shown when active */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 leading-relaxed">
+    <div class="container mx-auto p-6 lg:p-10 bg-white rounded-xl shadow-lg mt-8 mb-8">
+        <h1 class="text-4xl lg:text-5xl font-extrabold text-center text-blue-800 mb-8 leading-tight">
+            A Comparative Analysis of Leading Large Language Models (LLMs)
+        </h1>
+        <p class="text-lg text-gray-700 mb-8 text-center max-w-3xl mx-auto">
+            This interactive page provides a comprehensive comparison of prominent LLMs, examining their technical specifications, performance benchmarks, typical use cases, integration ecosystems, and critical ethical considerations.
+        </p>
+
+        <div class="flex flex-wrap justify-center mb-8 border-b-2 border-blue-200">
+            <button class="tab-button px-6 py-3 text-lg font-semibold text-gray-600 hover:text-blue-700 hover:bg-blue-50 focus:outline-none transition-colors duration-200 rounded-t-lg mx-2" onclick="openTab(event, 'performance')">Performance Summary</button>
+            <button class="tab-button px-6 py-3 text-lg font-semibold text-gray-600 hover:text-blue-700 hover:bg-blue-50 focus:outline-none transition-colors duration-200 rounded-t-lg mx-2" onclick="openTab(event, 'features')">Key Features & Capabilities</button>
+            <button class="tab-button px-6 py-3 text-lg font-semibold text-gray-600 hover:text-blue-700 hover:bg-blue-50 focus:outline-none transition-colors duration-200 rounded-t-lg mx-2" onclick="openTab(event, 'ethics')">Ethical Considerations</button>
+        </div>
+
+        <div id="performance" class="tab-content">
+            <h2 class="text-3xl font-bold text-blue-700 mb-6 pb-4 border-b border-blue-200">LLM Performance Summary</h2>
+            <p class="text-base text-gray-700 mb-6">
+                Evaluating LLMs involves assessing their strengths across various tasks, from general knowledge and complex reasoning to specialized coding and real-time information processing. Below is a simplified overview highlighting their core performance characteristics and typical use cases.
+            </p>
+
+            <div class="mb-6 flex flex-wrap gap-4 items-center">
+                <span class="text-lg font-semibold text-gray-800">Speed Metrics: Click a button below for an explanation.</span>
+                <button class="speed-toggle-button" onclick="toggleSpeedExplanation('latency')">Latency (TTFT)</button>
+                <button class="speed-toggle-button" onclick="toggleSpeedExplanation('tokens_per_sec')">Tokens per second</button>
+            </div>
+
+            <div id="latency-explanation" class="speed-explanation p-4 bg-blue-50 rounded-lg border border-blue-200 mb-6">
+                <p class="text-base text-blue-800">
+                    <strong>Latency (Time to First Token - TTFT):</strong> This measures the time it takes for an LLM to generate the *very first piece* of its response after receiving a prompt. It is crucial for applications where users expect an immediate initial reaction, such as real-time conversational chatbots or interactive interfaces. A low TTFT means the user sees something happening quickly, improving the perceived responsiveness and user experience.
+                </p>
+            </div>
+
+            <div id="tokens_per_sec-explanation" class="speed-explanation p-4 bg-blue-50 rounded-lg border border-blue-200 mb-6">
+                <p class="text-base text-blue-800">
+                    <strong>Tokens per second:</strong> This measures the rate at which the LLM generates output tokens *after* the first token has been produced. This metric indicates the overall throughput or how quickly the full response is delivered. It is important for tasks requiring long-form content generation, summarization of large documents, or any application where the total generation time for the entire output is critical.
+                </p>
+            </div>
+            <p class="text-base text-gray-700 mb-6">
+                Understanding both latency and tokens per second helps in choosing the right LLM for specific applications: low latency is vital for interactive experiences, while high tokens per second is crucial for batch processing or generating lengthy outputs.
+            </p>
+
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Table: Simplified LLM Performance Overview</h3>
+            <div class="overflow-x-auto shadow-md rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Metric</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gemini 2.5 Pro</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ChatGPT (GPT-4o)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claude 4 Sonnet</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claude 4 Opus</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perplexity (Sonar)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grok 3</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DeepSeek-R1-0528</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OpenAI o3</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OpenAI o4-mini</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gemini 2.5 Flash</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GPT-4.5</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Llama 4 Scout</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Primary Performance Strengths</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Excellent complex reasoning, mathematics (AIME), general knowledge (MMLU), multimodal analysis.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Versatile general intelligence, strong coding (SWE Bench), good for creative content and conversation.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Strong agentic coding (SWE Bench), long-form reasoning, ethical alignment.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Top-tier agentic coding, deep reasoning, handles highly complex tasks effectively.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Blazing fast real-time cited search, deep research, accurate factual answers.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Exceptional technical reasoning (AIME), real-time social media awareness, low latency.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Outstanding coding (Codeforces), strong mathematical reasoning, cost-efficient, open-source.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Strong general reasoning, mathematics (AIME), good for complex, multi-step queries.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Excellent mathematics (AIME), general reasoning, cost-effective for complex tasks.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Very fast, cost-efficient, good for high-volume everyday tasks, long context.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Strong general knowledge (MMLU), good for coding.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Massive context window, extremely fast, very cost-efficient, open-source.</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Key Applications</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Complex problem-solving, advanced research, multimodal content generation, agentic workflows.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Content creation, coding assistance, customer service, general inquiry.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Code review, document summarization, ethical content generation, in-depth analysis.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Large codebase review, in-depth research, complex problem-solving.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Research-backed content, real-time factual inquiries, internal knowledge search.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">STEM tasks, real-time data analysis, advanced technical problem-solving, casual conversation.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Code generation/analysis, mathematical problem-solving, customized AI solutions, offline deployment.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Advanced problem-solving, detailed explanations, STEM applications.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Budget-friendly STEM applications, complex reasoning with cost consideration.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Summarization, quick content generation, basic chat, high-throughput applications.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">General purpose AI, content generation, coding.</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Large document analysis, high-throughput tasks, customized solutions.</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Speed (Latency/Tokens per sec)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">High Latency (~30s TTFT), Moderate Speed (191 tokens/s)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Very Low Latency (0.51s TTFT), Moderate Speed (143 tokens/s)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Low Latency (~1.9s TTFT)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Low Latency (~1.95s TTFT)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Very High Speed (1200 tokens/s)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Extremely Low Latency (0.067s TTFT)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Moderate Latency (4s TTFT), Fast Streaming (3x GPT-4)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">High Latency (28s TTFT), Lower Speed (94 tokens/s)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Very High Latency (35.3s TTFT), Moderate Speed (135 tokens/s)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Very Low Latency (0.35s TTFT), High Speed (200 tokens/s)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Moderate Latency (1.25s TTFT), Lower Speed (48 tokens/s)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Very Low Latency (0.33s TTFT), Extremely High Speed (2600 tokens/s)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="features" class="tab-content">
+            <h2 class="text-3xl font-bold text-blue-700 mb-6 pb-4 border-b border-blue-200">Key Features and Capabilities</h2>
+            <p class="text-base text-gray-700 mb-6">
+                The evolution of LLMs is marked by a continuous expansion of their feature sets, moving beyond basic text generation to encompass multimodal understanding, extensive context processing, and sophisticated integration capabilities. This section highlights the defining characteristics and key strengths that differentiate each model in terms of functionality.
+            </p>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Table: LLM Feature and Capability Comparison</h3>
+            <div class="overflow-x-auto shadow-md rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Feature</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gemini</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ChatGPT</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claude</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Copilot</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perplexity</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grok</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">DeepSeek</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Developer</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Google</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">OpenAI</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Anthropic</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Microsoft/GitHub</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Perplexity AI</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">xAI</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">DeepSeek AI</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Modality (Text, Image, Audio, Video, 3D)</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Text, Image, Audio, Video</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Text, Image</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Text, Image</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Text, Image</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Text, Image (camera)</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Text, Image, Audio, 3D</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Text, Image (V3)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Open-Source/Proprietary</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Proprietary</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Proprietary</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Proprietary</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Proprietary</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Proprietary (uses open-source models)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Proprietary</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Open-Source</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Real-time Web Access</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Yes (Google Search)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Yes (Paid Tiers)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Yes (Paid Tiers)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Yes (Bing Search)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Yes (Core Function)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Yes (X Integration)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">No (Training Data Cutoff)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Key Integrations</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Google Workspace, Google AI Studio, LangGraph, CrewAI, LlamaIndex, Composio</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">OpenAI API, Plugins, Custom GPTs, Microsoft Azure AD, Google Workspace, CRM, ERP, BI Tools</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Anthropic API, GitHub Copilot Chat, Amazon Bedrock, Google Cloud Vertex AI, Jira, Confluence, Zapier</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Microsoft 365 Apps, GitHub, Windows, Power BI, Mobile Apps, Plugins</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">API, Perplexity Assistant, Comet Browser, Boost Space, Albato</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">xAI API, X (formerly Twitter)</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">API</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Primary Strengths</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Native Multimodality, Long Context, Complex Reasoning</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">General Versatility, Content Creation, Coding, Broad Ecosystem, Enterprise Features</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Ethical AI (Constitutional AI), Long-Form Reasoning, Large Codebase Review, Image Analysis</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Deep Ecosystem Integration, Code Completion, Data Analysis, Enterprise Productivity</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Real-time Cited Search, Deep Research, Internal Knowledge Search</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Real-time Web/Social Media Awareness, Advanced Technical Reasoning, STEM Tasks</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">RL-Driven Reasoning, Code/Math Prowess, Cost-Efficiency, Offline Capability</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="ethics" class="tab-content">
+            <h2 class="text-3xl font-bold text-blue-700 mb-6 pb-4 border-b border-blue-200">Ethical and Safety Posture Comparison</h2>
+            <p class="text-base text-gray-700 mb-6">
+                Ethical considerations and safety postures are increasingly critical differentiators for LLMs, influencing their trustworthiness and adoption, particularly in sensitive applications.
+            </p>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Table: LLM Ethical and Safety Comparison</h3>
+            <div class="overflow-x-auto shadow-md rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Ethical Aspect</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gemini</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ChatGPT</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claude</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Copilot</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perplexity</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grok</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">DeepSeek</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Primary Ethical Stance/Approach</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Responsible AI (Google AI Principles)</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Responsible AI (OpenAI principles)</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Constitutional AI (Helpful, Honest, Harmless)</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Responsible AI (Microsoft principles)</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Factual information with citations</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Maximally truth-seeking</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Open-source, affordable AI, reasoning enhancement</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Bias Mitigation Strategies</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Built-in safety filters; fairness analysis (American English focus)</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Diverse datasets, monitoring, critical assessment</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Ethical principles, bias reduction, diverse attribute choices</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Identify/minimize harmful biases; InterpretML, Fairlearn</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Algorithmic bias risk; creator bias</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">RLHF for bias/misinformation reduction; gender bias reduced</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Rigorous data filtering, bias-detection tools, fairness metrics; open architecture for audits</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Data Privacy Stance/Features</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Prompts/responses checked; app owner responsible for user data</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Avoid sharing sensitive data; understand platform policies</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Does not retain/train on individual user data by default</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Accesses only permitted data; prompts/responses not used for training; encrypted data</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Privacy/security concerns; reported image loophole</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Data privacy concerns; potential for surveillance</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">GDPR challenges; offline deployment; alleged data siphoning to China</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Transparency/Explainability Efforts</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Limited domain expertise, not environment-aware</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Lack of transparency in conclusions</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Provides justifications; simulated reasoning can mislead</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Non-deterministic outputs; no "accuracy" understanding</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Defers responsibility to creators; fails moral reasoning</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">"Black-box" nature; difficult to understand outputs</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">SHAP/LIME tools; transparent architecture</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Content Moderation/Censorship Policy</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Built-in safety filters; harmful content blocked</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Potential for misinformation/misuse</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Avoids harmful content; occasional over-cautiousness</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Refine training data, block sensitive queries</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">R1 1776 "uncensored"; generally avoids controversial topics</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Unfiltered/explicit content, misinformation, verbal abuse, deepfake concerns, weaponization potential</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Avoids/refuses sensitive topics (China-related)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Noted Ethical Controversies</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Hallucinations, bias amplification, inconsistent multilingual quality</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Bias in training data, hallucinations, privacy concerns, job displacement</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Over-cautiousness, hallucinations, confirmation/anchoring/fluency biases, simulated reasoning</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Hallucinations, racial/gender bias, misinformation</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Copyright/trademark infringement, `robots.txt` disregard, narrative control</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Unfiltered/explicit content, misinformation, verbal abuse, deepfake concerns, weaponization potential</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">State-mandated censorship, alleged military ties, data privacy issues, model distillation allegations</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+                tabcontent[i].style.display = "none"; /* Ensure display is none */
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active", "bg-blue-600", "text-white"); /* Remove active state styling */
+                tablinks[i].classList.add("text-gray-600", "hover:text-blue-700", "hover:bg-blue-50");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.remove("text-gray-600", "hover:text-blue-700", "hover:bg-blue-50");
+            evt.currentTarget.classList.add("active", "bg-blue-600", "text-white"); /* Add active state styling */
+        }
+
+        // New function for toggling speed explanations
+        function toggleSpeedExplanation(metric) {
+            var latencyExplanation = document.getElementById('latency-explanation');
+            var tokensPerSecExplanation = document.getElementById('tokens_per_sec-explanation');
+            var latencyButton = document.querySelector('.speed-toggle-button[onclick*="latency"]');
+            var tokensPerSecButton = document.querySelector('.speed-toggle-button[onclick*="tokens_per_sec"]');
+
+            // Hide all explanations and deactivate all buttons first
+            latencyExplanation.classList.remove('active');
+            tokensPerSecExplanation.classList.remove('active');
+            latencyButton.classList.remove('active');
+            tokensPerSecButton.classList.remove('active');
+
+            // Activate the selected explanation and button
+            if (metric === 'latency') {
+                latencyExplanation.classList.add('active');
+                latencyButton.classList.add('active');
+            } else if (metric === 'tokens_per_sec') {
+                tokensPerSecExplanation.classList.add('active');
+                tokensPerSecButton.classList.add('active');
+            }
+        }
+
+        // Initialize the first tab as active and show latency explanation by default
+        document.addEventListener("DOMContentLoaded", function() {
+            var tabButtons = document.getElementsByClassName("tab-button");
+            if (tabButtons.length > 0) {
+                // Simulate click on the first tab button to activate the Performance Summary tab
+                tabButtons[0].click();
+                // Then, show the Latency explanation by default
+                toggleSpeedExplanation('latency');
+            }
+        });
+    </script>
+</body>
+</html>
+
 
