@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Copilot Interface Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chat-message-fade {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-overlay {
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .modal-content {
+            animation: slideUp 0.3s ease-in-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f3f4f6; } /* Light track for contrast */
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; } /* Gray thumb */
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; } /* Darker gray on hover */
+
+        .tooltip {
+            position: absolute;
+            background-color: #374151; /* Darker gray for tooltip background */
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 60;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            pointer-events: none;
+            transform: translateY(-50%);
+        }
+        .tooltip.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .loader {
+            border: 2px solid #3b82f6; /* Blue border */
+            border-top: 2px solid transparent; /* Transparent top border */
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Style for the quick response submenu */
+        .quick-response-submenu {
+            position: absolute;
+            bottom: calc(100% + 10px); /* Position above the input bar */
+            left: 0; /* Align with the quick response button */
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            z-index: 50; /* Above other elements but below modal */
+            width: 280px; /* Fixed width as per screenshot */
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            border: 1px solid #e5e7eb; /* Light border */
+        }
+        .quick-response-submenu.visible {
+            display: flex;
+        }
+        .submenu-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .submenu-item:hover {
+            background-color: #f3f4f6;
+        }
+        .submenu-item-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            color: #4b5563;
+        }
+        .submenu-item-text {
+            flex-grow: 1;
+        }
+        .submenu-item-title {
+            font-weight: 500;
+            color: #1f2937;
+        }
+        .submenu-item-description {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .submenu-item-badge {
+            background-color: #fef2f2; /* Light red for Labs */
+            color: #ef4444; /* Red text */
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+        .submenu-item-time {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-left: 8px;
+        }
+        .submenu-item-radio {
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 16px;
+            flex-shrink: 0;
+        }
+        .submenu-item-radio.selected {
+            border-color: #2563eb; /* Blue border for selected */
+        }
+        .submenu-item-radio.selected::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: #2563eb; /* Blue dot for selected */
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-row h-screen">
+
+    <!-- Sidebar -->
+    <aside class="bg-gray-100 w-64 p-4 flex flex-col justify-between border-r border-gray-200">
+        <div>
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-10H8V9h3V6h2v3h3v2h-3v3h-2v-3zm0 0"></path>
+                    </svg>
+                    <span class="font-semibold text-lg text-gray-800">Copilot</span>
+                </div>
+                <button data-feature="newChat" class="p-1 rounded-md hover:bg-gray-200" data-tooltip="Start a new chat">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                </button>
+            </div>
+
+            <nav class="space-y-4">
+                <div>
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Discover</h3>
+                    <a href="#" data-feature="discover" class="flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-200" data-tooltip="Your daily news and inspiration">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 16.382V5.618a1 1 0 00-1.447-.894L15 7m-6 10v-5a1 1 0 011-1h4a1 1 0 011 1v5m-6 0h6"></path></svg>
+                        <span>Discover</span>
+                    </a>
+                    <a href="#" data-feature="labs" class="flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-200" data-tooltip="Experimental AI initiatives">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span>Labs</span>
+                    </a>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Pages</h3>
+                    <a href="#" data-feature="untitledPage" class="flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-200" data-tooltip="An untitled page for drafting or note-taking.">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span>Untitled page</span>
+                    </a>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Conversations</h3>
+                    <div class="space-y-1">
+                        <!-- Removed hardcoded conversations -->
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="flex justify-end">
+            <img src="https://placehold.co/32x32/a855f7/ffffff?text=U" alt="User" class="w-8 h-8 rounded-full cursor-pointer" data-tooltip="User Profile">
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 flex flex-col items-center justify-center p-4 md:p-6 lg:p-8 relative">
+        <!-- User Profile Icon in Top Right -->
+        <div class="absolute top-4 right-4">
+            <img src="https://placehold.co/32x32/a855f7/ffffff?text=U" alt="User" class="w-8 h-8 rounded-full cursor-pointer" data-feature="userProfileTopRight" data-tooltip="Manage your profile and settings.">
+        </div>
+
+        <div class="flex flex-col items-center justify-center h-full text-center chat-message-fade w-full max-w-2xl">
+            <!-- Removed "Hey Jiri, what's on my mind today?" -->
+            
+            <!-- Message Copilot Input Bar -->
+            <div class="w-full relative bg-white rounded-xl shadow-md p-2 border border-gray-200">
+                <div class="flex items-center">
+                    <!-- Input field -->
+                    <input type="text" id="chat-input" class="flex-1 bg-transparent border-none outline-none text-gray-800 placeholder-gray-400 px-2 py-1" placeholder="Message Copilot">
+                    <button id="send-button" class="p-2 ml-2 rounded-full bg-blue-600 hover:bg-blue-700 transition-colors" data-tooltip="Send message">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </div>
+                <!-- Buttons below the input field, inside the same container -->
+                <div class="flex items-center justify-start gap-2 mt-2 px-2 relative">
+                    <button data-feature="copilotNews" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" data-tooltip="Access Copilot news and updates">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </button>
+                    <button id="quick-response-toggle" class="flex items-center space-x-1 px-3 py-1 rounded-full hover:bg-gray-100 transition-colors text-gray-600 text-sm font-medium" data-tooltip="Toggle quick response options">
+                        <span>Quick response</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <button data-feature="attachFile" class="p-2 rounded-full hover:bg-gray-100" data-tooltip="Attach a file">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </button>
+                    <button data-feature="micInput" class="p-2 rounded-full hover:bg-gray-100" data-tooltip="Use voice input">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                    </button>
+                </div>
+                <!-- Quick Response Submenu (positioned relative to its parent .w-full.relative.bg-white...) -->
+                <div id="quick-response-submenu" class="quick-response-submenu hidden">
+                    <div class="submenu-item" data-response-style="quick" data-feature="quickResponseSubmenu">
+                        <svg class="submenu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <div class="submenu-item-text">
+                            <div class="submenu-item-title">Quick response</div>
+                            <div class="submenu-item-description">Best for everyday conversation</div>
+                        </div>
+                        <span class="submenu-item-time">2-3 sec</span>
+                        <div class="submenu-item-radio selected" data-radio-value="quick"></div>
+                    </div>
+                    <div class="submenu-item" data-response-style="thinkDeeper" data-feature="thinkDeeper">
+                        <svg class="submenu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <div class="submenu-item-text">
+                            <div class="submenu-item-title">Think Deeper</div>
+                            <div class="submenu-item-description">Better for more complex topics</div>
+                        </div>
+                        <span class="submenu-item-time">~30 sec</span>
+                        <div class="submenu-item-radio" data-radio-value="thinkDeeper"></div>
+                    </div>
+                    <div class="submenu-item" data-response-style="action" data-feature="action">
+                        <svg class="submenu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <div class="submenu-item-text">
+                            <div class="submenu-item-title">Action</div>
+                            <div class="submenu-item-description">Hand off everyday tasks</div>
+                        </div>
+                        <span class="submenu-item-badge">Labs</span>
+                        <span class="submenu-item-time">5-10 min</span>
+                        <div class="submenu-item-radio" data-radio-value="action"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Prompt Buttons -->
+            <div class="flex flex-wrap justify-center gap-3 mt-8">
+                <button data-feature="writeFirstDraft" data-quick-prompt="Write a first draft" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Start generating content for a document, email, or other text.">Write a first draft</button>
+                <button data-feature="getAdvice" data-quick-prompt="Get advice" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Receive guidance or suggestions on a specific topic or problem.">Get advice</button>
+                <button data-feature="learnSomethingNew" data-quick-prompt="Learn something new" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Explore a new topic and get explanations or summaries.">Learn something new</button>
+                <button data-feature="createAnImage" data-quick-prompt="Create an image" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Generate an image based on your textual description.">Create an image</button>
+                <button data-feature="makeAPlan" data-quick-prompt="Make a plan" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Develop a structured plan for a project, event, or task.">Make a plan</button>
+                <button data-feature="brainstormIdeas" data-quick-prompt="Brainstorm ideas" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Generate a variety of ideas on a given subject.">Brainstorm ideas</button>
+                <button data-feature="practiceALanguage" data-quick-prompt="Practice a language" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Engage in conversational practice or get grammar/vocabulary help for a language.">Practice a language</button>
+                <button data-feature="takeAQuiz" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Generate a quiz on a specified topic to test your knowledge.">Take a quiz</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="modal-overlay fixed inset-0"></div>
+        <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-lg p-6 relative border border-gray-200 text-gray-800">
+            <h3 id="modal-title" class="text-xl font-bold text-gray-900 mb-3"></h3>
+            <p id="modal-body" class="text-gray-700 leading-relaxed"></p>
+            <button id="modal-close" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tooltip Element -->
+    <div id="tooltip" class="tooltip hidden"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatContainer = document.getElementById('main-content');
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            const quickResponseToggle = document.getElementById('quick-response-toggle');
+            const quickResponseSubmenu = document.getElementById('quick-response-submenu');
+            const submenuItems = quickResponseSubmenu.querySelectorAll('.submenu-item');
+
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalClose = document.getElementById('modal-close');
+            const modalOverlay = document.querySelector('.modal-overlay');
+            const tooltipElement = document.getElementById('tooltip');
+
+            let currentResponseStyle = 'quick'; // Default selected style
+
+            const featureModals = {
+                quickResponse: {
+                    title: "Quick Response Options",
+                    body: "This dropdown allows you to select from pre-defined quick responses or conversation starters, making it faster to initiate common tasks or get specific types of output from Copilot."
+                },
+                quickResponseSubmenu: {
+                    title: "Quick Response Style",
+                    body: "This style is best for everyday conversations, providing concise and immediate answers, optimized for speed and simplicity."
+                },
+                thinkDeeper: {
+                    title: "Think Deeper Style",
+                    body: "The 'Think Deeper' style is designed for more complex topics, allowing Copilot to take more time to process and provide a comprehensive, detailed, and well-researched response."
+                },
+                action: {
+                    title: "Action Style (Labs)",
+                    body: "The 'Action' style is an experimental feature (in Labs) that allows Copilot to assist with everyday tasks, potentially integrating with other tools or services to 'hand off' actions. It's for more proactive assistance."
+                },
+                attachFile: {
+                    title: "Attach File",
+                    body: "This feature allows you to upload various file types (documents, images, etc.) to provide context for your query. Copilot can then analyze the file's content to give more relevant answers."
+                },
+                newChat: {
+                    title: "Start a New Chat",
+                    body: "This icon allows you to start a completely new conversation, clearing the context of the previous chat. This is useful when you want to discuss an unrelated topic."
+                },
+                discover: {
+                    title: "Discover",
+                    body: "The 'Discover' section provides daily news and inspiration, curated to help you stay updated and find new ideas related to your interests."
+                },
+                labs: {
+                    title: "Labs",
+                    body: "The 'Labs' section showcases experimental AI initiatives and features that are still under development. It's a place to explore cutting-edge capabilities and provide feedback."
+                },
+                untitledPage: {
+                    title: "Untitled Page",
+                    body: "This is a blank page where you can start drafting new content, take notes, or work on a document with Copilot's assistance. It provides a clean canvas for your ideas."
+                },
+                copilotNews: {
+                    title: "Copilot News",
+                    body: "This button provides access to the latest news, updates, and announcements related to Copilot, keeping you informed about new features and improvements."
+                },
+                micInput: {
+                    title: "Voice Input",
+                    body: "Use your voice to ask questions or give commands to Copilot. This provides a convenient, hands-free way to interact with the AI, especially useful on mobile devices."
+                },
+                userProfileTopRight: {
+                    title: "User Profile",
+                    body: "This icon represents your user profile. Clicking it would typically allow you to manage account settings, view subscription details, and personalize your Copilot experience."
+                },
+                writeFirstDraft: {
+                    title: "Write a First Draft",
+                    body: "Clicking this prompt will instruct Copilot to generate an initial draft of text based on your subsequent input. This is useful for starting essays, emails, reports, or creative writing."
+                },
+                getAdvice: {
+                    title: "Get Advice",
+                    body: "Use this prompt to ask Copilot for guidance, suggestions, or insights on a specific problem, decision, or general topic. It can offer perspectives and potential solutions."
+                },
+                learnSomethingNew: {
+                    title: "Learn Something New",
+                    body: "This prompt helps you explore new subjects. Copilot can provide concise explanations, summaries, or key facts about any topic you're curious about."
+                },
+                createAnImage: {
+                    title: "Create an Image",
+                    body: "This feature allows you to describe an image you want to generate, and Copilot will create it for you. It's useful for visual content creation or illustrating ideas."
+                },
+                makeAPlan: {
+                    title: "Make a Plan",
+                    body: "With this prompt, Copilot can help you outline steps, set timelines, and organize tasks for any project, event, or personal goal."
+                },
+                brainstormIdeas: {
+                    title: "Brainstorm Ideas",
+                    body: "This prompt is designed to help you generate a variety of creative or practical ideas on a given topic, overcoming writer's block or finding new angles."
+                },
+                practiceALanguage: {
+                    title: "Practice a Language",
+                    body: "Engage in interactive language practice with Copilot. You can converse, ask for grammar explanations, or get vocabulary help in various languages."
+                },
+                takeAQuiz: {
+                    title: "Take a Quiz",
+                    body: "Copilot can generate a custom quiz on any subject you specify, helping you test your knowledge and reinforce learning."
+                }
+            };
+
+            function showModal(title, body) {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = body;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                hideTooltip(); // Hide tooltip when modal opens
+            }
+
+            function hideModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+            
+            modalClose.addEventListener('click', hideModal);
+            modalOverlay.addEventListener('click', hideModal);
+
+            function showTooltip(element, text) {
+                if (modal.classList.contains('flex')) return; // Don't show tooltip if modal is open
+                tooltipElement.textContent = text;
+                const rect = element.getBoundingClientRect();
+                // Position tooltip to the right of the element, centered vertically
+                tooltipElement.style.left = `${rect.right + 10}px`; 
+                tooltipElement.style.top = `${rect.top + rect.height / 2}px`;
+                tooltipElement.classList.add('visible');
+            }
+
+            function hideTooltip() {
+                tooltipElement.classList.remove('visible');
+            }
+
+            function addTooltipListeners() {
+                document.querySelectorAll('[data-tooltip]').forEach(element => {
+                    element.addEventListener('mouseover', (e) => {
+                        showTooltip(e.currentTarget, e.currentTarget.dataset.tooltip);
+                    });
+                    element.addEventListener('mouseout', hideTooltip);
+                    element.addEventListener('click', hideTooltip); // Hide tooltip on click as well
+                });
+            }
+
+            function addMessage(sender, message, isUser = false) {
+                // Remove initial welcome message if present
+                const welcomeMessageContainer = chatContainer.querySelector('.flex.justify-center.items-center.h-full.text-center.chat-message-fade');
+                if (welcomeMessageContainer) {
+                    welcomeMessageContainer.remove();
+                }
+
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('flex', 'items-start', 'gap-3', 'chat-message-fade', 'w-full', 'max-w-2xl');
+                
+                let avatarHtml = '';
+                let messageBg = '';
+                let textColor = '';
+                let alignmentClass = '';
+
+                if (isUser) {
+                    avatarHtml = `<div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">U</div>`;
+                    messageBg = 'bg-blue-100'; // Lighter blue for user messages
+                    textColor = 'text-gray-900';
+                    alignmentClass = 'ml-auto flex-row-reverse'; // Align user messages to the right
+                } else {
+                    avatarHtml = `<div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">AI</div>`;
+                    messageBg = 'bg-gray-200'; // Light gray for AI messages
+                    textColor = 'text-gray-900';
+                    alignmentClass = ''; // Default alignment for AI messages
+                }
+
+                messageDiv.innerHTML = `
+                    <div class="flex items-start gap-3 w-full ${alignmentClass}">
+                        ${!isUser ? avatarHtml : ''}
+                        <div class="p-3 rounded-lg ${messageBg} ${textColor} max-w-[75%] shadow-sm">
+                            ${message}
+                        </div>
+                        ${isUser ? avatarHtml : ''}
+                    </div>
+                `;
+                // Append messages to a new container within main-content to keep the input at the bottom
+                let messagesWrapper = document.getElementById('messages-wrapper');
+                if (!messagesWrapper) {
+                    messagesWrapper = document.createElement('div');
+                    messagesWrapper.id = 'messages-wrapper';
+                    messagesWrapper.classList.add('flex', 'flex-col', 'space-y-4', 'w-full', 'max-w-2xl', 'mx-auto', 'mb-auto');
+                    chatContainer.insertBefore(messagesWrapper, chatContainer.firstChild); // Insert at the top
+                }
+                messagesWrapper.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom
+            }
+
+            function simulateCopilotResponse(query) {
+                // Remove initial welcome message if present
+                const welcomeMessageContainer = chatContainer.querySelector('.flex.justify-center.items-center.h-full.text-center.chat-message-fade');
+                if (welcomeMessageContainer) {
+                    welcomeMessageContainer.remove();
+                }
+
+                addMessage('user', query, true);
+
+                // Create a temporary div for messages if it doesn't exist
+                let messagesWrapper = document.getElementById('messages-wrapper');
+                if (!messagesWrapper) {
+                    messagesWrapper = document.createElement('div');
+                    messagesWrapper.id = 'messages-wrapper';
+                    messagesWrapper.classList.add('flex', 'flex-col', 'space-y-4', 'w-full', 'max-w-2xl', 'mx-auto', 'mb-auto');
+                    chatContainer.insertBefore(messagesWrapper, chatContainer.firstChild);
+                }
+
+                const thinkingMessageDiv = document.createElement('div');
+                thinkingMessageDiv.classList.add('flex', 'items-start', 'gap-3', 'chat-message-fade', 'w-full', 'max-w-2xl');
+                thinkingMessageDiv.innerHTML = `
+                    <div class="flex items-start gap-3 w-full">
+                        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">AI</div>
+                        <div class="p-3 rounded-lg bg-gray-200 text-gray-900 flex items-center space-x-2 shadow-sm">
+                            <div class="loader"></div>
+                            <span>Copilot is thinking...</span>
+                        </div>
+                    </div>
+                `;
+                messagesWrapper.appendChild(thinkingMessageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                setTimeout(() => {
+                    thinkingMessageDiv.remove(); // Remove thinking message
+
+                    let responseText = `I've processed your query: "<strong>${query}</strong>".`;
+                    
+                    if (query.toLowerCase().includes('summarize')) {
+                        responseText += `<br><br>Here's a concise summary of the topic you mentioned. For a real summary, I would need the actual document content. This demonstrates my ability to condense information effectively.`;
+                    } else if (query.toLowerCase().includes('story')) {
+                        responseText += `<br><br>Once upon a time, in a land of pure imagination, a brave adventurer set out to discover the lost city of Eldoria. This is just a snippet, but I can write much more detailed and engaging stories!`;
+                    } else if (query.toLowerCase().includes('quantum physics')) {
+                         responseText += `<br><br>Quantum physics is the study of matter and energy at the most fundamental level. It aims to describe the properties and behavior of atoms and subatomic particles. Unlike classical physics, quantum mechanics describes nature at the smallest scales where classical mechanics breaks down. It's a fascinating field!`;
+                    } else if (query.toLowerCase().includes('first draft')) {
+                        responseText += `<br><br>Here's a first draft for your request. I can help you outline, expand, or refine this further. Just let me know what you need!`;
+                    } else if (query.toLowerCase().includes('advice')) {
+                        responseText += `<br><br>Here's some general advice on the topic you asked about. Remember, for personal or critical matters, always consult a professional.`;
+                    } else if (query.toLowerCase().includes('learn something new')) {
+                        responseText += `<br><br>Great! What specific topic are you interested in learning about? I can provide explanations, tutorials, or resources.`;
+                    } else if (query.toLowerCase().includes('create an image')) {
+                        responseText += `<br><br>I can generate an image based on your description. What kind of image would you like to create?`;
+                    } else if (query.toLowerCase().includes('make a plan')) {
+                        responseText += `<br><br>To help you make a plan, please tell me more about your goal and any specific steps or deadlines you have in mind.`;
+                    } else if (query.toLowerCase().includes('brainstorm ideas')) {
+                        responseText += `<br><br>Let's brainstorm! What topic or problem are we focusing on? I can help you generate a wide range of ideas.`;
+                    } else if (query.toLowerCase().includes('practice a language')) {
+                        responseText += `<br><br>Excellent! Which language would you like to practice, and what kind of exercise would you prefer (e.g., conversation, grammar, vocabulary)?`;
+                    } else if (query.toLowerCase().includes('take a quiz')) {
+                        responseText += `<br><br>I can create a quiz for you! What subject or topic should the quiz be about, and what difficulty level would you prefer?`;
+                    }
+                    else {
+                        responseText += `<br><br>I can provide information, generate creative text, or help you brainstorm ideas. How else can I assist you with this?`;
+                    }
+
+                    responseText += `<br><br><span class="text-xs text-gray-500"><em>(This is a simulated response. In a real Copilot, the answer would be dynamically generated.)</em></span>`;
+
+                    addMessage('copilot', responseText, false);
+                    chatInput.value = ''; // Clear input field
+                }, 3000); // Simulate network delay
+            }
+
+            // Event Listeners
+            sendButton.addEventListener('click', () => {
+                const query = chatInput.value.trim();
+                if (query) {
+                    simulateCopilotResponse(query);
+                } else {
+                    showModal("Empty Query", "Please type a message before sending.");
+                }
+            });
+
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendButton.click();
+                }
+            });
+
+            quickResponseToggle.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent click from bubbling to document and closing submenu
+                quickResponseSubmenu.classList.toggle('visible');
+            });
+
+            document.addEventListener('click', (e) => {
+                // Close submenu if click outside
+                if (!quickResponseSubmenu.contains(e.target) && e.target !== quickResponseToggle) {
+                    quickResponseSubmenu.classList.remove('visible');
+                }
+            });
+
+            submenuItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const style = e.currentTarget.dataset.responseStyle;
+                    const feature = e.currentTarget.dataset.feature;
+
+                    // Update radio button selection
+                    quickResponseSubmenu.querySelectorAll('.submenu-item-radio').forEach(radio => {
+                        radio.classList.remove('selected');
+                    });
+                    e.currentTarget.querySelector('.submenu-item-radio').classList.add('selected');
+                    
+                    currentResponseStyle = style; // Update the current style
+                    showModal(featureModals[feature].title, featureModals[feature].body);
+                    quickResponseSubmenu.classList.remove('visible'); // Close submenu after selection
+                });
+            });
+
+
+            document.querySelectorAll('[data-feature]').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    const feature = e.currentTarget.dataset.feature;
+                    // Only show modal if it's not a submenu item that already handled its modal
+                    if (featureModals[feature] && !e.currentTarget.closest('.quick-response-submenu')) {
+                        showModal(featureModals[feature].title, featureModals[feature].body);
+                    }
+                    if (feature === 'newChat') {
+                        // Clear chat history and reset to welcome message
+                        chatContainer.innerHTML = `
+                            <!-- User Profile Icon in Top Right -->
+                            <div class="absolute top-4 right-4">
+                                <img src="https://placehold.co/32x32/a855f7/ffffff?text=U" alt="User" class="w-8 h-8 rounded-full cursor-pointer" data-feature="userProfileTopRight" data-tooltip="Manage your profile and settings.">
+                            </div>
+                            <div class="flex flex-col items-center justify-center h-full text-center chat-message-fade w-full max-w-2xl">
+                                <!-- No "Hey Jiri..." message -->
+                            </div>
+                            <!-- Message Copilot Input Bar -->
+                            <div class="w-full relative bg-white rounded-xl shadow-md p-2 border border-gray-200">
+                                <div class="flex items-center">
+                                    <input type="text" id="chat-input" class="flex-1 bg-transparent border-none outline-none text-gray-800 placeholder-gray-400 px-2 py-1" placeholder="Message Copilot">
+                                    <button id="send-button" class="p-2 ml-2 rounded-full bg-blue-600 hover:bg-blue-700 transition-colors" data-tooltip="Send message">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                    </button>
+                                </div>
+                                <!-- Buttons below the input field, inside the same container -->
+                                <div class="flex items-center justify-start gap-2 mt-2 px-2 relative">
+                                    <button data-feature="copilotNews" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" data-tooltip="Access Copilot news and updates">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </button>
+                                    <button id="quick-response-toggle" class="flex items-center space-x-1 px-3 py-1 rounded-full hover:bg-gray-100 transition-colors text-gray-600 text-sm font-medium" data-tooltip="Toggle quick response options">
+                                        <span>Quick response</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <button data-feature="attachFile" class="p-2 rounded-full hover:bg-gray-100" data-tooltip="Attach a file">
+                                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </button>
+                                    <button data-feature="micInput" class="p-2 rounded-full hover:bg-gray-100" data-tooltip="Use voice input">
+                                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Quick Prompt Buttons -->
+                            <div class="flex flex-wrap justify-center gap-3 mt-8">
+                                <button data-feature="writeFirstDraft" data-quick-prompt="Write a first draft" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Start generating content for a document, email, or other text.">Write a first draft</button>
+                                <button data-feature="getAdvice" data-quick-prompt="Get advice" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Receive guidance or suggestions on a specific topic or problem.">Get advice</button>
+                                <button data-feature="learnSomethingNew" data-quick-prompt="Learn something new" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Explore a new topic and get explanations or summaries.">Learn something new</button>
+                                <button data-feature="createAnImage" data-quick-prompt="Create an image" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Generate an image based on your textual description.">Create an image</button>
+                                <button data-feature="makeAPlan" data-quick-prompt="Make a plan" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Develop a structured plan for a project, event, or task.">Make a plan</button>
+                                <button data-feature="brainstormIdeas" data-quick-prompt="Brainstorm ideas" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Generate a variety of ideas on a given subject.">Brainstorm ideas</button>
+                                <button data-feature="practiceALanguage" data-quick-prompt="Practice a language" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Engage in conversational practice or get grammar/vocabulary help for a language.">Practice a language</button>
+                                <button data-feature="takeAQuiz" class="quick-prompt-btn bg-white hover:bg-gray-100 text-sm font-medium px-4 py-2 rounded-full shadow-sm border border-gray-200 transition-colors" data-tooltip="Generate a quiz on a specified topic to test your knowledge.">Take a quiz</button>
+                            </div>
+                        `;
+                        addTooltipListeners(); // Re-add listeners for new quick prompt buttons
+                        // Re-attach quick prompt buttons listeners to the newly rendered buttons
+                        document.querySelectorAll('.quick-prompt-btn').forEach(button => {
+                            button.addEventListener('click', (e) => {
+                                const prompt = e.currentTarget.dataset.quickPrompt;
+                                chatInput.value = prompt;
+                                simulateCopilotResponse(prompt);
+                            });
+                        });
+                    }
+                });
+            });
+
+            // Re-attach quick prompt buttons listeners initially and after new chat
+            document.querySelectorAll('.quick-prompt-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const prompt = e.currentTarget.dataset.quickPrompt;
+                    chatInput.value = prompt;
+                    simulateCopilotResponse(prompt);
+                });
+            });
+
+            // Initial setup
+            addTooltipListeners();
+        });
+    </script>
+</body>
+</html>
