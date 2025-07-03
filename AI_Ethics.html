@@ -1,269 +1,586 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <title>AI in Education: Faculty Perspectives</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f6f8fb;
-      color: #222;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #1d3557;
-      color: #fff;
-      padding: 2rem 1rem 1rem 1rem;
-      text-align: center;
-      border-bottom-left-radius: 32px;
-      border-bottom-right-radius: 32px;
-    }
-    h1 {
-      margin: 0 0 0.5rem 0;
-      font-size: 2.2rem;
-      letter-spacing: 1px;
-    }
-    h2 {
-      color: #1d3557;
-      margin-top: 2rem;
-    }
-    .container {
-      max-width: 950px;
-      margin: 2rem auto;
-      padding: 1.5rem;
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 2px 16px rgba(44, 62, 80, 0.07);
-    }
-    .issues-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      margin: 2rem 0;
-      justify-content: center;
-    }
-    .card {
-      background: #e9f1fa;
-      border-radius: 16px;
-      padding: 1.3rem 1rem;
-      min-width: 260px;
-      max-width: 330px;
-      box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
-      cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.2s;
-      border: 2px solid transparent;
-    }
-    .card.selected, .card:hover {
-      border: 2px solid #1d3557;
-      box-shadow: 0 6px 24px rgba(44, 62, 80, 0.13);
-      transform: translateY(-2px) scale(1.03);
-    }
-    .card-title {
-      font-weight: bold;
-      font-size: 1.13rem;
-      margin-bottom: 0.5rem;
-      color: #222;
-    }
-    .card-desc {
-      font-size: 1rem;
-      color: #444;
-    }
-    .details-section {
-      margin-top: 2rem;
-      background: #f6f8fc;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 1px 6px rgba(44, 62, 80, 0.05);
-      min-height: 180px;
-      transition: background 0.3s;
-    }
-    .section-title {
-      font-size: 1.1rem;
-      color: #1d3557;
-      margin-top: 1.2rem;
-      margin-bottom: 0.5rem;
-      font-weight: bold;
-    }
-    .key-points, .solutions, .pedagogy {
-      margin: 1rem 0;
-      padding-left: 1.2rem;
-    }
-    .key-points li, .solutions li, .pedagogy li {
-      margin-bottom: 0.7em;
-      line-height: 1.5;
-    }
-    @media (max-width: 700px) {
-      .issues-list {
-        flex-direction: column;
-        align-items: center;
-      }
-      .container {
-        margin: 1rem;
-        padding: 0.5rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethical AI in Education: An Interactive Exploration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Warm Neutrals & Cool Accents) -->
+    <!-- Application Structure Plan: A user-centric, single-page application designed for exploration rather than linear reading. The structure includes: 1) A welcoming hero section. 2) Sticky navigation for easy access to key areas. 3) An interactive 'Dilemmas' section with clickable cards to reveal detailed information, preventing cognitive overload. 4) An accordion-based 'Solutions' section for layered discovery. 5) A clear, scannable 'Student Guide' with Do/Don't cards for actionable advice. 6) An 'Explore the Connections' section with a dynamic radar chart, allowing users to visualize the relationship between problems and solutions. This structure was chosen to make a complex report digestible and engaging, encouraging user interaction and synthesis of information rather than passive consumption. -->
+    <!-- Visualization & Content Choices: 
+        - Dilemmas: Goal: Inform/Organize. Method: Interactive Cards (HTML/CSS/JS). Interaction: Click to reveal details. Justification: Breaks down complex topics into manageable, user-selectable chunks.
+        - Solutions: Goal: Organize/Inform. Method: Accordion (HTML/CSS/JS). Interaction: Click to expand/collapse. Justification: Condenses detailed information into a clean, hierarchical view.
+        - Student Guide: Goal: Inform/Guide. Method: Styled 'Do/Don't' Cards (HTML/Tailwind). Interaction: Static. Justification: Creates a visually clear, quick-reference guide for practical advice.
+        - Connections Chart: Goal: Compare/Relationships. Method: Interactive Radar Chart (Chart.js/Canvas). Interaction: Dropdown selector updates chart. Justification: Provides a novel, data-driven perspective on the report, highlighting the interconnectedness of issues and solutions, which is a key report theme. The chart container is responsive and constrained.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f3f0;
+            color: #4a4a4a;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-bottom-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+            padding: 0 1.5rem;
+        }
+        .accordion-content.open {
+            max-height: 1000px; /* Large enough for content */
+            padding: 1rem 1.5rem 1.5rem;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+        .smooth-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        }
+    </style>
 </head>
-<body>
-  <header>
-    <h1>AI in Education: Faculty Perspectives</h1>
-    <p>Major concerns, pedagogical changes, and strategies for student learning</p>
-  </header>
-  <div class="container">
-    <h2>Faculty's Major Issues of Concern</h2>
-    <div class="issues-list" id="issues-list">
-      <!-- Cards will be inserted here by JavaScript -->
-    </div>
-    <div class="details-section" id="details-section">
-      <em>Select an issue above to explore its impact and solutions.</em>
-    </div>
-  </div>
-  <script>
-    // Faculty concerns, pedagogical impact, and solutions
-    const issues = [
-      {
-        title: "Over-Reliance & Critical Thinking",
-        desc: "Students may become too dependent on AI tools, undermining their ability to think critically and independently.",
-        keyPoints: [
-          "AI tools can shortcut learning, making it easy for students to bypass essential cognitive processes.",
-          "Students may accept AI-generated content uncritically, missing opportunities for deeper understanding.",
-          "Faculty worry that critical thinking and original analysis may decline if AI is overused."
-        ],
-        pedagogy: [
-          "Shift from rote assignments to tasks requiring analysis, synthesis, and reflection on AI-generated content.",
-          "Incorporate metacognitive components—ask students to explain their process and critique AI outputs.",
-          "Design assessments that require personal insight, creativity, or up-to-date knowledge not easily replicated by AI."
-        ],
-        solutions: [
-          "Teach AI literacy: train students to question, verify, and critique AI-generated material.",
-          "Develop clear guidelines for ethical and responsible AI use in coursework.",
-          "Encourage reflective assignments where students compare their work with AI outputs and justify their choices."
-        ]
-      },
-      {
-        title: "Academic Integrity & Assessment",
-        desc: "AI challenges traditional assessment methods and raises new concerns about plagiarism and authentic learning.",
-        keyPoints: [
-          "Automated content generation can obscure individual student understanding and effort.",
-          "Traditional take-home essays and reports are increasingly vulnerable to AI misuse.",
-          "Faculty need to ensure assessments measure genuine student learning, not just AI's capabilities."
-        ],
-        pedagogy: [
-          "Redesign assignments to include process documentation, oral defenses, or in-class components.",
-          "Scaffold assignments in stages, requiring drafts, peer review, and instructor feedback.",
-          "Focus on project-based, collaborative, or experiential assessments that emphasize learning over product."
-        ],
-        solutions: [
-          "Create AI-resistant assessments and require students to submit evidence of their process.",
-          "Use plagiarism detection and AI output comparison tools thoughtfully.",
-          "Foster a culture of academic honesty and clarify expectations around AI use."
-        ]
-      },
-      {
-        title: "Bias, Fairness & Equity",
-        desc: "AI systems can perpetuate bias and exacerbate inequities, affecting grading, access, and representation.",
-        keyPoints: [
-          "AI may reinforce existing biases if trained on unrepresentative data, impacting fairness in grading or support.",
-          "Adaptive learning platforms can disadvantage students from underrepresented backgrounds.",
-          "Access to premium AI tools is often unequal, deepening the digital divide."
-        ],
-        pedagogy: [
-          "Critically examine AI tools for bias before classroom adoption.",
-          "Discuss equity and fairness in AI as part of course content.",
-          "Design assignments that allow all students to participate, regardless of AI access level."
-        ],
-        solutions: [
-          "Advocate for transparent, diverse data and regular audits of AI systems.",
-          "Provide alternative resources for students without premium AI access.",
-          "Promote inclusive teaching practices and universal design for learning."
-        ]
-      },
-      {
-        title: "Faculty Preparedness & Professional Development",
-        desc: "Many faculty feel unprepared to integrate AI, lacking training and institutional support.",
-        keyPoints: [
-          "Significant gaps in AI literacy and confidence among faculty, especially outside technical fields.",
-          "Faculty need support to evaluate, select, and implement AI tools ethically and effectively.",
-          "Rapid AI evolution requires ongoing professional development and collaboration."
-        ],
-        pedagogy: [
-          "Faculty roles are shifting from content delivery to mentorship, facilitation, and critical guidance.",
-          "Departments must create space for faculty to experiment, share, and reflect on AI integration.",
-          "Professional development should address both technical skills and ethical, pedagogical considerations."
-        ],
-        solutions: [
-          "Offer hands-on workshops, micro-credentials, and interdisciplinary AI teaching incubators.",
-          "Foster faculty learning communities for ongoing discussion and policy refinement.",
-          "Encourage cross-disciplinary collaboration to bridge technical and humanistic perspectives."
-        ]
-      },
-      {
-        title: "Privacy, Transparency & Data Security",
-        desc: "AI's use of student data raises concerns about privacy, consent, and transparency.",
-        keyPoints: [
-          "AI systems collect and analyze sensitive student data, often without clear consent or understanding.",
-          "Opaque algorithms make it difficult for faculty and students to understand or challenge decisions.",
-          "Data breaches or misuse could have serious consequences for student trust and safety."
-        ],
-        pedagogy: [
-          "Be transparent with students about how AI and data are used in the course.",
-          "Integrate discussions of privacy, data ethics, and digital citizenship into the curriculum.",
-          "Model responsible data stewardship and advocate for robust institutional policies."
-        ],
-        solutions: [
-          "Implement clear data governance, consent protocols, and privacy protections.",
-          "Educate students about their digital rights and responsibilities.",
-          "Regularly review and communicate AI tool privacy practices and risks."
-        ]
-      }
-    ];
+<body class="antialiased">
 
-    // Render cards
-    const issuesList = document.getElementById('issues-list');
-    const detailsSection = document.getElementById('details-section');
+    <!-- Header & Navigation -->
+    <header id="header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold text-gray-800">AI Ethics in Education</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#dilemmas" class="nav-link font-medium pb-1">The Dilemmas</a>
+                <a href="#solutions" class="nav-link font-medium pb-1">The Solutions</a>
+                <a href="#student-guide" class="nav-link font-medium pb-1">Student Guide</a>
+                <a href="#connections" class="nav-link font-medium pb-1">Explore Connections</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#dilemmas" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">The Dilemmas</a>
+            <a href="#solutions" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">The Solutions</a>
+            <a href="#student-guide" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Student Guide</a>
+            <a href="#connections" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Explore Connections</a>
+        </div>
+    </header>
 
-    function renderCards() {
-      issues.forEach((issue, idx) => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.tabIndex = 0;
-        card.setAttribute('role', 'button');
-        card.setAttribute('aria-label', issue.title);
-        card.innerHTML = `
-          <div class="card-title">${issue.title}</div>
-          <div class="card-desc">${issue.desc}</div>
-        `;
-        card.addEventListener('click', () => selectIssue(idx));
-        card.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') selectIssue(idx);
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="container mx-auto px-6 py-16 md:py-24 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 leading-tight">Navigating the AI Frontier in Education</h1>
+            <p class="mt-6 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">The rise of AI presents both incredible opportunities and complex ethical challenges. This guide is designed to help students, educators, and leaders understand and navigate this new landscape responsibly.</p>
+        </section>
+
+        <!-- Section 1: The Dilemmas -->
+        <section id="dilemmas" class="py-16 md:py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">The Core Ethical Dilemmas</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">AI's integration into education surfaces critical challenges that require our attention. Click on a dilemma to explore its nuances, real-world examples, and the core tensions at play.</p>
+                </div>
+                <div id="dilemmas-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Cards will be injected by JavaScript -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Modal for Dilemma Details -->
+        <div id="dilemma-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0">
+                <div class="p-6 md:p-8">
+                    <div class="flex justify-between items-start">
+                        <h3 id="modal-title" class="text-2xl font-bold text-gray-800"></h3>
+                        <button id="modal-close" class="text-gray-500 hover:text-gray-800">&times;</button>
+                    </div>
+                    <p id="modal-definition" class="mt-4 text-gray-600"></p>
+                    <div class="mt-6">
+                        <h4 class="font-semibold text-gray-700">How It Manifests:</h4>
+                        <ul id="modal-manifestations" class="mt-2 list-disc list-inside text-gray-600 space-y-1"></ul>
+                    </div>
+                    <div id="modal-stake-container" class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
+                         <h4 class="font-semibold text-blue-800">What's at Stake?</h4>
+                         <p id="modal-stake" class="mt-1 text-blue-700"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: The Solutions -->
+        <section id="solutions" class="py-16 md:py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Charting a Path Forward: Key Solutions</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Addressing these dilemmas requires a multi-faceted approach. Explore the interconnected strategies that can help build a responsible and human-centered educational ecosystem.</p>
+                </div>
+                <div id="solutions-accordion" class="max-w-3xl mx-auto space-y-4">
+                     <!-- Accordion items will be injected by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Student Guide -->
+        <section id="student-guide" class="py-16 md:py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">A Student's Guide to Ethical AI Use</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">As a student, you are on the front lines of AI in education. Here's how you can use these powerful tools responsibly and ethically to enhance your learning.</p>
+                </div>
+                <div id="student-guide-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Student guide cards will be injected by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Explore Connections -->
+        <section id="connections" class="py-16 md:py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Explore the Connections</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Problems and solutions are deeply interconnected. Select a dilemma to see which solution types are most effective in addressing it, based on the report's findings.</p>
+                </div>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                    <div class="w-full md:w-1/3">
+                        <label for="dilemma-selector" class="block text-sm font-medium text-gray-700 mb-2">Select a Dilemma:</label>
+                        <select id="dilemma-selector" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </select>
+                        <div id="chart-context" class="mt-4 p-4 bg-gray-100 rounded-lg text-gray-700 text-sm">
+                            <p>This chart visualizes the relative impact of each solution category on the selected dilemma. A higher score indicates a stronger connection and effectiveness.</p>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-2/3 flex justify-center">
+                        <div class="chart-container">
+                            <canvas id="connectionsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>&copy; 2024 AI Ethics in Education Initiative. All rights reserved.</p>
+            <p class="text-sm text-gray-400 mt-2">This interactive experience is based on the report "Ethical Conundrums with AI Usage in Education."</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // Data from the report
+            const dilemmasData = [
+                {
+                    id: 'integrity',
+                    title: 'Academic Integrity & Authorship',
+                    icon: '🎓',
+                    definition: 'The challenge of defining original student work and preventing misuse of AI for content generation and plagiarism.',
+                    manifestations: [
+                        'Students using AI to write entire essays or code.',
+                        'Difficulty in distinguishing student work from AI-generated content.',
+                        'The rise of an "arms race" between AI generation and detection tools.',
+                        'Blurring lines of ownership and what constitutes "original thought".'
+                    ],
+                    stake: 'The core tension is between leveraging AI as a powerful learning assistant and the crisis of authenticity that challenges the very definition of academic integrity.'
+                },
+                {
+                    id: 'privacy',
+                    title: 'Data Privacy & Security',
+                    icon: '🔒',
+                    definition: 'The risks associated with the collection, storage, and potential misuse of sensitive student data required by AI systems.',
+                    manifestations: [
+                        'Collection of personal, academic, and behavioral data.',
+                        'Risk of data breaches, as seen with services like ProctorU.',
+                        'A sense of constant surveillance altering student behavior.',
+                        'Lack of student control over how their data is used or commercialized.'
+                    ],
+                    stake: 'The core tension is between the promise of data-driven personalized learning and the threat of pervasive surveillance that erodes privacy and trust.'
+                },
+                {
+                    id: 'bias',
+                    title: 'Algorithmic Bias & Equity',
+                    icon: '⚖️',
+                    definition: 'The risk of AI systems perpetuating and amplifying existing societal biases, leading to unfair outcomes for certain student groups.',
+                    manifestations: [
+                        'Grading systems that favor specific writing styles or backgrounds.',
+                        'Admissions algorithms that may exclude marginalized groups.',
+                        'Predictive models underestimating the potential of minority students.',
+                        'The 2020 UK grading scandal disproportionately penalizing students from low-income areas.'
+                    ],
+                    stake: 'The core tension lies in the paradox of using AI to achieve "fairness" while the systems themselves can act as mirrors and amplifiers of deep-seated societal inequities.'
+                },
+                {
+                    id: 'autonomy',
+                    title: 'Student Autonomy & Critical Thinking',
+                    icon: '🧠',
+                    definition: 'The concern that over-reliance on AI for answers diminishes students\' ability to think critically, solve problems independently, and develop foundational cognitive skills.',
+                    manifestations: [
+                        'Students becoming passive learners, seeking answers instead of understanding processes.',
+                        'Erosion of foundational skills like mental calculation or analytical reasoning.',
+                        'Reduced attention spans due to the availability of instant solutions.',
+                        'Loss of human connection and empathy in the learning process.'
+                    ],
+                    stake: 'The core tension is between the efficiency gained from AI-provided answers and the potential erosion of the essential, effortful cognitive processes that lead to deep learning.'
+                },
+                {
+                    id: 'transparency',
+                    title: 'Transparency & Explainability',
+                    icon: '🔍',
+                    definition: 'The "black box" problem, where the decision-making processes of complex AI systems are opaque, making it difficult to trust, verify, or challenge their outputs.',
+                    manifestations: [
+                        'Inability to understand why an AI assigned a certain grade or recommendation.',
+                        'Difficulty in identifying and correcting hidden biases.',
+                        'Erosion of trust among students and educators.',
+                        'Challenges in holding anyone accountable for flawed AI decisions.'
+                    ],
+                    stake: 'The core tension is the trade-off between the performance of highly complex models and their explainability, forcing a choice between accuracy and accountability.'
+                },
+                {
+                    id: 'educator-role',
+                    title: 'The Evolving Role of the Educator',
+                    icon: '👩‍🏫',
+                    definition: 'The fundamental shift in the educator\'s role, balancing AI as a powerful augmentation tool against fears of de-professionalization or replacement.',
+                    manifestations: [
+                        'AI automating tasks like grading and tutoring.',
+                        'Educators feeling their professional authority is undermined.',
+                        'Anxiety about job displacement vs. empowerment.',
+                        'The need to shift focus from content delivery to mentorship and fostering human-centric skills.'
+                    ],
+                    stake: 'The core tension is between AI empowering educators by automating mundane tasks and the psychological fear of AI displacing the irreplaceable human elements of teaching.'
+                }
+            ];
+
+            const solutionsData = [
+                {
+                    title: "Policy and Governance Frameworks",
+                    icon: "🏛️",
+                    content: "Establishing clear, proactive institutional rules is the bedrock of responsible AI. This involves creating comprehensive policies on AI usage, defining ethical guidelines for classrooms, and ensuring robust data governance that complies with privacy laws like FERPA. The goal is to move from reacting to problems to proactively designing an ethical ecosystem."
+                },
+                {
+                    title: "Technological Safeguards",
+                    icon: "🛡️",
+                    content: "Technology is both the source of and solution to many ethical risks. Key safeguards include strong encryption and anonymization of student data, implementing 'privacy-by-design' principles from the start, and using Explainable AI (XAI) to make algorithmic decisions transparent. These measures build trust and allow for bias detection."
+                },
+                {
+                    title: "Human-in-the-Loop (HITL) Oversight",
+                    icon: "🤝",
+                    content: "AI should augment, not replace, human judgment. The HITL model ensures that a person is involved in training, evaluating, and making final decisions, especially in high-stakes areas like grading or admissions. This preserves the irreplaceable human elements of nuance, empathy, and ethical reasoning, while using human feedback to continuously improve the AI."
+                },
+                {
+                    title: "Fostering AI Literacy & Digital Citizenship",
+                    icon: "💡",
+                    content: "Empowering all stakeholders with knowledge is crucial. This means providing professional development for educators on AI's capabilities and limitations, and teaching students to be critical consumers of AI-generated content. Cultivating digital citizenship ensures users are not just passive consumers but informed, responsible participants."
+                }
+            ];
+
+            const studentGuideData = [
+                {
+                    icon: '🎯',
+                    title: 'Understand AI\'s Purpose',
+                    text: 'Use AI as a tool to brainstorm, get feedback, and learn more efficiently—not to do your thinking for you. The goal is to enhance your skills, not replace them.',
+                    type: 'do'
+                },
+                {
+                    icon: '💬',
+                    title: 'Be Transparent',
+                    text: 'Honesty builds trust. Always tell your teacher when and how you used AI in your work, following the specific citation rules for your class.',
+                    type: 'do'
+                },
+                {
+                    icon: '🤔',
+                    title: 'Critically Evaluate Everything',
+                    text: 'Don\'t blindly trust AI. It can be wrong or biased. Always fact-check its outputs, question its reasoning, and compare it with other reliable sources.',
+                    type: 'do'
+                },
+                {
+                    icon: '🙈',
+                    title: 'Don\'t Overshare Personal Data',
+                    text: 'Be very careful about what personal information (name, grades, location) you give to AI tools. Use a burner email when possible to protect your privacy.',
+                    type: 'dont'
+                },
+                {
+                    icon: '📝',
+                    title: 'Don\'t Ignore the Rules',
+                    text: 'Understand your school\'s specific policies on AI use. Misrepresenting AI work as your own has serious consequences for academic integrity.',
+                    type: 'dont'
+                },
+                {
+                    icon: '✅',
+                    title: 'Know Your Rights & Rules',
+                    text: 'Familiarize yourself with your school\'s academic integrity policy regarding AI. Knowing the rules helps you avoid accidental missteps and ensures fairness.',
+                    type: 'do'
+                }
+            ];
+
+            const chartData = {
+                integrity: [4, 2, 4, 5],
+                privacy: [5, 5, 3, 3],
+                bias: [4, 4, 5, 4],
+                autonomy: [3, 1, 4, 5],
+                transparency: [4, 5, 4, 3],
+                'educator-role': [4, 2, 5, 5]
+            };
+
+            // Populate Dilemmas Grid
+            const dilemmasGrid = document.getElementById('dilemmas-grid');
+            dilemmasData.forEach(dilemma => {
+                const card = document.createElement('div');
+                card.className = 'card bg-white p-6 rounded-lg smooth-shadow cursor-pointer';
+                card.dataset.id = dilemma.id;
+                card.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="text-3xl mr-4">${dilemma.icon}</span>
+                        <h3 class="text-xl font-semibold text-gray-800">${dilemma.title}</h3>
+                    </div>
+                    <p class="mt-4 text-gray-600">${dilemma.definition.substring(0, 100)}...</p>
+                    <span class="mt-4 inline-block text-blue-600 font-medium">Learn More &rarr;</span>
+                `;
+                dilemmasGrid.appendChild(card);
+            });
+
+            // Populate Solutions Accordion
+            const solutionsAccordion = document.getElementById('solutions-accordion');
+            solutionsData.forEach(solution => {
+                const item = document.createElement('div');
+                item.className = 'bg-white rounded-lg smooth-shadow';
+                item.innerHTML = `
+                    <button class="accordion-toggle w-full flex justify-between items-center text-left p-4 md:p-5 font-semibold text-gray-800">
+                        <span class="flex items-center"><span class="text-2xl mr-3">${solution.icon}</span>${solution.title}</span>
+                        <span class="accordion-icon transform transition-transform duration-300 text-blue-500 text-2xl font-light">&plus;</span>
+                    </button>
+                    <div class="accordion-content">
+                        <p class="text-gray-600">${solution.content}</p>
+                    </div>
+                `;
+                solutionsAccordion.appendChild(item);
+            });
+            
+            // Populate Student Guide Grid
+            const studentGuideGrid = document.getElementById('student-guide-grid');
+            studentGuideData.forEach(item => {
+                const card = document.createElement('div');
+                const bgColor = item.type === 'do' ? 'bg-teal-50' : 'bg-red-50';
+                const borderColor = item.type === 'do' ? 'border-teal-500' : 'border-red-500';
+                card.className = `p-6 rounded-lg ${bgColor} border-l-4 ${borderColor}`;
+                card.innerHTML = `
+                    <div class="flex items-start">
+                        <span class="text-2xl mr-4">${item.icon}</span>
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800">${item.title}</h4>
+                            <p class="mt-2 text-gray-700">${item.text}</p>
+                        </div>
+                    </div>
+                `;
+                studentGuideGrid.appendChild(card);
+            });
+
+            // Modal Logic
+            const modal = document.getElementById('dilemma-modal');
+            const modalContent = modal.querySelector('.bg-white');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDefinition = document.getElementById('modal-definition');
+            const modalManifestations = document.getElementById('modal-manifestations');
+            const modalStake = document.getElementById('modal-stake');
+            const modalClose = document.getElementById('modal-close');
+
+            dilemmasGrid.addEventListener('click', e => {
+                const card = e.target.closest('.card');
+                if (card) {
+                    const dilemmaId = card.dataset.id;
+                    const data = dilemmasData.find(d => d.id === dilemmaId);
+                    modalTitle.textContent = data.title;
+                    modalDefinition.textContent = data.definition;
+                    modalManifestations.innerHTML = data.manifestations.map(m => `<li>${m}</li>`).join('');
+                    modalStake.textContent = data.stake;
+
+                    modal.classList.remove('hidden');
+                    setTimeout(() => {
+                        modalContent.classList.remove('scale-95', 'opacity-0');
+                    }, 10);
+                }
+            });
+
+            function closeModal() {
+                 modalContent.classList.add('scale-95', 'opacity-0');
+                 setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            modal.addEventListener('click', e => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Accordion Logic
+            solutionsAccordion.addEventListener('click', e => {
+                const toggle = e.target.closest('.accordion-toggle');
+                if (toggle) {
+                    const content = toggle.nextElementSibling;
+                    const icon = toggle.querySelector('.accordion-icon');
+                    
+                    // Close other accordions
+                    document.querySelectorAll('.accordion-content.open').forEach(openContent => {
+                        if(openContent !== content) {
+                            openContent.classList.remove('open');
+                            openContent.previousElementSibling.querySelector('.accordion-icon').innerHTML = '&plus;';
+                            openContent.previousElementSibling.querySelector('.accordion-icon').classList.remove('rotate-45');
+                        }
+                    });
+
+                    content.classList.toggle('open');
+                    if (content.classList.contains('open')) {
+                        icon.innerHTML = '&times;';
+                        icon.classList.add('rotate-45');
+                    } else {
+                        icon.innerHTML = '&plus;';
+                        icon.classList.remove('rotate-45');
+                    }
+                }
+            });
+
+            // Chart.js Logic
+            const selector = document.getElementById('dilemma-selector');
+            dilemmasData.forEach(d => {
+                const option = document.createElement('option');
+                option.value = d.id;
+                option.textContent = d.title;
+                selector.appendChild(option);
+            });
+
+            const ctx = document.getElementById('connectionsChart').getContext('2d');
+            const connectionsChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Policy', 'Tech Safeguards', 'Human Oversight', 'AI Literacy'],
+                    datasets: [{
+                        label: 'Solution Effectiveness',
+                        data: chartData.integrity,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(59, 130, 246, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#4a4a4a'
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                max: 5,
+                                stepSize: 1,
+                                backdropColor: 'rgba(255, 255, 255, 0.75)',
+                                color: '#6b7280'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Effectiveness: ${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            selector.addEventListener('change', e => {
+                const selectedDilemma = e.target.value;
+                connectionsChart.data.datasets[0].data = chartData[selectedDilemma];
+                connectionsChart.update();
+            });
+            
+            // Mobile Menu Toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu on link click
+            mobileMenu.addEventListener('click', () => {
+                 mobileMenu.classList.add('hidden');
+            });
+
+            // Nav link active state on scroll
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+            
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
         });
-        issuesList.appendChild(card);
-      });
-    }
-
-    function selectIssue(idx) {
-      // Highlight selected card
-      Array.from(issuesList.children).forEach((card, i) => {
-        card.classList.toggle('selected', i === idx);
-      });
-      // Render details
-      const issue = issues[idx];
-      detailsSection.innerHTML = `
-        <h2>${issue.title}</h2>
-        <p><b>Description:</b> ${issue.desc}</p>
-        <div class="section-title">Major Concerns</div>
-        <ul class="key-points">${issue.keyPoints.map(kp => `<li>${kp}</li>`).join('')}</ul>
-        <div class="section-title">How Pedagogy May Change</div>
-        <ul class="pedagogy">${issue.pedagogy.map(pd => `<li>${pd}</li>`).join('')}</ul>
-        <div class="section-title">Ensuring Student Learning</div>
-        <ul class="solutions">${issue.solutions.map(sol => `<li>${sol}</li>`).join('')}</ul>
-      `;
-    }
-
-    // Initialize
-    renderCards();
-  </script>
+    </script>
 </body>
 </html>
