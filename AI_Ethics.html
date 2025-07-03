@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Ethical Conundrums of AI in Education</title>
+  <title>AI in Education: Faculty Perspectives & Pedagogical Change</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f9fafc;
+      background: #f5f7fa;
       color: #222;
       margin: 0;
       padding: 0;
     }
     header {
-      background: #3858e9;
+      background: #2c3e50;
       color: #fff;
       padding: 2rem 1rem 1rem 1rem;
       text-align: center;
@@ -26,18 +26,18 @@
       letter-spacing: 1px;
     }
     h2 {
+      color: #2c3e50;
       margin-top: 2rem;
-      color: #3858e9;
     }
     .container {
-      max-width: 900px;
+      max-width: 950px;
       margin: 2rem auto;
-      padding: 1rem;
+      padding: 1.5rem;
       background: #fff;
       border-radius: 20px;
-      box-shadow: 0 2px 16px rgba(56, 88, 233, 0.07);
+      box-shadow: 0 2px 16px rgba(44, 62, 80, 0.07);
     }
-    .conundrums-list {
+    .issues-list {
       display: flex;
       flex-wrap: wrap;
       gap: 1.5rem;
@@ -45,24 +45,24 @@
       justify-content: center;
     }
     .card {
-      background: #f1f3fa;
+      background: #eaf0fa;
       border-radius: 16px;
-      padding: 1.5rem 1rem;
+      padding: 1.3rem 1rem;
       min-width: 260px;
-      max-width: 320px;
-      box-shadow: 0 2px 8px rgba(56, 88, 233, 0.06);
+      max-width: 330px;
+      box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
       cursor: pointer;
       transition: box-shadow 0.2s, transform 0.2s;
       border: 2px solid transparent;
     }
     .card.selected, .card:hover {
-      border: 2px solid #3858e9;
-      box-shadow: 0 6px 24px rgba(56, 88, 233, 0.12);
+      border: 2px solid #2c3e50;
+      box-shadow: 0 6px 24px rgba(44, 62, 80, 0.13);
       transform: translateY(-2px) scale(1.03);
     }
     .card-title {
       font-weight: bold;
-      font-size: 1.15rem;
+      font-size: 1.13rem;
       margin-bottom: 0.5rem;
       color: #222;
     }
@@ -72,23 +72,30 @@
     }
     .details-section {
       margin-top: 2rem;
-      background: #f7f9fe;
+      background: #f6f8fc;
       border-radius: 12px;
       padding: 1.5rem;
-      box-shadow: 0 1px 6px rgba(56, 88, 233, 0.05);
+      box-shadow: 0 1px 6px rgba(44, 62, 80, 0.05);
       min-height: 180px;
       transition: background 0.3s;
     }
-    .key-points, .solutions {
+    .key-points, .solutions, .pedagogy {
       margin: 1rem 0;
       padding-left: 1.2rem;
     }
-    .key-points li, .solutions li {
+    .key-points li, .solutions li, .pedagogy li {
       margin-bottom: 0.7em;
       line-height: 1.5;
     }
+    .section-title {
+      font-size: 1.1rem;
+      color: #2c3e50;
+      margin-top: 1.2rem;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
     @media (max-width: 700px) {
-      .conundrums-list {
+      .issues-list {
         flex-direction: column;
         align-items: center;
       }
@@ -101,130 +108,157 @@
 </head>
 <body>
   <header>
-    <h1>Ethical Conundrums of AI in Education</h1>
-    <p>Explore the key ethical challenges, their impact, and possible solutions.</p>
+    <h1>AI in Education: Faculty Perspectives</h1>
+    <p>Major concerns, pedagogical shifts, and strategies for student learning in the age of AI</p>
   </header>
   <div class="container">
-    <h2>Major Ethical Conundrums</h2>
-    <div class="conundrums-list" id="conundrums-list">
+    <h2>Faculty's Major Issues of Concern</h2>
+    <div class="issues-list" id="issues-list">
       <!-- Cards will be inserted here by JavaScript -->
     </div>
     <div class="details-section" id="details-section">
-      <em>Select an ethical conundrum above to learn more.</em>
+      <em>Select an issue above to explore its impact and solutions.</em>
     </div>
   </div>
   <script>
-    // Data for each ethical conundrum
-    const conundrums = [
+    // Faculty concerns, pedagogical impact, and solutions
+    const issues = [
       {
-        title: "Bias & Fairness",
-        desc: "AI can perpetuate or amplify biases present in training data, leading to unfair outcomes for certain groups.",
+        title: "Over-Reliance & Critical Thinking",
+        desc: "Students may become too dependent on AI tools, undermining their ability to think critically and independently.",
         keyPoints: [
-          "<b>Algorithmic bias</b> can result in discrimination based on race, gender, socioeconomic status, or ability[1][2][3][4][5][8][10][13][14].",
-          "Biased AI may unfairly influence grading, admissions, or resource allocation[1][2][3][4][5][8][10][13][14].",
-          "Bias often stems from unrepresentative or skewed datasets and lack of transparency in how AI makes decisions[1][2][3][4][5][8][10][13][14]."
+          "82% of faculty are worried about over-reliance on AI; 83% doubt students' ability to critically evaluate AI output[2].",
+          "AI can shortcut learning, making it easy for students to bypass essential cognitive processes[2][8].",
+          "Faculty fear that students may accept AI-generated content uncritically, missing opportunities for deeper learning[2][8]."
+        ],
+        pedagogy: [
+          "Shift from rote assignments to tasks requiring analysis, synthesis, and reflection on AI-generated content[2][5][12][15].",
+          "Incorporate metacognitive components—ask students to explain their process and critique AI outputs[12][15].",
+          "Design assessments that require personal insight, creativity, or up-to-date knowledge not easily replicated by AI[12][15]."
         ],
         solutions: [
-          "Use <b>diverse and representative data</b> for training AI systems[5][10][13].",
-          "Regularly audit and monitor AI for bias, and involve diverse stakeholders in development[5][10][13].",
-          "Ensure transparency in data sources and algorithmic processes[4][5][10][13][14]."
+          "Teach AI literacy: train students to question, verify, and critique AI-generated material[2][8][13][15].",
+          "Develop clear guidelines for ethical and responsible AI use in coursework[15].",
+          "Encourage reflective assignments where students compare their work with AI outputs and justify their choices[12][15]."
         ]
       },
       {
-        title: "Privacy & Data Security",
-        desc: "AI in education collects and analyzes vast amounts of student data, raising concerns about privacy, consent, and data misuse.",
+        title: "Academic Integrity & Assessment",
+        desc: "AI challenges traditional assessment methods and raises new concerns about plagiarism and authentic learning.",
         keyPoints: [
-          "Sensitive data includes academic performance, behavior, demographics, and even location[1][3][4][6][8][13][14].",
-          "Risks include unauthorized access, data breaches, and potential misuse for commercial or profiling purposes[1][3][6][8][13][14].",
-          "Students and parents may not fully understand what data is collected or how it is used[1][6][8][13][14]."
+          "Faculty report urgent need to revamp evaluation methods to address AI-enabled cheating and plagiarism[2][12][15].",
+          "Automated content generation can obscure individual student understanding and effort[2][12][15].",
+          "Traditional take-home essays and reports are increasingly vulnerable to AI misuse[12][15]."
+        ],
+        pedagogy: [
+          "Redesign assignments to include process documentation, oral defenses, or in-class components[12][15].",
+          "Scaffold assignments in stages, requiring drafts, peer review, and instructor feedback[12][15].",
+          "Focus on project-based, collaborative, or experiential assessments that emphasize learning over product[5][15]."
         ],
         solutions: [
-          "Implement <b>robust data governance frameworks</b> with informed consent and clear data usage policies[6][13][14].",
-          "Use strong encryption and anonymization techniques to protect student data[6][13].",
-          "Give students and parents granular control over their data and transparent communication about its use[6][13][14]."
+          "Create AI-resistant assessments and require students to submit evidence of their process[12][15].",
+          "Use plagiarism detection and AI output comparison tools thoughtfully[15].",
+          "Foster a culture of academic honesty and clarify expectations around AI use[15]."
         ]
       },
       {
-        title: "Transparency & Accountability",
-        desc: "AI decision-making can be opaque ('black box'), making it hard to understand, challenge, or verify outcomes.",
+        title: "Bias, Fairness & Equity",
+        desc: "AI systems can perpetuate bias and exacerbate inequities, affecting grading, access, and representation.",
         keyPoints: [
-          "Lack of transparency undermines trust and makes it difficult to hold systems accountable for errors or unfairness[3][4][8][13][14].",
-          "Students and educators may not know how AI reaches its recommendations or decisions[3][4][8][13][14].",
-          "Opaque systems can make it challenging to identify and correct mistakes or biases[3][4][8][13][14]."
+          "AI may reinforce existing biases if trained on unrepresentative data, impacting fairness in grading or support[1][11][13].",
+          "Adaptive learning platforms can disadvantage students from underrepresented backgrounds[11][13].",
+          "Access to premium AI tools is often unequal, deepening the digital divide[11][13]."
+        ],
+        pedagogy: [
+          "Critically examine AI tools for bias before classroom adoption[1][11][13].",
+          "Discuss equity and fairness in AI as part of course content[13][15].",
+          "Design assignments that allow all students to participate, regardless of AI access level[5][11]."
         ],
         solutions: [
-          "Require <b>explainable AI</b> with clear documentation and user-friendly dashboards[4][5][13][14].",
-          "Establish clear lines of accountability for AI-driven decisions[4][13][14].",
-          "Educate stakeholders on how AI works and how to question its outputs[4][13][14]."
+          "Advocate for transparent, diverse data and regular audits of AI systems[1][13].",
+          "Provide alternative resources for students without premium AI access[11][13].",
+          "Promote inclusive teaching practices and universal design for learning[5][11]."
         ]
       },
       {
-        title: "Equity & Access",
-        desc: "Not all students have equal access to AI-powered tools, risking a widening digital divide.",
+        title: "Faculty Preparedness & Professional Development",
+        desc: "Many faculty feel unprepared to integrate AI, lacking training and institutional support.",
         keyPoints: [
-          "AI can improve accessibility and personalize learning, but only for those with the necessary technology and resources[3][8][10][11].",
-          "Students in under-resourced schools or regions may be left behind, exacerbating existing inequalities[8][10][11].",
-          "Equitable access is essential to ensure AI benefits all learners, not just a privileged subset[8][10][11]."
+          "Significant gaps in AI literacy and confidence among faculty, especially outside technical fields[4][8].",
+          "Faculty need support to evaluate, select, and implement AI tools ethically and effectively[4][8][13].",
+          "Rapid AI evolution requires ongoing professional development and collaboration[4][8][13]."
+        ],
+        pedagogy: [
+          "Faculty roles are shifting from content delivery to mentorship, facilitation, and critical guidance[3][7][8].",
+          "Departments must create space for faculty to experiment, share, and reflect on AI integration[4][8][13].",
+          "Professional development should address both technical skills and ethical, pedagogical considerations[4][8][13]."
         ],
         solutions: [
-          "Promote <b>universal access</b> to AI tools and digital infrastructure[8][10][11].",
-          "Design AI systems to accommodate diverse learning needs and contexts[8][10][11].",
-          "Advocate for policy and funding to bridge the digital divide[8][10][11]."
+          "Offer hands-on workshops, micro-credentials, and interdisciplinary AI teaching incubators[4][8].",
+          "Foster faculty learning communities for ongoing discussion and policy refinement[8][13].",
+          "Encourage cross-disciplinary collaboration to bridge technical and humanistic perspectives[4][8][13]."
         ]
       },
       {
-        title: "Academic Integrity & Human Agency",
-        desc: "AI can facilitate plagiarism or diminish students' independent thinking and creativity.",
+        title: "Privacy, Transparency & Data Security",
+        desc: "AI's use of student data raises concerns about privacy, consent, and transparency.",
         keyPoints: [
-          "Generative AI can produce essays or solve assignments, making it easier to bypass genuine learning[14].",
-          "Over-reliance on AI may erode critical thinking and problem-solving skills[9][14].",
-          "Students may struggle to distinguish between ethical and unethical AI use[9][14]."
+          "AI systems collect and analyze sensitive student data, often without clear consent or understanding[1][9][13].",
+          "Opaque algorithms make it difficult for faculty and students to understand or challenge decisions[1][13].",
+          "Data breaches or misuse could have serious consequences for student trust and safety[1][9][13]."
+        ],
+        pedagogy: [
+          "Be transparent with students about how AI and data are used in the course[13][15].",
+          "Integrate discussions of privacy, data ethics, and digital citizenship into the curriculum[13][15].",
+          "Model responsible data stewardship and advocate for robust institutional policies[1][13][15]."
         ],
         solutions: [
-          "Teach students to use AI as a <b>learning tool</b>, not a replacement for their own work[9][14].",
-          "Develop clear guidelines and policies on acceptable AI use in assignments[9][14].",
-          "Foster critical thinking and digital literacy to help students navigate AI responsibly[9][14]."
+          "Implement clear data governance, consent protocols, and privacy protections[1][13][15].",
+          "Educate students about their digital rights and responsibilities[13][15].",
+          "Regularly review and communicate AI tool privacy practices and risks[13][15]."
         ]
       }
     ];
 
     // Render cards
-    const conundrumsList = document.getElementById('conundrums-list');
+    const issuesList = document.getElementById('issues-list');
     const detailsSection = document.getElementById('details-section');
 
     function renderCards() {
-      conundrums.forEach((c, idx) => {
+      issues.forEach((issue, idx) => {
         const card = document.createElement('div');
         card.className = 'card';
         card.tabIndex = 0;
         card.setAttribute('role', 'button');
-        card.setAttribute('aria-label', c.title);
+        card.setAttribute('aria-label', issue.title);
         card.innerHTML = `
-          <div class="card-title">${c.title}</div>
-          <div class="card-desc">${c.desc}</div>
+          <div class="card-title">${issue.title}</div>
+          <div class="card-desc">${issue.desc}</div>
         `;
-        card.addEventListener('click', () => selectConundrum(idx));
+        card.addEventListener('click', () => selectIssue(idx));
         card.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') selectConundrum(idx);
+          if (e.key === 'Enter' || e.key === ' ') selectIssue(idx);
         });
-        conundrumsList.appendChild(card);
+        issuesList.appendChild(card);
       });
     }
 
-    function selectConundrum(idx) {
+    function selectIssue(idx) {
       // Highlight selected card
-      Array.from(conundrumsList.children).forEach((card, i) => {
+      Array.from(issuesList.children).forEach((card, i) => {
         card.classList.toggle('selected', i === idx);
       });
       // Render details
-      const c = conundrums[idx];
+      const issue = issues[idx];
       detailsSection.innerHTML = `
-        <h2>${c.title}</h2>
-        <p><b>Description:</b> ${c.desc}</p>
-        <h3>Key Points</h3>
-        <ul class="key-points">${c.keyPoints.map(kp => `<li>${kp}</li>`).join('')}</ul>
-        <h3>Possible Solutions</h3>
-        <ul class="solutions">${c.solutions.map(sol => `<li>${sol}</li>`).join('')}</ul>
+        <h2>${issue.title}</h2>
+        <p><b>Description:</b> ${issue.desc}</p>
+        <div class="section-title">Major Concerns</div>
+        <ul class="key-points">${issue.keyPoints.map(kp => `<li>${kp}</li>`).join('')}</ul>
+        <div class="section-title">How Pedagogy May Change</div>
+        <ul class="pedagogy">${issue.pedagogy.map(pd => `<li>${pd}</li>`).join('')}</ul>
+        <div class="section-title">Ensuring Student Learning</div>
+        <ul class="solutions">${issue.solutions.map(sol => `<li>${sol}</li>`).join('')}</ul>
       `;
     }
 
