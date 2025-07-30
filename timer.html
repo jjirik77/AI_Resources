@@ -24,7 +24,7 @@
         }
         .digit {
             font-weight: 900;
-            font-size: clamp(3rem, 18vw, 10rem);
+            font-size: clamp(2.5rem, 15vw, 9rem); /* Adjusted font size */
             line-height: 1;
             color: #f9fafb; /* gray-50 */
         }
@@ -37,18 +37,21 @@
         .btn-secondary {
             @apply bg-gray-700 text-gray-300 border-gray-500 hover:bg-gray-600 hover:border-gray-400 hover:text-white focus:ring-gray-500;
         }
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
+        }
+        .btn:disabled {
+            @apply opacity-50 cursor-not-allowed;
         }
     </style>
 </head>
 <body class="text-gray-200 flex items-center justify-center min-h-screen p-4">
 
     <!-- Main Timer Card -->
-    <div id="timer-card" class="w-full max-w-2xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-700/50 transition-colors duration-500">
+    <div id="timer-card" class="w-full max-w-5xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-700/50 transition-colors duration-500">
         <div class="relative text-center mb-6">
             <h1 class="text-3xl lg:text-4xl font-bold text-white">Classroom Timer</h1>
-            <button id="fullscreen-btn" class="absolute top-0 right-0 text-gray-400 hover:text-white transition-colors duration-200">
+            <button id="fullscreen-btn" class="absolute top-0 right-0 text-gray-400 hover:text-white transition-colors duration-200" disabled>
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5"></path></svg>
             </button>
         </div>
@@ -69,11 +72,11 @@
 
         <!-- Main Controls -->
         <div class="grid grid-cols-2 gap-4 mb-8">
-            <button id="start-pause-btn" class="btn btn-primary bg-green-600 border-green-700 hover:bg-green-500 focus:ring-green-500 text-lg h-14 px-6">
+            <button id="start-pause-btn" class="btn btn-primary bg-green-600 border-green-700 hover:bg-green-500 focus:ring-green-500 text-lg h-14 px-6" disabled>
                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <span id="start-pause-text">Start</span>
             </button>
-            <button id="reset-btn" class="btn btn-primary bg-red-600 border-red-700 hover:bg-red-500 focus:ring-red-500 text-lg h-14 px-6">
+            <button id="reset-btn" class="btn btn-primary bg-red-600 border-red-700 hover:bg-red-500 focus:ring-red-500 text-lg h-14 px-6" disabled>
                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 9a9 9 0 0114.23-5.23l-2.73 2.73M20 15a9 9 0 01-14.23 5.23l2.73-2.73"></path></svg>
                 <span>Reset</span>
             </button>
@@ -83,17 +86,17 @@
         <div class="space-y-4">
             <!-- Preset Buttons -->
             <div class="flex justify-center gap-3 flex-wrap">
-                <button class="btn btn-secondary w-16 h-16 text-lg" data-time="300">5m</button>
-                <button class="btn btn-secondary w-16 h-16 text-lg" data-time="600">10m</button>
-                <button class="btn btn-secondary w-16 h-16 text-lg" data-time="1800">30m</button>
-                <button class="btn btn-secondary w-16 h-16 text-lg" data-time="3600">60m</button>
+                <button class="btn btn-secondary w-16 h-16 text-lg" data-time="300" disabled>5m</button>
+                <button class="btn btn-secondary w-16 h-16 text-lg" data-time="600" disabled>10m</button>
+                <button class="btn btn-secondary w-16 h-16 text-lg" data-time="1800" disabled>30m</button>
+                <button class="btn btn-secondary w-16 h-16 text-lg" data-time="3600" disabled>60m</button>
             </div>
             <!-- Adjustment Buttons -->
             <div class="flex justify-center gap-3">
-                <button id="add5" class="btn btn-secondary w-20 h-14">+ 5 min</button>
-                <button id="add1" class="btn btn-secondary w-20 h-14">+ 1 min</button>
-                <button id="sub1" class="btn btn-secondary w-20 h-14">- 1 min</button>
-                <button id="sub5" class="btn btn-secondary w-20 h-14">- 5 min</button>
+                <button id="add5" class="btn btn-secondary w-20 h-14" disabled>+ 5 min</button>
+                <button id="add1" class="btn btn-secondary w-20 h-14" disabled>+ 1 min</button>
+                <button id="sub1" class="btn btn-secondary w-20 h-14" disabled>- 1 min</button>
+                <button id="sub5" class="btn btn-secondary w-20 h-14" disabled>- 5 min</button>
             </div>
         </div>
     </div>
@@ -202,109 +205,38 @@
         }
 
         function toggleTimer() {
-            if (isRunning) {
-                clearInterval(timerInterval);
-                isRunning = false;
-                updateStartButton('paused');
-            } else {
-                if (totalSeconds <= 0) return;
-                isRunning = true;
-                if (Tone.context.state !== 'running') Tone.start();
-                updateStartButton('running');
-
-                timerInterval = setInterval(() => {
-                    totalSeconds--;
-                    updateDisplay();
-                    updateProgressBar();
-
-                    // Check for 5-minute warning
-                    if (initialTime > 300 && totalSeconds === 300) {
-                        playFiveMinuteWarning();
-                    }
-
-                    // Check for 1-minute warning
-                    if (initialTime > 300 && totalSeconds === 60) {
-                        playOneMinuteWarning();
-                    }
-
-                    if (totalSeconds <= 0) {
-                        clearInterval(timerInterval);
-                        isRunning = false;
-                        updateStartButton('stopped');
-                        timerCard.classList.add('timer-ended-card');
-                        playAlarm();
-                        // Set interval for repeating alarm sound
-                        timerInterval = setInterval(playAlarm, 1000);
-                    }
-                }, 1000);
-            }
+            // Functionality disabled
         }
 
         function resetTimer() {
-            clearInterval(timerInterval);
-            isRunning = false;
-            totalSeconds = initialTime;
-            updateDisplay();
-            updateProgressBar();
-            updateStartButton('stopped');
-            timerCard.classList.remove('timer-ended-card');
+            // Functionality disabled
         }
 
         function setTime(seconds) {
             initialTime = seconds;
-            resetTimer();
-        }
-        
-        function adjustTime(seconds) {
-            if (timerCard.classList.contains('timer-ended-card')) {
-                clearInterval(timerInterval);
-                timerCard.classList.remove('timer-ended-card');
-                updateStartButton('stopped');
-            }
-
-            const newTotalSeconds = Math.max(0, totalSeconds + seconds);
-            
-            if (!isRunning) {
-                initialTime = newTotalSeconds;
-            } else {
-                 initialTime = Math.max(0, initialTime + seconds);
-            }
-            totalSeconds = newTotalSeconds;
-
+            totalSeconds = initialTime;
             updateDisplay();
             updateProgressBar();
         }
-
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else {
-              if (document.exitFullscreen) {
-                document.exitFullscreen(); 
-              }
-            }
+        
+        function adjustTime(seconds) {
+            // Functionality disabled
         }
 
-        // Event Listeners
-        startPauseBtn.addEventListener('click', toggleTimer);
-        resetBtn.addEventListener('click', resetTimer);
-        fullscreenBtn.addEventListener('click', toggleFullScreen);
+        function toggleFullScreen() {
+            // Functionality disabled
+        }
 
-        presetButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const time = parseInt(button.dataset.time, 10);
-                setTime(time);
-            });
-        });
-
-        document.getElementById('add5').addEventListener('click', () => adjustTime(300));
-        document.getElementById('add1').addEventListener('click', () => adjustTime(60));
-        document.getElementById('sub1').addEventListener('click', () => adjustTime(-60));
-        document.getElementById('sub5').addEventListener('click', () => adjustTime(-300));
+        // Event Listeners are not attached to locked controls
 
         // Initialize display
         setTime(300); // Start with a default of 5 minutes
+        
+        // Disable all buttons on load
+        document.querySelectorAll('button').forEach(button => {
+            button.disabled = true;
+        });
+
     </script>
 </body>
 </html>
-
