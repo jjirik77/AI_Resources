@@ -1,54 +1,174 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ethical AI in Education: An Interactive Exploration</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Calm Harmony (Warm Neutrals & Cool Accents) -->
-    <!-- Application Structure Plan: A user-centric, single-page application designed for exploration rather than linear reading. The structure includes: 1) A welcoming hero section. 2) Sticky navigation for easy access to key areas. 3) An interactive 'Dilemmas' section with clickable cards to reveal detailed information, preventing cognitive overload. 4) An accordion-based 'Solutions' section for layered discovery. 5) A clear, scannable 'Student Guide' with Do/Don't cards for actionable advice. 6) An 'Explore the Connections' section with a dynamic radar chart, allowing users to visualize the relationship between problems and solutions. This structure was chosen to make a complex report digestible and engaging, encouraging user interaction and synthesis of information rather than passive consumption. -->
-    <!-- Visualization & Content Choices: 
-        - Dilemmas: Goal: Inform/Organize. Method: Interactive Cards (HTML/CSS/JS). Interaction: Click to reveal details. Justification: Breaks down complex topics into manageable, user-selectable chunks.
-        - Solutions: Goal: Organize/Inform. Method: Accordion (HTML/CSS/JS). Interaction: Click to expand/collapse. Justification: Condenses detailed information into a clean, hierarchical view.
-        - Student Guide: Goal: Inform/Guide. Method: Styled 'Do/Don't' Cards (HTML/Tailwind). Interaction: Static. Justification: Creates a visually clear, quick-reference guide for practical advice.
-        - Connections Chart: Goal: Compare/Relationships. Method: Interactive Radar Chart (Chart.js/Canvas). Interaction: Dropdown selector updates chart. Justification: Provides a novel, data-driven perspective on the report, highlighting the interconnectedness of issues and solutions, which is a key report theme. The chart container is responsive and constrained.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f3f0;
-            color: #4a4a4a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-        .nav-link {
-            transition: color 0.3s ease, border-bottom-color 0.3s ease;
-            border-bottom: 2px solid transparent;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        .nav-link:hover, .nav-link.active {
-            color: #3b82f6;
-            border-bottom-color: #3b82f6;
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-btn.active {
+            background: #2980b9;
+            color: white;
+        }
+
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
         .card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+        .card h3 {
+            color: #2980b9;
+            margin-bottom: 15px;
+            font-size: 1.3em;
         }
+        .card p {
+            margin-bottom: 10px;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .accordion-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .accordion-toggle:hover {
+            background: #e9ecef;
+        }
+
         .accordion-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-out, padding 0.5s ease-out;
             padding: 0 1.5rem;
         }
+
         .accordion-content.open {
-            max-height: 1000px; /* Large enough for content */
+            max-height: 1000px;
             padding: 1rem 1.5rem 1.5rem;
         }
+
         .chart-container {
             position: relative;
             width: 100%;
@@ -63,144 +183,168 @@
                 height: 450px;
             }
         }
-        .smooth-shadow {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        
+        .dilemma-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .student-guide-grid {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+             gap: 20px;
+        }
+
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            display: none;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            position: relative;
+            animation: fadeIn 0.5s;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .header h1 {
+                font-size: 2em;
+            }
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+            .nav-btn {
+                width: 100%;
+                max-width: 300px;
+            }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="antialiased">
-
-    <!-- Header & Navigation -->
-    <header id="header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-xl font-bold text-gray-800">AI Ethics in Education</a>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#dilemmas" class="nav-link font-medium pb-1">The Dilemmas</a>
-                <a href="#solutions" class="nav-link font-medium pb-1">The Solutions</a>
-                <a href="#student-guide" class="nav-link font-medium pb-1">Student Guide</a>
-                <a href="#connections" class="nav-link font-medium pb-1">Explore Connections</a>
-            </div>
-            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
-                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
-        </nav>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden">
-            <a href="#dilemmas" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">The Dilemmas</a>
-            <a href="#solutions" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">The Solutions</a>
-            <a href="#student-guide" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Student Guide</a>
-            <a href="#connections" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Explore Connections</a>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Ethical AI in Education</h1>
+            <div class="subtitle">An Interactive Exploration</div>
         </div>
-    </header>
 
-    <!-- Main Content -->
-    <main>
-        <!-- Hero Section -->
-        <section class="container mx-auto px-6 py-16 md:py-24 text-center">
-            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 leading-tight">Navigating the AI Frontier in Education</h1>
-            <p class="mt-6 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">The rise of AI presents both incredible opportunities and complex ethical challenges. This guide is designed to help students, educators, and leaders understand and navigate this new landscape responsibly.</p>
-        </section>
+        <div class="navigation">
+            <button class="nav-btn active" onclick="showSection('dilemmas')">The Dilemmas</button>
+            <button class="nav-btn" onclick="showSection('solutions')">The Solutions</button>
+            <button class="nav-btn" onclick="showSection('student-guide')">Student Guide</button>
+            <button class="nav-btn" onclick="showSection('connections')">Explore Connections</button>
+        </div>
 
-        <!-- Section 1: The Dilemmas -->
-        <section id="dilemmas" class="py-16 md:py-20 bg-white">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">The Core Ethical Dilemmas</h2>
-                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">AI's integration into education surfaces critical challenges that require our attention. Click on a dilemma to explore its nuances, real-world examples, and the core tensions at play.</p>
-                </div>
-                <div id="dilemmas-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Cards will be injected by JavaScript -->
+        <!-- The Dilemmas Section -->
+        <div id="dilemmas" class="content-section active">
+            <h2 class="section-title">The Core Ethical Dilemmas</h2>
+            <p>AI's integration into education surfaces critical challenges that require our attention. Click on a dilemma to explore its nuances, real-world examples, and the core tensions at play.</p>
+            <div id="dilemmas-grid" class="dilemma-grid">
+                <!-- Dilemma cards will be injected by JavaScript -->
+            </div>
+        </div>
+
+        <!-- The Solutions Section -->
+        <div id="solutions" class="content-section">
+            <h2 class="section-title">Charting a Path Forward: Key Solutions</h2>
+            <p>Addressing these dilemmas requires a multi-faceted approach. Explore the interconnected strategies that can help build a responsible and human-centered educational ecosystem.</p>
+            <div id="solutions-accordion">
+                <!-- Solutions accordion items will be injected by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Student Guide Section -->
+        <div id="student-guide" class="content-section">
+            <h2 class="section-title">A Student's Guide to Ethical AI Use</h2>
+            <p>As a student, you are on the front lines of AI in education. Here's how you can use these powerful tools responsibly and ethically to enhance your learning.</p>
+            <div id="student-guide-grid" class="student-guide-grid">
+                <!-- Student guide cards will be injected by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Explore Connections Section -->
+        <div id="connections" class="content-section">
+            <h2 class="section-title">Explore the Connections</h2>
+            <p>Problems and solutions are deeply interconnected. Select a dilemma to see which solution types are most effective in addressing it, based on the report's findings.</p>
+            <div class="budget-breakdown">
+                <div class="budget-item" style="padding: 20px;">
+                    <label for="dilemma-selector" style="display: block; margin-bottom: 10px; color: #2c3e50;">Select a Dilemma:</label>
+                    <select id="dilemma-selector" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 1em;">
+                        <!-- Options will be injected by JavaScript -->
+                    </select>
                 </div>
             </div>
-        </section>
-        
+            <div class="chart-container" style="margin-top: 20px;">
+                <canvas id="connectionsChart"></canvas>
+            </div>
+        </div>
+
         <!-- Modal for Dilemma Details -->
-        <div id="dilemma-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0">
-                <div class="p-6 md:p-8">
-                    <div class="flex justify-between items-start">
-                        <h3 id="modal-title" class="text-2xl font-bold text-gray-800"></h3>
-                        <button id="modal-close" class="text-gray-500 hover:text-gray-800">&times;</button>
-                    </div>
-                    <p id="modal-definition" class="mt-4 text-gray-600"></p>
-                    <div class="mt-6">
-                        <h4 class="font-semibold text-gray-700">How It Manifests:</h4>
-                        <ul id="modal-manifestations" class="mt-2 list-disc list-inside text-gray-600 space-y-1"></ul>
-                    </div>
-                    <div id="modal-stake-container" class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
-                         <h4 class="font-semibold text-blue-800">What's at Stake?</h4>
-                         <p id="modal-stake" class="mt-1 text-blue-700"></p>
-                    </div>
+        <div id="dilemma-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" id="modal-close">&times;</span>
+                <h3 id="modal-title" style="color: #2c3e50; font-size: 1.5em; margin-bottom: 10px;"></h3>
+                <p id="modal-definition" style="margin-bottom: 15px;"></p>
+                <h4 style="color: #2c3e50; font-size: 1.2em; border-bottom: 1px solid #ccc; padding-bottom: 5px;">How It Manifests:</h4>
+                <ul id="modal-manifestations" style="margin-top: 10px; padding-left: 20px;"></ul>
+                <div class="card" style="margin-top: 20px; background: #d1ecf1; border-left-color: #17a2b8;">
+                    <h4 style="color: #17a2b8; font-size: 1.1em; margin-bottom: 5px;">What's at Stake?</h4>
+                    <p id="modal-stake"></p>
                 </div>
             </div>
         </div>
-
-        <!-- Section 2: The Solutions -->
-        <section id="solutions" class="py-16 md:py-20">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Charting a Path Forward: Key Solutions</h2>
-                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Addressing these dilemmas requires a multi-faceted approach. Explore the interconnected strategies that can help build a responsible and human-centered educational ecosystem.</p>
-                </div>
-                <div id="solutions-accordion" class="max-w-3xl mx-auto space-y-4">
-                     <!-- Accordion items will be injected by JavaScript -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: Student Guide -->
-        <section id="student-guide" class="py-16 md:py-20 bg-white">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">A Student's Guide to Ethical AI Use</h2>
-                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">As a student, you are on the front lines of AI in education. Here's how you can use these powerful tools responsibly and ethically to enhance your learning.</p>
-                </div>
-                <div id="student-guide-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Student guide cards will be injected by JavaScript -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 4: Explore Connections -->
-        <section id="connections" class="py-16 md:py-20">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Explore the Connections</h2>
-                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Problems and solutions are deeply interconnected. Select a dilemma to see which solution types are most effective in addressing it, based on the report's findings.</p>
-                </div>
-                <div class="flex flex-col md:flex-row items-center justify-center gap-8">
-                    <div class="w-full md:w-1/3">
-                        <label for="dilemma-selector" class="block text-sm font-medium text-gray-700 mb-2">Select a Dilemma:</label>
-                        <select id="dilemma-selector" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        </select>
-                        <div id="chart-context" class="mt-4 p-4 bg-gray-100 rounded-lg text-gray-700 text-sm">
-                            <p>This chart visualizes the relative impact of each solution category on the selected dilemma. A higher score indicates a stronger connection and effectiveness.</p>
-                        </div>
-                    </div>
-                    <div class="w-full md:w-2/3 flex justify-center">
-                        <div class="chart-container">
-                            <canvas id="connectionsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-    
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white">
-        <div class="container mx-auto px-6 py-8 text-center">
-            <p>&copy; 2024 AI Ethics in Education Initiative. All rights reserved.</p>
-            <p class="text-sm text-gray-400 mt-2">This interactive experience is based on the report "Ethical Conundrums with AI Usage in Education."</p>
-        </div>
-    </footer>
-
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            
-            // Data from the report
+        function showSection(sectionId) {
+            var sections = document.querySelectorAll('.content-section');
+            sections.forEach(function(section) {
+                section.classList.remove('active');
+            });
+            var buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(function(button) {
+                button.classList.remove('active');
+            });
+            var targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            var clickedButton = document.querySelector('.nav-btn[onclick*="' + sectionId + '"]');
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
             const dilemmasData = [
                 {
                     id: 'integrity',
@@ -209,11 +353,11 @@
                     definition: 'The challenge of defining original student work and preventing misuse of AI for content generation and plagiarism.',
                     manifestations: [
                         'Students using AI to write entire essays or code.',
-                        'Difficulty in distinguishing student work from AI-generated content.',
-                        'The rise of an "arms race" between AI generation and detection tools.',
+                        'The "arms race" between AI generation and flawed detection tools that may penalize non-native English speakers.',
+                        'Difficulty distinguishing student work from AI-generated content.',
                         'Blurring lines of ownership and what constitutes "original thought".'
                     ],
-                    stake: 'The core tension is between leveraging AI as a powerful learning assistant and the crisis of authenticity that challenges the very definition of academic integrity.'
+                    stake: 'The core tension is between leveraging AI as a powerful learning assistant and the crisis of authenticity that challenges the very definition of academic integrity. A focus on pedagogical strategies (e.g., oral exams) is proving more effective than unreliable AI detectors.'
                 },
                 {
                     id: 'privacy',
@@ -222,7 +366,7 @@
                     definition: 'The risks associated with the collection, storage, and potential misuse of sensitive student data required by AI systems.',
                     manifestations: [
                         'Collection of personal, academic, and behavioral data.',
-                        'Risk of data breaches, as seen with services like ProctorU.',
+                        'Risk of data breaches and commercial exploitation of student data.',
                         'A sense of constant surveillance altering student behavior.',
                         'Lack of student control over how their data is used or commercialized.'
                     ],
@@ -234,10 +378,10 @@
                     icon: '⚖️',
                     definition: 'The risk of AI systems perpetuating and amplifying existing societal biases, leading to unfair outcomes for certain student groups.',
                     manifestations: [
-                        'Grading systems that favor specific writing styles or backgrounds.',
+                        'AI grading systems that favor specific writing styles or backgrounds.',
+                        'Predictive models misidentifying students as "at-risk," leading to a lack of resources for certain groups.',
                         'Admissions algorithms that may exclude marginalized groups.',
-                        'Predictive models underestimating the potential of minority students.',
-                        'The 2020 UK grading scandal disproportionately penalizing students from low-income areas.'
+                        'The 2020 UK grading scandal disproportionately penalizing low-income students.'
                     ],
                     stake: 'The core tension lies in the paradox of using AI to achieve "fairness" while the systems themselves can act as mirrors and amplifiers of deep-seated societal inequities.'
                 },
@@ -253,6 +397,19 @@
                         'Loss of human connection and empathy in the learning process.'
                     ],
                     stake: 'The core tension is between the efficiency gained from AI-provided answers and the potential erosion of the essential, effortful cognitive processes that lead to deep learning.'
+                },
+                {
+                    id: 'over-reliance',
+                    title: 'Emotional Over-reliance on AI',
+                    icon: '🤖',
+                    definition: 'The emerging risk of students using conversational AI chatbots as emotional companions, which can lead to over-dependency and exposure to harmful advice.',
+                    manifestations: [
+                        'Students using chatbots for emotional support and friendship, displacing peer interaction.',
+                        'A tendency for students to rely on AI for making personal life decisions.',
+                        'Chatbots providing dangerous or harmful advice on sensitive topics.',
+                        'The lack of an effective age verification system on many platforms.'
+                    ],
+                    stake: 'The core tension is between the apparent utility of AI as a mentor or companion and the psychological risk of dependency and emotional harm to students.'
                 },
                 {
                     id: 'transparency',
@@ -274,9 +431,9 @@
                     definition: 'The fundamental shift in the educator\'s role, balancing AI as a powerful augmentation tool against fears of de-professionalization or replacement.',
                     manifestations: [
                         'AI automating tasks like grading and tutoring.',
+                        'A significant usage gap where students adopt AI far faster than educators, creating a need for professional development.',
                         'Educators feeling their professional authority is undermined.',
-                        'Anxiety about job displacement vs. empowerment.',
-                        'The need to shift focus from content delivery to mentorship and fostering human-centric skills.'
+                        'Anxiety about job displacement vs. empowerment.'
                     ],
                     stake: 'The core tension is between AI empowering educators by automating mundane tasks and the psychological fear of AI displacing the irreplaceable human elements of teaching.'
                 }
@@ -307,7 +464,7 @@
 
             const studentGuideData = [
                 {
-                    icon: '🎯',
+                    icon: '�',
                     title: 'Understand AI\'s Purpose',
                     text: 'Use AI as a tool to brainstorm, get feedback, and learn more efficiently—not to do your thinking for you. The goal is to enhance your skills, not replace them.',
                     type: 'do'
@@ -349,131 +506,63 @@
                 privacy: [5, 5, 3, 3],
                 bias: [4, 4, 5, 4],
                 autonomy: [3, 1, 4, 5],
+                'over-reliance': [3, 3, 5, 5],
                 transparency: [4, 5, 4, 3],
                 'educator-role': [4, 2, 5, 5]
             };
 
-            // Populate Dilemmas Grid
             const dilemmasGrid = document.getElementById('dilemmas-grid');
             dilemmasData.forEach(dilemma => {
                 const card = document.createElement('div');
-                card.className = 'card bg-white p-6 rounded-lg smooth-shadow cursor-pointer';
+                card.className = 'card';
                 card.dataset.id = dilemma.id;
                 card.innerHTML = `
-                    <div class="flex items-center">
-                        <span class="text-3xl mr-4">${dilemma.icon}</span>
-                        <h3 class="text-xl font-semibold text-gray-800">${dilemma.title}</h3>
+                    <div style="display: flex; align-items: center;">
+                        <span style="font-size: 2em; margin-right: 10px;">${dilemma.icon}</span>
+                        <h3 style="color: #2980b9;">${dilemma.title}</h3>
                     </div>
-                    <p class="mt-4 text-gray-600">${dilemma.definition.substring(0, 100)}...</p>
-                    <span class="mt-4 inline-block text-blue-600 font-medium">Learn More &rarr;</span>
+                    <p>${dilemma.definition.substring(0, 100)}...</p>
+                    <button class="nav-btn" style="margin-top: 15px;">Learn More &rarr;</button>
                 `;
+                card.querySelector('button').onclick = () => showModal(dilemma.id);
                 dilemmasGrid.appendChild(card);
             });
 
-            // Populate Solutions Accordion
             const solutionsAccordion = document.getElementById('solutions-accordion');
             solutionsData.forEach(solution => {
                 const item = document.createElement('div');
-                item.className = 'bg-white rounded-lg smooth-shadow';
+                item.className = 'card';
+                item.style.cursor = 'pointer';
                 item.innerHTML = `
-                    <button class="accordion-toggle w-full flex justify-between items-center text-left p-4 md:p-5 font-semibold text-gray-800">
-                        <span class="flex items-center"><span class="text-2xl mr-3">${solution.icon}</span>${solution.title}</span>
-                        <span class="accordion-icon transform transition-transform duration-300 text-blue-500 text-2xl font-light">&plus;</span>
-                    </button>
-                    <div class="accordion-content">
-                        <p class="text-gray-600">${solution.content}</p>
+                    <div style="display: flex; align-items: center;">
+                        <span style="font-size: 1.5em; margin-right: 10px;">${solution.icon}</span>
+                        <h3 style="color: #2980b9; margin-bottom: 0;">${solution.title}</h3>
                     </div>
+                    <p style="display: none; margin-top: 10px;">${solution.content}</p>
                 `;
+                item.onclick = function() {
+                    const content = this.querySelector('p');
+                    content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                };
                 solutionsAccordion.appendChild(item);
             });
-            
-            // Populate Student Guide Grid
+
             const studentGuideGrid = document.getElementById('student-guide-grid');
             studentGuideData.forEach(item => {
                 const card = document.createElement('div');
-                const bgColor = item.type === 'do' ? 'bg-teal-50' : 'bg-red-50';
-                const borderColor = item.type === 'do' ? 'border-teal-500' : 'border-red-500';
-                card.className = `p-6 rounded-lg ${bgColor} border-l-4 ${borderColor}`;
+                card.className = `card ${item.type === 'do' ? 'success' : 'warning'}`;
                 card.innerHTML = `
-                    <div class="flex items-start">
-                        <span class="text-2xl mr-4">${item.icon}</span>
+                    <div style="display: flex; align-items: flex-start;">
+                        <span style="font-size: 1.5em; margin-right: 10px;">${item.icon}</span>
                         <div>
-                            <h4 class="text-lg font-semibold text-gray-800">${item.title}</h4>
-                            <p class="mt-2 text-gray-700">${item.text}</p>
+                            <h3 style="font-size: 1.2em; margin-bottom: 5px;">${item.title}</h3>
+                            <p style="color: #333; font-size: 0.9em;">${item.text}</p>
                         </div>
                     </div>
                 `;
                 studentGuideGrid.appendChild(card);
             });
 
-            // Modal Logic
-            const modal = document.getElementById('dilemma-modal');
-            const modalContent = modal.querySelector('.bg-white');
-            const modalTitle = document.getElementById('modal-title');
-            const modalDefinition = document.getElementById('modal-definition');
-            const modalManifestations = document.getElementById('modal-manifestations');
-            const modalStake = document.getElementById('modal-stake');
-            const modalClose = document.getElementById('modal-close');
-
-            dilemmasGrid.addEventListener('click', e => {
-                const card = e.target.closest('.card');
-                if (card) {
-                    const dilemmaId = card.dataset.id;
-                    const data = dilemmasData.find(d => d.id === dilemmaId);
-                    modalTitle.textContent = data.title;
-                    modalDefinition.textContent = data.definition;
-                    modalManifestations.innerHTML = data.manifestations.map(m => `<li>${m}</li>`).join('');
-                    modalStake.textContent = data.stake;
-
-                    modal.classList.remove('hidden');
-                    setTimeout(() => {
-                        modalContent.classList.remove('scale-95', 'opacity-0');
-                    }, 10);
-                }
-            });
-
-            function closeModal() {
-                 modalContent.classList.add('scale-95', 'opacity-0');
-                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
-            }
-
-            modalClose.addEventListener('click', closeModal);
-            modal.addEventListener('click', e => {
-                if (e.target === modal) {
-                    closeModal();
-                }
-            });
-
-            // Accordion Logic
-            solutionsAccordion.addEventListener('click', e => {
-                const toggle = e.target.closest('.accordion-toggle');
-                if (toggle) {
-                    const content = toggle.nextElementSibling;
-                    const icon = toggle.querySelector('.accordion-icon');
-                    
-                    // Close other accordions
-                    document.querySelectorAll('.accordion-content.open').forEach(openContent => {
-                        if(openContent !== content) {
-                            openContent.classList.remove('open');
-                            openContent.previousElementSibling.querySelector('.accordion-icon').innerHTML = '&plus;';
-                            openContent.previousElementSibling.querySelector('.accordion-icon').classList.remove('rotate-45');
-                        }
-                    });
-
-                    content.classList.toggle('open');
-                    if (content.classList.contains('open')) {
-                        icon.innerHTML = '&times;';
-                        icon.classList.add('rotate-45');
-                    } else {
-                        icon.innerHTML = '&plus;';
-                        icon.classList.remove('rotate-45');
-                    }
-                }
-            });
-
-            // Chart.js Logic
             const selector = document.getElementById('dilemma-selector');
             dilemmasData.forEach(d => {
                 const option = document.createElement('option');
@@ -491,12 +580,13 @@
                         label: 'Solution Effectiveness',
                         data: chartData.integrity,
                         backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
                         borderWidth: 2,
-                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointBackgroundColor: 'rgba(52, 152, 219, 1)',
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(59, 130, 246, 1)'
+                        pointHoverBorderColor: 'rgba(52, 152, 219, 1)',
+                        pointRadius: 6
                     }]
                 },
                 options: {
@@ -504,39 +594,18 @@
                     maintainAspectRatio: false,
                     scales: {
                         r: {
-                            angleLines: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            },
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
                             pointLabels: {
-                                font: {
-                                    size: 12,
-                                    weight: '500'
-                                },
-                                color: '#4a4a4a'
+                                font: { size: 12, weight: '600' },
+                                color: '#333'
                             },
-                            ticks: {
-                                beginAtZero: true,
-                                max: 5,
-                                stepSize: 1,
-                                backdropColor: 'rgba(255, 255, 255, 0.75)',
-                                color: '#6b7280'
-                            }
+                            ticks: { beginAtZero: true, max: 5, stepSize: 1, backdropColor: 'rgba(255, 255, 255, 0.75)', color: '#666' }
                         }
                     },
                     plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `Effectiveness: ${context.raw}`;
-                                }
-                            }
-                        }
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: function(context) { return `Effectiveness: ${context.raw}`; } } }
                     }
                 }
             });
@@ -546,41 +615,27 @@
                 connectionsChart.data.datasets[0].data = chartData[selectedDilemma];
                 connectionsChart.update();
             });
-            
-            // Mobile Menu Toggle
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-            
-            // Close mobile menu on link click
-            mobileMenu.addEventListener('click', () => {
-                 mobileMenu.classList.add('hidden');
-            });
 
-            // Nav link active state on scroll
-            const sections = document.querySelectorAll('section');
-            const navLinks = document.querySelectorAll('.nav-link');
-            
-            window.addEventListener('scroll', () => {
-                let current = '';
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    if (pageYOffset >= sectionTop - 100) {
-                        current = section.getAttribute('id');
-                    }
-                });
-            
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href').includes(current)) {
-                        link.classList.add('active');
-                    }
-                });
-            });
+            function showModal(dilemmaId) {
+                const data = dilemmasData.find(d => d.id === dilemmaId);
+                document.getElementById('modal-title').textContent = data.title;
+                document.getElementById('modal-definition').textContent = data.definition;
+                document.getElementById('modal-manifestations').innerHTML = data.manifestations.map(m => `<li>${m}</li>`).join('');
+                document.getElementById('modal-stake').textContent = data.stake;
+                document.getElementById('dilemma-modal').style.display = 'block';
+            }
+            window.showModal = showModal;
 
+            document.getElementById('modal-close').onclick = function() {
+                document.getElementById('dilemma-modal').style.display = 'none';
+            };
+            window.onclick = function(event) {
+                if (event.target === document.getElementById('dilemma-modal')) {
+                    document.getElementById('dilemma-modal').style.display = 'none';
+                }
+            };
         });
     </script>
 </body>
 </html>
+�
