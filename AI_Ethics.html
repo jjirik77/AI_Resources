@@ -112,6 +112,7 @@
             margin: 20px 0;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
         }
 
         .card h3 {
@@ -137,53 +138,18 @@
             background: #f8d7da;
             border-left-color: #dc3545;
         }
-
-        .accordion-toggle {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .accordion-toggle:hover {
-            background: #e9ecef;
-        }
-
-        .accordion-content {
+        
+        .dilemma-content, .solution-content, .guide-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-out, padding 0.5s ease-out;
             padding: 0 1.5rem;
         }
-
-        .accordion-content.open {
+        .dilemma-content.open, .solution-content.open, .guide-content.open {
             max-height: 1000px;
-            padding: 1rem 1.5rem 1.5rem;
+            padding: 1rem 0;
         }
 
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px;
-            max-height: 450px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 450px;
-            }
-        }
-        
         .dilemma-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -194,41 +160,6 @@
              display: grid;
              grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
              gap: 20px;
-        }
-
-        .modal {
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            display: none;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 600px;
-            border-radius: 10px;
-            position: relative;
-            animation: fadeIn 0.5s;
-        }
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
         }
 
         @media (max-width: 768px) {
@@ -305,21 +236,6 @@
             </div>
             <div class="chart-container" style="margin-top: 20px;">
                 <canvas id="connectionsChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Modal for Dilemma Details -->
-        <div id="dilemma-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-button" id="modal-close">&times;</span>
-                <h3 id="modal-title" style="color: #2c3e50; font-size: 1.5em; margin-bottom: 10px;"></h3>
-                <p id="modal-definition" style="margin-bottom: 15px;"></p>
-                <h4 style="color: #2c3e50; font-size: 1.2em; border-bottom: 1px solid #ccc; padding-bottom: 5px;">How It Manifests:</h4>
-                <ul id="modal-manifestations" style="margin-top: 10px; padding-left: 20px;"></ul>
-                <div class="card" style="margin-top: 20px; background: #d1ecf1; border-left-color: #17a2b8;">
-                    <h4 style="color: #17a2b8; font-size: 1.1em; margin-bottom: 5px;">What's at Stake?</h4>
-                    <p id="modal-stake"></p>
-                </div>
             </div>
         </div>
     </div>
@@ -464,7 +380,7 @@
 
             const studentGuideData = [
                 {
-                    icon: '�',
+                    icon: '🎯',
                     title: 'Understand AI\'s Purpose',
                     text: 'Use AI as a tool to brainstorm, get feedback, and learn more efficiently—not to do your thinking for you. The goal is to enhance your skills, not replace them.',
                     type: 'do'
@@ -515,36 +431,60 @@
             dilemmasData.forEach(dilemma => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.dataset.id = dilemma.id;
                 card.innerHTML = `
-                    <div style="display: flex; align-items: center;">
+                    <div class="dilemma-header" style="display: flex; align-items: center;">
                         <span style="font-size: 2em; margin-right: 10px;">${dilemma.icon}</span>
                         <h3 style="color: #2980b9;">${dilemma.title}</h3>
                     </div>
-                    <p>${dilemma.definition.substring(0, 100)}...</p>
-                    <button class="nav-btn" style="margin-top: 15px;">Learn More &rarr;</button>
+                    <div class="dilemma-content">
+                        <p>${dilemma.definition}</p>
+                        <h4 style="color: #2c3e50; font-size: 1.2em; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 15px;">How It Manifests:</h4>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            ${dilemma.manifestations.map(m => `<li>${m}</li>`).join('')}
+                        </ul>
+                        <div class="card info" style="margin-top: 20px;">
+                            <h4 style="color: #17a2b8; font-size: 1.1em; margin-bottom: 5px;">What's at Stake?</h4>
+                            <p>${dilemma.stake}</p>
+                        </div>
+                    </div>
                 `;
-                card.querySelector('button').onclick = () => showModal(dilemma.id);
+                card.addEventListener('click', function() {
+                    const content = this.querySelector('.dilemma-content');
+                    const allDilemmaContents = document.querySelectorAll('#dilemmas-grid .dilemma-content');
+                    allDilemmaContents.forEach(item => {
+                        if (item !== content) {
+                            item.classList.remove('open');
+                        }
+                    });
+                    content.classList.toggle('open');
+                });
                 dilemmasGrid.appendChild(card);
             });
 
             const solutionsAccordion = document.getElementById('solutions-accordion');
             solutionsData.forEach(solution => {
-                const item = document.createElement('div');
-                item.className = 'card';
-                item.style.cursor = 'pointer';
-                item.innerHTML = `
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
                     <div style="display: flex; align-items: center;">
                         <span style="font-size: 1.5em; margin-right: 10px;">${solution.icon}</span>
                         <h3 style="color: #2980b9; margin-bottom: 0;">${solution.title}</h3>
                     </div>
-                    <p style="display: none; margin-top: 10px;">${solution.content}</p>
+                    <div class="solution-content">
+                        <p style="margin-top: 10px;">${solution.content}</p>
+                    </div>
                 `;
-                item.onclick = function() {
-                    const content = this.querySelector('p');
-                    content.style.display = content.style.display === 'none' ? 'block' : 'none';
-                };
-                solutionsAccordion.appendChild(item);
+                card.addEventListener('click', function() {
+                    const content = this.querySelector('.solution-content');
+                    const allSolutionContents = document.querySelectorAll('#solutions-accordion .solution-content');
+                    allSolutionContents.forEach(item => {
+                        if (item !== content) {
+                            item.classList.remove('open');
+                        }
+                    });
+                    content.classList.toggle('open');
+                });
+                solutionsAccordion.appendChild(card);
             });
 
             const studentGuideGrid = document.getElementById('student-guide-grid');
@@ -556,10 +496,22 @@
                         <span style="font-size: 1.5em; margin-right: 10px;">${item.icon}</span>
                         <div>
                             <h3 style="font-size: 1.2em; margin-bottom: 5px;">${item.title}</h3>
-                            <p style="color: #333; font-size: 0.9em;">${item.text}</p>
                         </div>
                     </div>
+                    <div class="guide-content">
+                        <p style="color: #333; font-size: 0.9em; margin-top: 10px;">${item.text}</p>
+                    </div>
                 `;
+                card.addEventListener('click', function() {
+                    const content = this.querySelector('.guide-content');
+                    const allGuideContents = document.querySelectorAll('#student-guide-grid .guide-content');
+                    allGuideContents.forEach(item => {
+                        if (item !== content) {
+                            item.classList.remove('open');
+                        }
+                    });
+                    content.classList.toggle('open');
+                });
                 studentGuideGrid.appendChild(card);
             });
 
@@ -615,27 +567,7 @@
                 connectionsChart.data.datasets[0].data = chartData[selectedDilemma];
                 connectionsChart.update();
             });
-
-            function showModal(dilemmaId) {
-                const data = dilemmasData.find(d => d.id === dilemmaId);
-                document.getElementById('modal-title').textContent = data.title;
-                document.getElementById('modal-definition').textContent = data.definition;
-                document.getElementById('modal-manifestations').innerHTML = data.manifestations.map(m => `<li>${m}</li>`).join('');
-                document.getElementById('modal-stake').textContent = data.stake;
-                document.getElementById('dilemma-modal').style.display = 'block';
-            }
-            window.showModal = showModal;
-
-            document.getElementById('modal-close').onclick = function() {
-                document.getElementById('dilemma-modal').style.display = 'none';
-            };
-            window.onclick = function(event) {
-                if (event.target === document.getElementById('dilemma-modal')) {
-                    document.getElementById('dilemma-modal').style.display = 'none';
-                }
-            };
         });
     </script>
 </body>
 </html>
-�
