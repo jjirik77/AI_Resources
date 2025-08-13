@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Artist's Toolkit</title>
+    <!-- Use Tailwind CSS for a modern, responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            display: grid;
+            grid-template-columns: 250px 1fr; /* Fixed-width menu and flexible content */
+            grid-template-rows: auto 1fr; /* Fixed header and flexible content */
+            height: 100vh;
+            background-color: #ecf0f1;
+        }
+
+        /* Top header spans both columns */
+        header {
+            grid-column: 1 / -1;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Navigation menu is in the first column and is fixed */
+        nav {
+            grid-column: 1;
+            grid-row: 2;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        /* Main content is in the second column and scrolls independently */
+        .main-content {
+            grid-column: 2;
+            grid-row: 2;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Custom styles for the details summary, to match the aesthetic */
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        /* Hide content sections by default and show only the active one */
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        
+        /* Highlight the active menu link */
+        .menu-link.active {
+            background-color: #1f2937; /* A slightly lighter gray-900 */
+        }
+        
+        /* Mobile layout adjustments */
+        @media (max-width: 1024px) {
+            body {
+                grid-template-columns: 1fr; /* Single column on mobile */
+                grid-template-rows: auto auto 1fr;
+            }
+            nav {
+                grid-column: 1;
+                grid-row: 2;
+                width: 100%;
+                height: auto;
+                position: static;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 0;
+            }
+            nav ul {
+                display: flex;
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+            nav li {
+                flex-shrink: 0;
+            }
+            nav a {
+                padding: 0.75rem 1rem;
+            }
+            .main-content {
+                grid-column: 1;
+                grid-row: 3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <header class="bg-gray-800 text-white p-4 flex items-center justify-between shadow-lg z-10">
+        <h1 class="text-xl md:text-2xl font-bold">The AI Artist's Toolkit 🎨🤖</h1>
+    </header>
+
+    <!-- Left-side Navigation Menu -->
+    <nav class="p-4 bg-gray-900 text-white">
+        <h3 class="text-2xl font-bold text-gray-200 mb-6 hidden lg:block">Course Menu</h3>
+        <ul class="space-y-4 lg:block">
+            <li><a href="#intro" id="menu-0" class="menu-link block p-3 rounded-lg text-lg font-medium text-gray-200 hover:bg-gray-700 transition-colors duration-200 active">👋 Introduction</a></li>
+            <li><a href="#module-1" id="menu-1" class="menu-link block p-3 rounded-lg text-lg font-medium text-indigo-400 hover:bg-gray-700 transition-colors duration-200">🎨 Module 1: Creative Partner</a></li>
+            <li><a href="#module-2" id="menu-2" class="menu-link block p-3 rounded-lg text-lg font-medium text-purple-400 hover:bg-gray-700 transition-colors duration-200">👁️ Module 2: The Artist's Eye</a></li>
+            <li><a href="#module-3" id="menu-3" class="menu-link block p-3 rounded-lg text-lg font-medium text-green-400 hover:bg-gray-700 transition-colors duration-200">⚖️ Module 3: Ethical Canvas</a></li>
+            <li><a href="#module-4" id="menu-4" class="menu-link block p-3 rounded-lg text-lg font-medium text-yellow-400 hover:bg-gray-700 transition-colors duration-200">🚀 Module 4: Your Future</a></li>
+            <li><a href="#knowledge-check" id="menu-5" class="menu-link block p-3 rounded-lg text-lg font-medium text-red-400 hover:bg-gray-700 transition-colors duration-200">🧠 Knowledge Check</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-content p-4 lg:p-8 bg-gray-100">
+        <div class="bg-white rounded-xl shadow-2xl p-8 lg:p-12 min-h-full">
+            <main>
+                <!-- Introduction Section -->
+                <div id="intro" class="content-section active">
+                    <p class="text-gray-600 max-w-xl mx-auto mb-10">
+                        Welcome to an exploration of AI as a powerful new medium in fine art. This interactive guide will help you understand, use, and critically engage with this transformative technology.
+                    </p>
+                </div>
+
+                <!-- Module 1: AI as Your Creative Partner -->
+                <div id="module-1" class="content-section">
+                    <div class="mb-10 p-6 bg-indigo-50 rounded-xl border-l-4 border-indigo-500">
+                        <h2 class="text-3xl font-bold text-indigo-700 mb-4">Module 1: AI as Your Creative Partner</h2>
+                        <p class="text-gray-700">This module introduces you to AI as a tool for generating, augmenting, and exploring new artistic possibilities. You'll learn the language of AI, and how to direct its creative output.</p>
+                        
+                        <details id="details-1" class="mt-6 bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 open:shadow-md">
+                            <summary class="flex items-center justify-between p-4 cursor-pointer font-bold text-lg text-indigo-600 bg-white hover:bg-indigo-50 transition-colors duration-200">
+                                <span>Core Concepts: Prompt Engineering</span>
+                                <svg id="chevron-down-icon-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                            </summary>
+                            <div class="p-4 border-t border-gray-200 bg-gray-50">
+                                <p class="text-gray-700">
+                                    <strong>Prompt Engineering</strong> is the art of crafting effective inputs (prompts) to guide an AI. Think of it as a new form of communication with your creative partner. Precision, descriptive language, and a clear vision are key.
+                                </p>
+                                <p class="mt-2 text-gray-700">
+                                    The best prompts combine artistic elements you already know: <strong>style, medium, subject, composition, and emotion.</strong>
+                                </p>
+                            </div>
+                        </details>
+        
+                        <div class="mt-8 p-6 bg-white rounded-lg shadow-inner border border-gray-200">
+                            <h4 class="text-xl font-semibold text-red-600 mb-4">Try It Out! Prompt Generator</h4>
+                            <p class="text-gray-700 mb-4">Enter a descriptive prompt below and generate a unique piece of AI art. Focus on the details you would use to describe your work to another artist.</p>
+                            <textarea id="promptInput" rows="4" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:outline-none transition-all duration-200" placeholder="e.g., 'A melancholic self-portrait in the style of Egon Schiele, using digital pastels, with a chaotic, abstract background.'"></textarea>
+                            
+                            <button id="generateBtn" onclick="generateImage()" class="mt-4 px-6 py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 transition-colors duration-200 w-full lg:w-auto">
+                                Generate AI Art
+                            </button>
+                            
+                            <div id="imageOutput" class="mt-6 flex items-center justify-center h-72 bg-gray-200 rounded-lg border-2 border-dashed border-gray-400 text-gray-600 italic">
+                                <p>Your AI-generated art will appear here!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Module 2: The Artist's Eye in the Age of AI -->
+                <div id="module-2" class="content-section">
+                    <div class="mb-10 p-6 bg-purple-50 rounded-xl border-l-4 border-purple-500">
+                        <h2 class="text-3xl font-bold text-purple-700 mb-4">Module 2: The Artist's Eye in the Age of AI</h2>
+                        <p class="text-gray-700">AI can generate incredible images, but it's your artistic eye that gives them soul. This module reinforces the foundational skills that make you an irreplaceable artist.</p>
+                        
+                        <details id="details-2" class="mt-6 bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 open:shadow-md">
+                            <summary class="flex items-center justify-between p-4 cursor-pointer font-bold text-lg text-purple-600 bg-white hover:bg-purple-50 transition-colors duration-200">
+                                <span>Why Your Traditional Skills Matter More Than Ever</span>
+                                <svg id="chevron-down-icon-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                            </summary>
+                            <div class="p-4 border-t border-gray-200 bg-gray-50">
+                                <p class="text-gray-700">AI is an incredible tool, but it doesn't understand composition, light, or emotion the way a human artist does. Your mastery of traditional techniques (drawing, painting, sculpture) is what allows you to <strong>critique, refine, and edit</strong> AI-generated outputs.</p>
+                                <ul class="list-disc list-inside mt-4 text-gray-700 space-y-2">
+                                    <li><strong>Composition:</strong> Use your knowledge to guide the AI towards balanced or dynamic layouts.</li>
+                                    <li><strong>Color Theory:</strong> Direct the AI to a specific palette or emotional tone.</li>
+                                    <li><strong>Intent:</strong> Only you can imbue the work with personal meaning and a distinct narrative.</li>
+                                </ul>
+                            </div>
+                        </details>
+        
+                        <div class="mt-8 p-6 bg-purple-100 rounded-lg border border-purple-300">
+                            <h4 class="text-xl font-semibold text-purple-800 mb-2">Challenge Yourself</h4>
+                            <p class="text-gray-700">
+                                Create a physical sketch or painting based on the AI-generated image from Module 1. How does your interpretation differ from the AI's? What did you add that the AI couldn't? This exercise will help you bridge the gap between digital and physical creation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Module 3: Navigating the Ethical Canvas -->
+                <div id="module-3" class="content-section">
+                    <div class="mb-10 p-6 bg-green-50 rounded-xl border-l-4 border-green-500">
+                        <h2 class="text-3xl font-bold text-green-700 mb-4">Module 3: Navigating the Ethical Canvas</h2>
+                        <p class="text-gray-700">AI art is a legal and ethical minefield. This module provides a framework for critical discussion and responsible creation in this new landscape.</p>
+                        
+                        <details id="details-3" class="mt-6 bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 open:shadow-md">
+                            <summary class="flex items-center justify-between p-4 cursor-pointer font-bold text-lg text-green-600 bg-white hover:bg-green-50 transition-colors duration-200">
+                                <span>The Question of Authorship and Copyright</span>
+                                <svg id="chevron-down-icon-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                            </summary>
+                            <div class="p-4 border-t border-gray-200 bg-gray-50">
+                                <p class="text-gray-700">When is a work of art truly yours? The U.S. Copyright Office requires "human authorship" for copyright protection. This means an AI-generated image alone may not be protected. However, if you significantly edit, manipulate, or use it as a foundational element in a larger work, you may be able to claim ownership.</p>
+                                <p class="mt-2 text-gray-700">
+                                    <strong>Reflect & Discuss:</strong> If an AI is trained on thousands of artists' works, and you use it to create something, who is the true author? Is it the thousands of artists, the AI's creator, or you?
+                                </p>
+                            </div>
+                        </details>
+        
+                        <details id="details-4" class="mt-4 bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 open:shadow-md">
+                            <summary class="flex items-center justify-between p-4 cursor-pointer font-bold text-lg text-green-600 bg-white hover:bg-green-50 transition-colors duration-200">
+                                <span>Bias and the AI Black Box</span>
+                                <svg id="chevron-down-icon-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                            </summary>
+                            <div class="p-4 border-t border-gray-200 bg-gray-50">
+                                <p class="text-gray-700">AI models are trained on vast datasets that often contain human biases. This can lead to skewed or stereotypical outputs. As an artist, you have a responsibility to be aware of and actively work against these biases.</p>
+                                <p class="mt-2 text-gray-700">
+                                    <strong>Reflect & Discuss:</strong> How might an AI's output perpetuate harmful stereotypes? How can you, as an artist, use AI to challenge, rather than reinforce, these biases?
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+                
+                <!-- Module 4: Your Future in the AI Art World -->
+                <div id="module-4" class="content-section">
+                    <div class="mb-10 p-6 bg-yellow-50 rounded-xl border-l-4 border-yellow-500">
+                        <h2 class="text-3xl font-bold text-yellow-700 mb-4">Module 4: Your Future in the AI Art World</h2>
+                        <p class="text-gray-700">The art world is changing, and new career paths are emerging. This module helps you think strategically about your future as an AI-literate artist.</p>
+                        
+                        <details id="details-5" class="mt-6 bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 open:shadow-md">
+                            <summary class="flex items-center justify-between p-4 cursor-pointer font-bold text-lg text-yellow-600 bg-white hover:bg-yellow-50 transition-colors duration-200">
+                                <span>Emerging Roles & Skills</span>
+                                <svg id="chevron-down-icon-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                            </summary>
+                            <div class="p-4 border-t border-gray-200 bg-gray-50">
+                                <p class="text-gray-700">Beyond traditional roles, artists with AI skills are now in demand for new positions like:</p>
+                                <ul class="list-disc list-inside mt-4 text-gray-700 space-y-2">
+                                    <li><strong>AI Creative Director:</strong> Guiding creative vision for AI-driven projects.</li>
+                                    <li><strong>Prompt Engineer:</strong> Specializing in crafting AI inputs for marketing, design, or fine art.</li>
+                                    <li><strong>AI Ethicist:</strong> Consulting on the responsible use of AI in creative fields.</li>
+                                    <li><strong>Generative Artist:</strong> Creating art where AI is the primary tool.</li>
+                                </ul>
+                                <p class="mt-2 text-gray-700">
+                                    Your portfolio should demonstrate both your mastery of traditional media and your proficiency with AI. The combination shows you are a versatile and forward-thinking artist.
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Knowledge Check Section -->
+                <div id="knowledge-check" class="content-section">
+                    <div class="p-6 bg-red-50 rounded-xl border-l-4 border-red-500 mt-10">
+                        <h2 class="text-3xl font-bold text-red-700 mb-4">🧠 Knowledge Check</h2>
+                        <p class="text-gray-700 mb-4">Test your understanding of the key concepts from the modules.</p>
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                            <p class="font-semibold text-lg text-red-600 mb-4">Question 1: What is the primary purpose of "Prompt Engineering" in the context of AI art?</p>
+                            <div class="space-y-3">
+                                <label class="flex items-center text-gray-700">
+                                    <input type="radio" name="q1" value="a" class="mr-2">
+                                    <span>To write code for the AI to follow.</span>
+                                </label>
+                                <label class="flex items-center text-gray-700">
+                                    <input type="radio" name="q1" value="b" class="mr-2">
+                                    <span>To critique and edit AI-generated images after they are created.</span>
+                                </label>
+                                <label class="flex items-center text-gray-700">
+                                    <input type="radio" name="q1" value="c" class="mr-2">
+                                    <span>To craft effective inputs to guide the AI's creative output.</span>
+                                </label>
+                                <label class="flex items-center text-gray-700">
+                                    <input type="radio" name="q1" value="d" class="mr-2">
+                                    <span>To analyze the legal and ethical implications of AI art.</span>
+                                </label>
+                            </div>
+                            <button id="checkAnswerBtn" onclick="checkAnswer()" class="mt-6 px-6 py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 transition-colors duration-200 w-full lg:w-auto">
+                                Check Answer
+                            </button>
+                            <p id="feedback" class="mt-4 font-bold"></p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuLinks = document.querySelectorAll('.menu-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            // Function to show a specific section and update active link
+            const showSection = (sectionId) => {
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(sectionId).classList.add('active');
+                
+                menuLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+                document.querySelector(`a[href="#${sectionId}"]`).classList.add('active');
+            };
+
+            // Event listener for menu links
+            menuLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const sectionId = link.getAttribute('href').substring(1);
+                    showSection(sectionId);
+                });
+            });
+
+            // Initial state: show the first module
+            showSection('intro');
+        });
+
+        // Use async/await for API calls, and handle errors with try/catch
+        async function generateImage() {
+            const promptInput = document.getElementById('promptInput').value;
+            const imageOutput = document.getElementById('imageOutput');
+            const generateBtn = document.getElementById('generateBtn');
+
+            if (promptInput.trim() === '') {
+                // Use a custom message for better UX instead of a default alert()
+                imageOutput.innerHTML = '<p class="text-red-500">Please enter a prompt to generate AI art!</p>';
+                return;
+            }
+
+            // Disable the button and show a loading state
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = 'Generating...';
+            imageOutput.innerHTML = '<div class="flex flex-col items-center justify-center"><p class="animate-pulse">Generating your art...</p><svg class="animate-spin h-8 w-8 text-indigo-500 mt-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>';
+            
+            // API payload for image generation
+            const payload = {
+                instances: {
+                    prompt: promptInput
+                },
+                parameters: {
+                    sampleCount: 1 // Generate one image
+                }
+            };
+
+            // Use an empty string for the API key, as the environment will inject it
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+            // Exponential backoff for API retries
+            const maxRetries = 5;
+            let retryCount = 0;
+            let backoffDelay = 1000; // 1 second
+
+            async function fetchWithRetry(url, options) {
+                while (retryCount < maxRetries) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (response.status === 429) {
+                            throw new Error('Rate limit exceeded');
+                        }
+                        if (!response.ok) {
+                            const error = await response.json();
+                            throw new Error(error.error.message);
+                        }
+                        return response;
+                    } catch (error) {
+                        retryCount++;
+                        if (retryCount < maxRetries) {
+                            await new Promise(resolve => setTimeout(resolve, backoffDelay));
+                            backoffDelay *= 2;
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+            }
+
+            try {
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                // Extract the base64 image data
+                const base64Data = result?.predictions?.[0]?.bytesBase64Encoded;
+
+                if (base64Data) {
+                    const imageUrl = `data:image/png;base64,${base64Data}`;
+                    imageOutput.innerHTML = `<img src="${imageUrl}" alt="AI-generated art based on prompt: ${promptInput}" class="rounded-lg shadow-lg max-w-full max-h-full object-contain">`;
+                } else {
+                    imageOutput.innerHTML = '<p class="text-red-500">Could not generate image. Please try a different prompt.</p>';
+                }
+
+            } catch (error) {
+                console.error('API Error:', error);
+                imageOutput.innerHTML = `<p class="text-red-500">Error generating image: ${error.message}. Please try again.</p>`;
+            } finally {
+                // Re-enable the button
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = 'Generate AI Art';
+            }
+        }
+
+        // JavaScript for the knowledge check
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback');
+            const selectedOption = document.querySelector('input[name="q1"]:checked');
+            
+            if (!selectedOption) {
+                feedback.textContent = 'Please select an answer.';
+                feedback.className = 'mt-4 font-bold text-yellow-600';
+                return;
+            }
+
+            if (selectedOption.value === 'c') {
+                feedback.textContent = 'Correct! Prompt Engineering is the art of giving an AI clear, creative guidance.';
+                feedback.className = 'mt-4 font-bold text-green-600';
+            } else {
+                feedback.textContent = 'Incorrect. Please review Module 1 and try again!';
+                feedback.className = 'mt-4 font-bold text-red-600';
+            }
+        }
+    </script>
+</body>
+</html>
