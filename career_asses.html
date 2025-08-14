@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Cybersecurity Career Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        .framework-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .framework-card.recommended {
+            border-color: #22d3ee; /* cyan-400 */
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+        }
+        .details-panel {
+            display: none;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            max-height: 0;
+        }
+        .interest-bar-bg {
+            background-color: #4b5563; /* gray-600 */
+        }
+        .interest-bar-fill {
+            background-color: #22d3ee; /* cyan-400 */
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="assessment-container" class="w-full max-w-5xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10 transition-all duration-500">
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="text-center fade-in">
+            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400 mb-4">Comprehensive Cybersecurity Career Assessment</h1>
+            <p class="text-gray-300 mb-6 text-lg">This two-stage assessment will first identify your core work style and then pinpoint specific cybersecurity roles you might enjoy. Discover your path in the vast world of cybersecurity.</p>
+            <button id="start-btn" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+                Start Profile Assessment
+            </button>
+        </div>
+
+        <!-- Stage 1 Quiz Screen -->
+        <div id="quiz-screen-stage1" class="hidden fade-in">
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="question-counter-stage1" class="text-sm font-semibold text-cyan-400"></span>
+                    <span id="progress-text-stage1" class="text-sm font-semibold text-gray-400"></span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div id="progress-bar-stage1" class="bg-cyan-500 h-2.5 rounded-full progress-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            <h2 class="text-2xl font-semibold mb-8 text-gray-100 text-center">Which statement is more true for you?</h2>
+            <div id="answers-container-stage1" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+        
+        <!-- Intermediate Screen -->
+        <div id="intermediate-screen" class="hidden fade-in text-center">
+             <h1 class="text-3xl md:text-4xl font-bold text-cyan-400 mb-4">Profile Assessment Complete!</h1>
+            <p class="text-gray-300 mb-6 text-lg">You've completed the first stage. Now, let's refine your results by exploring your interest in specific cybersecurity tasks.</p>
+            <button id="start-stage2-btn" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+                Start Interest Inventory
+            </button>
+        </div>
+
+        <!-- Stage 2 Quiz Screen -->
+        <div id="quiz-screen-stage2" class="hidden fade-in">
+             <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="question-counter-stage2" class="text-sm font-semibold text-cyan-400"></span>
+                    <span id="progress-text-stage2" class="text-sm font-semibold text-gray-400"></span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div id="progress-bar-stage2" class="bg-cyan-500 h-2.5 rounded-full progress-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            <h2 class="text-2xl font-semibold mb-6 text-gray-100 text-center">How interested are you in this activity?</h2>
+            <p id="interest-question-text" class="text-center text-lg text-gray-300 mb-8"></p>
+            <div id="interest-answers-container" class="flex justify-center gap-2 md:gap-4 flex-wrap"></div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden fade-in">
+            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400 mb-2 text-center">Your Cybersecurity Career Explorer</h1>
+            <div id="profile-summary" class="text-center mb-8"></div>
+            
+            <div id="top-recommendation-container" class="mb-10">
+                <!-- Top recommendation will be dynamically inserted here -->
+            </div>
+
+            <h2 class="text-2xl font-semibold text-center text-white border-t border-gray-600 pt-8 mb-6">Other Categories to Explore</h2>
+            <div id="other-categories-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Other categories will be dynamically inserted here -->
+            </div>
+
+            <div class="text-center mt-10">
+                <button id="restart-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform transform hover:scale-105">
+                    Take Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM ELEMENTS ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreenStage1 = document.getElementById('quiz-screen-stage1');
+        const intermediateScreen = document.getElementById('intermediate-screen');
+        const quizScreenStage2 = document.getElementById('quiz-screen-stage2');
+        const resultsScreen = document.getElementById('results-screen');
+        const startBtn = document.getElementById('start-btn');
+        const startStage2Btn = document.getElementById('start-stage2-btn');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // --- ASSESSMENT DATA ---
+        const traits = {
+            ANALYTICAL: { score: 0, name: 'Analytical' },
+            DECISIVE: { score: 0, name: 'Decisive' },
+            METHODICAL: { score: 0, name: 'Methodical' },
+            STRATEGIC: { score: 0, name: 'Strategic' },
+            BUILDER: { score: 0, name: 'Builder' },
+            COMMUNICATOR: { score: 0, name: 'Communicator' },
+        };
+
+        const frameworkCategories = {
+            SP: { name: 'Securely Provision', trait: 'BUILDER', roles: [], desc: 'Conceptualizes, designs, and builds secure IT systems.' },
+            OM: { name: 'Operate and Maintain', trait: 'METHODICAL', roles: [], desc: 'Provides the support, administration, and maintenance necessary to ensure effective and efficient IT system performance and security.' },
+            OV: { name: 'Oversee and Govern', trait: 'STRATEGIC', roles: [], desc: 'Provides leadership, management, direction, or development and advocacy so the organization may effectively conduct cybersecurity work.' },
+            PR: { name: 'Protect and Defend', trait: 'DECISIVE', roles: [], desc: 'Identifies, analyzes, and mitigates threats to internal IT systems and networks.' },
+            AN: { name: 'Analyze', trait: 'ANALYTICAL', roles: [], desc: 'Performs highly-specialized review and evaluation of incoming cybersecurity information to determine its usefulness for intelligence.' },
+            IN: { name: 'Investigate', trait: 'ANALYTICAL', roles: [], desc: 'Investigates cybersecurity events or crimes.' }
+        };
+
+        const workRoles = {
+            '621': { id: '621', cat: 'SP', name: 'Software Developer', desc: 'Creates secure computer applications, software, or specialized utility programs.' },
+            '641': { id: '641', cat: 'SP', name: 'Systems Requirements Planner', desc: 'Consults with customers to gather and evaluate functional requirements.' },
+            '652': { id: '652', cat: 'SP', name: 'Security Architect', desc: 'Designs and builds secure IT systems and networks.' },
+            '451': { id: '451', cat: 'OM', name: 'System Administrator', desc: 'Responsible for setting up and maintaining systems.' },
+            '441': { id: '441', cat: 'OM', name: 'Network Operations Specialist', desc: 'Plans, implements, and operates network services/systems.' },
+            '722': { id: '722', cat: 'OV', name: 'Information Systems Security Manager', desc: 'Manages the cybersecurity of a program, organization, or system.' },
+            '751': { id: '751', cat: 'OV', name: 'Cyber Workforce Developer and Manager', desc: 'Develops and conducts cybersecurity training or education.' },
+            '701': { id: '701', cat: 'OV', name: 'Cyber Policy and Strategy Planner', desc: 'Develops and recommends cybersecurity policy and strategy.' },
+            '612': { id: '612', cat: 'OV', name: 'Security Control Assessor', desc: 'Conducts assessments of security controls to ensure compliance.' },
+            '511': { id: '511', cat: 'PR', name: 'Cyber Defense Analyst', desc: 'Uses data to analyze events and identify threats.' },
+            '531': { id: '531', cat: 'PR', name: 'Cyber Defense Incident Responder', desc: 'Responds to crises to mitigate threats and recover systems.' },
+            '141': { id: '141', cat: 'AN', name: 'Threat/Warning Analyst', desc: 'Analyzes and assesses cyber intelligence to provide warnings of threats.' },
+            '121': { id: '121', cat: 'AN', name: 'Exploitation Analyst', desc: 'Analyzes collected information to identify vulnerabilities and potential for exploitation.' },
+            '212': { id: '212', cat: 'IN', name: 'Cyber Defense Forensics Analyst', desc: 'Collects and analyzes digital evidence from incidents.' }
+        };
+        
+        Object.values(workRoles).forEach(role => {
+            if(frameworkCategories[role.cat]) frameworkCategories[role.cat].roles.push(role);
+        });
+
+        const stage1Questions = [
+            { a: { text: "I enjoy building a new system from scratch more than maintaining an existing one.", weights: { BUILDER: 2 } }, b: { text: "I prefer ensuring an existing system is running perfectly and securely.", weights: { METHODICAL: 2 } } },
+            { a: { text: "In a crisis, I feel a strong urge to take immediate action.", weights: { DECISIVE: 2 } }, b: { text: "In a crisis, my first instinct is to step back, gather information, and analyze.", weights: { ANALYTICAL: 2 } } },
+            { a: { text: "I am more interested in creating training programs and policies for people.", weights: { COMMUNICATOR: 2, STRATEGIC: 1 } }, b: { text: "I am more interested in writing code and scripts for computers.", weights: { BUILDER: 2 } } },
+            { a: { text: "I'm more interested in designing a long-term security plan for an entire organization.", weights: { STRATEGIC: 2 } }, b: { text: "I'm more interested in responding to an active, ongoing security threat.", weights: { DECISIVE: 2 } } },
+            { a: { text: "Finding a single, critical flaw in a complex system is deeply satisfying.", weights: { ANALYTICAL: 2 } }, b: { text: "Ensuring a complex system meets all required compliance standards is deeply satisfying.", weights: { METHODICAL: 2 } } },
+            { a: { text: "I trust data and evidence more than intuition.", weights: { ANALYTICAL: 2, METHODICAL: 1 } }, b: { text: "My intuition is often correct, even when the data isn't clear yet.", weights: { DECISIVE: 2, STRATEGIC: 1 } } },
+            { a: { text: "I enjoy work that has a predictable rhythm and a structured process.", weights: { METHODICAL: 2 } }, b: { text: "I thrive in dynamic environments where priorities can change at a moment's notice.", weights: { DECISIVE: 2 } } },
+            { a: { text: "My strength is in creating and enforcing policies.", weights: { STRATEGIC: 2, COMMUNICATOR: 1 } }, b: { text: "My strength is in investigating incidents and finding the root cause.", weights: { ANALYTICAL: 2, DECISIVE: 1 } } },
+            { a: { text: "I'd rather be a detective, solving a complex digital mystery piece by piece.", weights: { ANALYTICAL: 2 } }, b: { text: "I'd rather be a firefighter, rushing in to contain and control a digital emergency.", weights: { DECISIVE: 2 } } },
+            { a: { text: "It's more important to have a perfect, comprehensive plan before starting.", weights: { STRATEGIC: 2, METHODICAL: 1 } }, b: { text: "It's more important to start quickly and adapt the plan as you go.", weights: { DECISIVE: 2 } } },
+            { a: { text: "I feel frustrated when people don't follow established protocols.", weights: { METHODICAL: 2 } }, b: { text: "I feel frustrated when rigid protocols get in the way of solving a problem efficiently.", weights: { DECISIVE: 2 } } },
+            { a: { text: "I enjoy documenting my work meticulously so it can be audited later.", weights: { METHODICAL: 2, COMMUNICATOR: 1 } }, b: { text: "I prefer to move on to the next challenge once a problem is solved.", weights: { DECISIVE: 1, BUILDER: 1 } } },
+            { a: { text: "I am more concerned with 'How does this work?'", weights: { ANALYTICAL: 2, BUILDER: 1 } }, b: { text: "I am more concerned with 'Why should we be doing this?'", weights: { STRATEGIC: 2 } } },
+            { a: { text: "When learning a new tool, I read the entire manual first.", weights: { METHODICAL: 2 } }, b: { text: "When learning a new tool, I start using it and figure it out through trial and error.", weights: { ANALYTICAL: 1, BUILDER: 1 } } },
+            { a: { text: "I would prefer a job that involves identifying future risks and preventing them.", weights: { STRATEGIC: 2 } }, b: { text: "I would prefer a job that involves reacting to current events and fixing them.", weights: { DECISIVE: 2 } } },
+            { a: { text: "A successful day is when I've followed my checklist and completed all my tasks.", weights: { METHODICAL: 2 } }, b: { text: "A successful day is when I've discovered something new and unexpected.", weights: { ANALYTICAL: 2 } } },
+            { a: { text: "I am skilled at explaining complex technical details to a non-technical audience.", weights: { COMMUNICATOR: 2, STRATEGIC: 1 } }, b: { text: "I am skilled at digging through complex technical data to find a single piece of evidence.", weights: { ANALYTICAL: 2 } } },
+            { a: { text: "I'm energized by debating high-level strategy and long-term goals.", weights: { STRATEGIC: 2 } }, b: { text: "I'm energized by the thrill of a high-stakes, time-sensitive operation.", weights: { DECISIVE: 2 } } },
+            { a: { text: "The most important thing is to be correct.", weights: { ANALYTICAL: 2, METHODICAL: 1 } }, b: { text: "The most important thing is to be effective.", weights: { DECISIVE: 2, STRATEGIC: 1 } } },
+            { a: { text: "I think in terms of systems, frameworks, and architecture.", weights: { STRATEGIC: 2, BUILDER: 1 } }, b: { text: "I think in terms of evidence, logs, and artifacts.", weights: { ANALYTICAL: 2 } } }
+        ];
+
+        const interestQuestionsByTrait = {
+            BUILDER: [
+                { text: "Writing and testing secure code for a new application.", roles: ['621'] },
+                { text: "Designing the security architecture for a new enterprise network.", roles: ['652'] },
+                { text: "Translating customer needs into technical system requirements.", roles: ['641'] }
+            ],
+            METHODICAL: [
+                { text: "Managing user accounts and system patches on servers.", roles: ['451'] },
+                { text: "Auditing a cloud environment to ensure it meets compliance standards like ISO 27001.", roles: ['612'] },
+                { text: "Monitoring network devices to ensure they are operating correctly.", roles: ['441'] }
+            ],
+            STRATEGIC: [
+                { text: "Developing a company-wide cybersecurity training program.", roles: ['751'] },
+                { text: "Drafting a formal policy on acceptable use of company IT resources.", roles: ['701'] },
+                { text: "Managing the budget and roadmap for a cybersecurity department.", roles: ['722'] }
+            ],
+            DECISIVE: [
+                { text: "Coordinating the response to a live ransomware attack.", roles: ['531'] },
+                { text: "Actively monitoring security alerts and responding to potential threats in real-time.", roles: ['511'] },
+            ],
+            ANALYTICAL: [
+                { text: "Performing a deep-dive forensic analysis of a compromised hard drive.", roles: ['212'] },
+                { text: "Analyzing intelligence reports to predict future cyber threats.", roles: ['141'] },
+                { text: "Reverse-engineering malware to understand how it works.", roles: ['121'] }
+            ],
+            COMMUNICATOR: [
+                 { text: "Developing a company-wide cybersecurity training program.", roles: ['751'] },
+                 { text: "Drafting a formal policy on acceptable use of company IT resources.", roles: ['701'] },
+                 { text: "Consulting with customers to gather and evaluate functional requirements.", roles: ['641'] }
+            ]
+        };
+
+        let currentStage1Index = 0;
+        let currentStage2Index = 0;
+        let stage2QuestionSet = [];
+        let interestScores = {};
+        let maxInterestScores = {};
+        let userPrimaryTrait = '';
+
+        function init() {
+            startBtn.addEventListener('click', startStage1);
+            startStage2Btn.addEventListener('click', startStage2);
+            restartBtn.addEventListener('click', () => {
+                resultsScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+            });
+        }
+
+        function startStage1() {
+            startScreen.classList.add('hidden');
+            quizScreenStage1.classList.remove('hidden');
+            currentStage1Index = 0;
+            Object.values(traits).forEach(trait => trait.score = 0);
+            showStage1Question();
+        }
+
+        function showStage1Question() {
+            const container = document.getElementById('answers-container-stage1');
+            container.innerHTML = '';
+
+            if (currentStage1Index < stage1Questions.length) {
+                const question = stage1Questions[currentStage1Index];
+                
+                const progress = ((currentStage1Index) / stage1Questions.length) * 100;
+                document.getElementById('progress-bar-stage1').style.width = `${progress}%`;
+                document.getElementById('question-counter-stage1').textContent = `Question ${currentStage1Index + 1} of ${stage1Questions.length}`;
+                document.getElementById('progress-text-stage1').textContent = `Profile Assessment: ${Math.round(progress)}% Complete`;
+
+                ['a', 'b'].forEach(choice => {
+                    const button = document.createElement('button');
+                    button.className = "flex items-center justify-center text-center p-6 bg-gray-700 rounded-lg hover:bg-cyan-700 hover:ring-2 hover:ring-cyan-400 transition-all duration-200 h-full";
+                    button.innerHTML = `<span class="text-gray-200 text-lg">${question[choice].text}</span>`;
+                    button.onclick = () => selectStage1Answer(question[choice].weights);
+                    container.appendChild(button);
+                });
+            } else {
+                quizScreenStage1.classList.add('hidden');
+                intermediateScreen.classList.remove('hidden');
+            }
+        }
+
+        function selectStage1Answer(weights) {
+            for (const traitName in weights) {
+                if (traits[traitName]) traits[traitName].score += weights[traitName];
+            }
+            currentStage1Index++;
+            showStage1Question();
+        }
+
+        function startStage2() {
+            intermediateScreen.classList.add('hidden');
+            quizScreenStage2.classList.remove('hidden');
+            
+            const sortedTraits = Object.values(traits).sort((a, b) => b.score - a.score);
+            userPrimaryTrait = sortedTraits[0].name.toUpperCase();
+
+            stage2QuestionSet = [];
+            if (interestQuestionsByTrait[userPrimaryTrait]) {
+                stage2QuestionSet.push(...interestQuestionsByTrait[userPrimaryTrait]);
+            }
+            
+            const otherTraits = Object.keys(interestQuestionsByTrait).filter(t => t !== userPrimaryTrait);
+            for(let i=0; i<3; i++) {
+                const randomTrait = otherTraits[Math.floor(Math.random() * otherTraits.length)];
+                const randomQuestion = interestQuestionsByTrait[randomTrait][Math.floor(Math.random() * interestQuestionsByTrait[randomTrait].length)];
+                if (!stage2QuestionSet.find(q => q.text === randomQuestion.text)) {
+                    stage2QuestionSet.push(randomQuestion);
+                }
+            }
+            stage2QuestionSet = [...new Set(stage2QuestionSet)]; // Ensure unique questions
+
+            currentStage2Index = 0;
+            interestScores = {};
+            maxInterestScores = {};
+            Object.keys(workRoles).forEach(id => {
+                interestScores[id] = 0;
+                maxInterestScores[id] = 0;
+            });
+
+            // Calculate max possible scores for percentage bar
+            stage2QuestionSet.forEach(q => {
+                q.roles.forEach(roleId => {
+                    if (maxInterestScores[roleId] !== undefined) {
+                        maxInterestScores[roleId] += 3; // Max value for a question is 3
+                    }
+                });
+            });
+
+            showStage2Question();
+        }
+
+        function showStage2Question() {
+            if (currentStage2Index < stage2QuestionSet.length) {
+                const question = stage2QuestionSet[currentStage2Index];
+                document.getElementById('interest-question-text').textContent = question.text;
+                
+                const progress = ((currentStage2Index) / stage2QuestionSet.length) * 100;
+                document.getElementById('progress-bar-stage2').style.width = `${progress}%`;
+                document.getElementById('question-counter-stage2').textContent = `Activity ${currentStage2Index + 1} of ${stage2QuestionSet.length}`;
+                document.getElementById('progress-text-stage2').textContent = `Interest Inventory: ${Math.round(progress)}% Complete`;
+
+                const container = document.getElementById('interest-answers-container');
+                container.innerHTML = '';
+                const ratings = [
+                    { text: 'Not Interested', value: 0 },
+                    { text: 'Slightly', value: 1 },
+                    { text: 'Moderately', value: 2 },
+                    { text: 'Very', value: 3 }
+                ];
+                ratings.forEach(rating => {
+                    const button = document.createElement('button');
+                    button.className = "bg-gray-600 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg transition-all";
+                    button.textContent = rating.text;
+                    button.onclick = () => selectStage2Answer(question.roles, rating.value);
+                    container.appendChild(button);
+                });
+            } else {
+                showResults();
+            }
+        }
+
+        function selectStage2Answer(roles, value) {
+            roles.forEach(roleId => {
+                if(interestScores[roleId] !== undefined) {
+                    interestScores[roleId] += value;
+                }
+            });
+            currentStage2Index++;
+            showStage2Question();
+        }
+        
+        function getProfile() {
+            const profiles = {
+                ANALYTICAL: { title: "The Digital Detective", description: "You are driven by logic, evidence, and a desire to uncover the truth. You excel at deep investigation and finding patterns others miss." },
+                DECISIVE: { title: "The First Responder", description: "You are action-oriented, thrive under pressure, and remain calm in a crisis. You excel at making quick, critical decisions." },
+                METHODICAL: { title: "The Systems Guardian", description: "You are structured and process-driven. You excel at building and verifying defenses and ensuring systems adhere to standards." },
+                STRATEGIC: { title: "The Cyber Architect", description: "You are a big-picture thinker who focuses on long-term planning and governance. You excel at designing robust security programs and policy." },
+                BUILDER: { title: "The Secure Coder", description: "You are a creative problem-solver who enjoys constructing things. You excel at writing secure code and developing resilient systems." },
+                COMMUNICATOR: { title: "The Cyber Educator", description: "You are skilled at translating complex topics. You excel at creating policy, training programs, and fostering a culture of security." }
+            };
+            return profiles[userPrimaryTrait];
+        }
+
+
+        function showResults() {
+            quizScreenStage2.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+
+            const userProfile = getProfile();
+            document.getElementById('profile-summary').innerHTML = `
+                <h2 class="text-2xl font-semibold text-white">${userProfile.title}</h2>
+                <p class="text-gray-300 mt-2 max-w-2xl mx-auto">${userProfile.description}</p>
+            `;
+
+            const topRecContainer = document.getElementById('top-recommendation-container');
+            const otherCatContainer = document.getElementById('other-categories-container');
+            topRecContainer.innerHTML = '';
+            otherCatContainer.innerHTML = '';
+
+            const topCategory = Object.values(frameworkCategories).find(cat => cat.trait === userPrimaryTrait);
+            
+            // Render Top Recommendation
+            if(topCategory) {
+                const card = document.createElement('div');
+                card.className = 'framework-card recommended bg-gray-700 p-6 rounded-lg border-2';
+                card.innerHTML = `
+                    <h2 class="text-2xl font-bold text-cyan-400 mb-1">Top Recommendation</h2>
+                    <h3 class="text-xl font-semibold text-white">${topCategory.name}</h3>
+                    <p class="text-sm text-gray-400 mb-4">${topCategory.desc}</p>
+                    <div class="space-y-3">
+                    ${topCategory.roles.sort((a,b) => interestScores[b.id] - interestScores[a.id]).map(role => {
+                        const interestPercentage = maxInterestScores[role.id] > 0 ? (interestScores[role.id] / maxInterestScores[role.id]) * 100 : 0;
+                        return `
+                        <div class="p-3 bg-gray-800 rounded">
+                            <h4 class="font-semibold text-white">${role.name}</h4>
+                            <p class="text-xs text-gray-500 mb-2">${role.desc}</p>
+                            <div class="flex items-center">
+                                <span class="text-xs font-medium text-cyan-300 mr-2 w-20">Interest:</span>
+                                <div class="w-full interest-bar-bg rounded-full h-2.5">
+                                    <div class="interest-bar-fill h-2.5 rounded-full" style="width: ${interestPercentage}%"></div>
+                                </div>
+                            </div>
+                        </div>`
+                    }).join('')}
+                    </div>
+                `;
+                topRecContainer.appendChild(card);
+            }
+
+            // Render Other Categories
+            Object.values(frameworkCategories).filter(cat => cat.trait !== userPrimaryTrait).forEach(category => {
+                const card = document.createElement('div');
+                card.className = 'framework-card bg-gray-700 p-4 rounded-lg border-2 border-transparent cursor-pointer hover:border-gray-600';
+                card.innerHTML = `
+                    <h3 class="text-xl font-bold text-cyan-400">${category.name}</h3>
+                    <p class="text-sm text-gray-400">${category.desc}</p>
+                `;
+                
+                const detailsPanel = document.createElement('div');
+                detailsPanel.className = 'details-panel mt-4 space-y-3';
+                
+                category.roles.sort((a,b) => interestScores[b.id] - interestScores[a.id]).forEach(role => {
+                    const interestPercentage = maxInterestScores[role.id] > 0 ? (interestScores[role.id] / maxInterestScores[role.id]) * 100 : 0;
+                    detailsPanel.innerHTML += `
+                        <div class="p-3 bg-gray-800 rounded">
+                            <h4 class="font-semibold text-white">${role.name}</h4>
+                            <p class="text-xs text-gray-500 mb-2">${role.desc}</p>
+                             <div class="flex items-center">
+                                <span class="text-xs font-medium text-cyan-300 mr-2 w-20">Interest:</span>
+                                <div class="w-full interest-bar-bg rounded-full h-2.5">
+                                    <div class="interest-bar-fill h-2.5 rounded-full" style="width: ${interestPercentage}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                card.appendChild(detailsPanel);
+                card.addEventListener('click', () => {
+                    const panel = card.querySelector('.details-panel');
+                    if (panel.style.display === 'block') {
+                        panel.style.maxHeight = '0';
+                        panel.style.padding = '0';
+                        setTimeout(() => { panel.style.display = 'none'; }, 500);
+                    } else {
+                        panel.style.display = 'block';
+                        panel.style.padding = '1rem 0 0 0';
+                        panel.style.maxHeight = panel.scrollHeight + "px";
+                    }
+                });
+                otherCatContainer.appendChild(card);
+            });
+        }
+
+        init();
+    });
+    </script>
+</body>
+</html>
