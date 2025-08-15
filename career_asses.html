@@ -170,7 +170,8 @@
      * - Expanded workRoles and interestQuestionsByTrait to cover all major NICE/DCWF specialty areas.
      * - Ensured every role in the bank now has at least 3 distinct activity probes.
      * - Added new roles for SOC Analyst, Detections Engineer, Threat Hunter, Product Security, Platform Security, Privacy Engineering, Third-Party Risk, Red Teaming, and Cyber Ops Planning.
-     * - Updated version to reflect comprehensive content expansion.
+     * - Added DCWF-specific roles: Collection Analyst, Exploitation Analyst, Network Exploitation Specialist.
+     * - Created a new 'Collect & Operate' category to house DCWF-specific roles.
      */
     document.addEventListener('DOMContentLoaded', () => {
         // --- DOM ELEMENTS ---
@@ -201,6 +202,7 @@
             OV: { name: 'Oversee and Govern', traits: ['LEADERSHIP', 'POLICY', 'EDUCATION'], roles: [], desc: 'Provides leadership, management, direction, or development and advocacy so the organization may effectively conduct cybersecurity work.' },
             PR: { name: 'Protect and Defend', traits: ['DECISIVE', 'ANALYTICAL', 'METHODICAL'], roles: [], desc: 'Identifies, analyzes, and mitigates threats to internal IT systems and networks.' },
             AN: { name: 'Analyze', traits: ['ANALYTICAL'], roles: [], desc: 'Performs highly-specialized review and evaluation of incoming cybersecurity information to determine its usefulness for intelligence.' },
+            CO: { name: 'Collect and Operate', traits: ['ANALYTICAL', 'DECISIVE'], roles: [], desc: 'Focuses on the collection of intelligence and the execution of cyber operations. (Primarily DCWF)' },
             IN: { name: 'Investigate', traits: ['ANALYTICAL'], roles: [], desc: 'Investigates cybersecurity events or crimes.' }
         };
 
@@ -230,6 +232,10 @@
             'THUNTER': { id: 'THUNTER', cat: 'AN', trait: 'ANALYTICAL', name: 'Threat Hunter', desc: 'Proactively searches for undetected adversaries within the network.', skills: ['Hypothesis-driven investigation', 'EDR Querying (e.g., KQL)', 'MITRE ATT&CK'], certs: ['GCTI', 'SANS SEC555'], projects: ['Develop a hunt plan for a specific technique', 'Analyze a large dataset (e.g., BZAR) for signs of intrusion'] },
             'FORENSICS': { id: 'FORENSICS', cat: 'IN', trait: 'ANALYTICAL', name: 'Forensics Analyst', desc: 'Collects and analyzes digital evidence from incidents.', skills: ['EnCase/FTK', 'Memory Analysis', 'Timeline Creation'], certs: ['GCFA', 'CHFI'], projects: ['Analyze a disk image from a mock incident', 'Recover deleted files from a USB drive'] },
             'AISEC': { id: 'AISEC', cat: 'SP', trait: 'DEVELOPMENT', name: 'AI/ML Security Engineer', desc: 'Secures AI/ML systems against unique threats like model theft and data poisoning.', skills: ['Adversarial ML', 'Python', 'ML Frameworks'], certs: ['(Emerging)', 'CCSK'], projects: ['Attempt a model evasion attack on a public API', 'Research defenses for data poisoning attacks'] },
+            // DCWF Collection/Exploitation/Network Exploitation special roles
+            'COLLECTION_ANALYST': { id: 'COLLECTION_ANALYST', cat: 'CO', trait: 'METHODICAL', name: 'Collection Analyst', desc: 'Analyzes requirements and manages collection strategies for cyber operations.', skills: ['Requirements Analysis', 'Collection Planning', 'Cross-agency Coordination'], certs: ['Security+', 'Clearance'], projects: ['Develop a mock collection plan based on a fictional intelligence gap', 'Analyze public data streams (e.g., Twitter API) for intelligence'] },
+            'EXPLOITATION_ANALYST': { id: 'EXPLOITATION_ANALYST', cat: 'CO', trait: 'ANALYTICAL', name: 'Exploitation Analyst', desc: 'Analyzes target networks and systems to find vulnerabilities for exploitation.', skills: ['Protocol Analysis', 'Reverse Engineering', 'Vulnerability Research'], certs: ['OSCE', 'GREM', 'Clearance'], projects: ['Reverse engineer a simple application to find a flaw', 'Analyze a pcap of an unknown protocol'] },
+            'NETWORK_EXPLOITATION': { id: 'NETWORK_EXPLOITATION', cat: 'CO', trait: 'ANALYTICAL', name: 'Network Exploitation Specialist', desc: 'Performs network discovery and active exploitation on target systems.', skills: ['Network Reconnaissance', 'Exploit Development', 'Post-Exploitation Techniques'], certs: ['OSCP', 'GPEN', 'Clearance'], projects: ['Build a network mapping tool using public data', 'Write a Python script to auto-enumerate Nmap results'] },
         };
         
         Object.values(workRoles).forEach(role => {
@@ -295,9 +301,6 @@
                 { id: 'D3', text: "Integrating security tools into a CI/CD pipeline.", roles: ['APPSEC', 'PRODSEC'] },
                 { id: 'D4', text: "Performing security code reviews and providing feedback to developers.", roles: ['PRODSEC'] },
                 { id: 'D5', text: "Triaging security findings from bug bounty programs.", roles: ['PRODSEC'] },
-                { id: 'D6', text: "Writing and tuning detection rules in a SIEM (e.g., Splunk, Sentinel).", roles: ['DETECTIONS_ENGINEER'] },
-                { id: 'D7', text: "Developing custom parsers for new log sources.", roles: ['DETECTIONS_ENGINEER'] },
-                { id: 'D8', text: "Researching new adversary techniques to build proactive detections.", roles: ['DETECTIONS_ENGINEER'] }
             ],
             ARCHITECTURE: [
                 { id: 'A1', text: "Designing the security architecture for a new enterprise network.", roles: ['ARCHITECT'] }, 
@@ -322,7 +325,10 @@
                 { id: 'M12', text: "Writing Infrastructure-as-Code (IaC) to deploy secure cloud resources.", roles: ['CSPE'] },
                 { id: 'M13', text: "Analyzing network traffic between PLCs and HMIs for anomalous behavior.", roles: ['OTSEC'] },
                 { id: 'M14', text: "Hardening industrial control systems (ICS) and SCADA environments against cyber threats.", roles: ['OTSEC'] },
-                { id: 'M15', text: "Developing and testing incident response plans for a manufacturing plant floor.", roles: ['OTSEC'] }
+                { id: 'M15', text: "Developing and testing incident response plans for a manufacturing plant floor.", roles: ['OTSEC'] },
+                { id: 'M16', text: "Planning and executing a technical collection operation against a hostile infrastructure.", roles: ['COLLECTION_ANALYST'] },
+                { id: 'M17', text: "Managing and deconflicting intelligence collection requirements from multiple stakeholders.", roles: ['COLLECTION_ANALYST'] },
+                { id: 'M18', text: "Evaluating the effectiveness of different collection methods and sources.", roles: ['COLLECTION_ANALYST'] }
             ],
             LEADERSHIP: [
                 { id: 'L1', text: "Managing the budget and roadmap for a cybersecurity department.", roles: ['MANAGER'] }, 
@@ -380,7 +386,13 @@
                 { id: 'Y16', text: "Providing detailed reports on defensive gaps and recommended improvements.", roles: ['REDTEAM'] },
                 { id: 'Y17', text: "Conducting adversarial testing against machine learning models to find vulnerabilities.", roles: ['AISEC'] },
                 { id: 'Y18', text: "Securing the data pipelines used to train and deploy ML models.", roles: ['AISEC'] },
-                { id: 'Y19', text: "Researching and defending against new threats like data poisoning and model inversion attacks.", roles: ['AISEC'] }
+                { id: 'Y19', text: "Researching and defending against new threats like data poisoning and model inversion attacks.", roles: ['AISEC'] },
+                { id: 'Y20', text: "Analyzing intercepted data to develop technical insights on target networks.", roles: ['EXPLOITATION_ANALYST'] },
+                { id: 'Y21', text: "Reverse engineering network protocols to assess exploitation potential.", roles: ['EXPLOITATION_ANALYST'] },
+                { id: 'Y22', text: "Identifying and characterizing new target opportunities.", roles: ['EXPLOITATION_ANALYST'] },
+                { id: 'Y23', text: "Performing network discovery and vulnerability analysis on target systems.", roles: ['NETWORK_EXPLOITATION'] },
+                { id: 'Y24', text: "Building tooling to support advanced network reconnaissance and exploitation.", roles: ['NETWORK_EXPLOITATION'] },
+                { id: 'Y25', text: "Actively exploiting network devices and systems to achieve operational objectives.", roles: ['NETWORK_EXPLOITATION'] }
             ]
         };
 
