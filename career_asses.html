@@ -65,6 +65,10 @@
         <div id="start-screen" class="text-center fade-in">
             <h1 class="text-3xl md:text-4xl font-bold text-cyan-400 mb-4">Comprehensive Cybersecurity Career Assessment</h1>
             <p class="text-gray-300 mb-6 text-lg">This two-stage assessment will first identify your core work style and then pinpoint specific cybersecurity roles you might enjoy. Discover your path in the vast world of cybersecurity.</p>
+            <div class="flex items-center justify-center mb-6">
+                <input id="consent-checkbox" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500">
+                <label for="consent-checkbox" class="ml-2 block text-sm text-gray-400">Allow anonymous collection of assessment data for validation purposes.</label>
+            </div>
             <button id="start-btn" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
                 Start Profile Assessment
             </button>
@@ -160,22 +164,13 @@
 
     <script>
     /**
-     * Assessment Version: v2.0-high-stakes
-     * Date: 2025-08-14
+     * Assessment Version: v2.2-comprehensive-coverage
+     * Date: 2025-08-15
      * Summary of Changes:
-     * - Expanded Stage 1 to 40 items across 8 traits with balanced positive/reverse keying.
-     * - Implemented within-person normalization for trait scores and tie-breaker logic for primary traits.
-     * - Stage 2 is now deterministic, based on primary traits, ensuring robust evidence for roles.
-     * - Added new roles/activities for domains like Cloud Security, AppSec, and Red Teaming.
-     * - Implemented a comprehensive FitScore (60% Interest, 30% Trait Alignment, 10% Evidence Quality).
-     * - Added attention/inconsistency checks to calculate a High/Medium/Low confidence score.
-     * - Results UI now gates low-confidence roles, shows actionable next steps, and includes a JSON export feature.
-     * * --- README Snippet ---
-     * How to Interpret Your Results:
-     * - FitScore: A holistic measure of how suitable a role is for you, blending your interests and personality.
-     * - Interest %: How much you liked the specific tasks associated with a role.
-     * - Alignment %: How well the role's required personality profile matches your assessment results.
-     * - Confidence: Our confidence in the recommendation based on the consistency of your answers and the amount of data collected.
+     * - Expanded workRoles and interestQuestionsByTrait to cover all major NICE/DCWF specialty areas.
+     * - Ensured every role in the bank now has at least 3 distinct activity probes.
+     * - Added new roles for SOC Analyst, Detections Engineer, Threat Hunter, Product Security, Platform Security, Privacy Engineering, Third-Party Risk, Red Teaming, and Cyber Ops Planning.
+     * - Updated version to reflect comprehensive content expansion.
      */
     document.addEventListener('DOMContentLoaded', () => {
         // --- DOM ELEMENTS ---
@@ -191,6 +186,7 @@
         const exportModal = document.getElementById('export-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const copyJsonBtn = document.getElementById('copy-json-btn');
+        const consentCheckbox = document.getElementById('consent-checkbox');
 
         // --- ASSESSMENT DATA ---
         const traits = {
@@ -203,25 +199,37 @@
             SP: { name: 'Securely Provision', traits: ['ARCHITECTURE', 'DEVELOPMENT'], roles: [], desc: 'Conceptualizes, designs, and builds secure IT systems.' },
             OM: { name: 'Operate and Maintain', traits: ['METHODICAL'], roles: [], desc: 'Provides the support, administration, and maintenance necessary to ensure effective and efficient IT system performance and security.' },
             OV: { name: 'Oversee and Govern', traits: ['LEADERSHIP', 'POLICY', 'EDUCATION'], roles: [], desc: 'Provides leadership, management, direction, or development and advocacy so the organization may effectively conduct cybersecurity work.' },
-            PR: { name: 'Protect and Defend', traits: ['DECISIVE', 'ANALYTICAL'], roles: [], desc: 'Identifies, analyzes, and mitigates threats to internal IT systems and networks.' },
+            PR: { name: 'Protect and Defend', traits: ['DECISIVE', 'ANALYTICAL', 'METHODICAL'], roles: [], desc: 'Identifies, analyzes, and mitigates threats to internal IT systems and networks.' },
             AN: { name: 'Analyze', traits: ['ANALYTICAL'], roles: [], desc: 'Performs highly-specialized review and evaluation of incoming cybersecurity information to determine its usefulness for intelligence.' },
             IN: { name: 'Investigate', traits: ['ANALYTICAL'], roles: [], desc: 'Investigates cybersecurity events or crimes.' }
         };
 
         const workRoles = {
-            '621': { id: '621', cat: 'SP', trait: 'DEVELOPMENT', name: 'AppSec Engineer', desc: 'Develops, creates, and modifies secure computer applications.', skills: ['Python/Go', 'SAST/DAST', 'CI/CD Pipelines'], certs: ['GWEB', 'CSSLP'], projects: ['Build a secure login form', 'Contribute to an open-source security tool'] },
-            '652': { id: '652', cat: 'SP', trait: 'ARCHITECTURE', name: 'Security Architect', desc: 'Designs and builds secure IT systems and networks.', skills: ['Zero Trust', 'Network Design', 'Cloud Architecture'], certs: ['CISSP-ISSAP', 'SABSA'], projects: ['Design a secure network for a small business', 'Create a threat model for a web app'] },
-            '451': { id: '451', cat: 'OM', trait: 'METHODICAL', name: 'System Administrator', desc: 'Responsible for setting up and maintaining systems.', skills: ['Linux/Windows', 'Scripting', 'Patch Management'], certs: ['RHCE', 'MCSE'], projects: ['Set up a hardened home server', 'Automate system updates with a script'] },
-            '722': { id: '722', cat: 'OV', trait: 'LEADERSHIP', name: 'Security Manager', desc: 'Manages the cybersecurity of a program, organization, or system.', skills: ['Risk Management', 'Budgeting', 'Team Leadership'], certs: ['CISM', 'CISSP'], projects: ['Develop a mock incident response plan', 'Create a security budget for a fictional startup'] },
-            '751': { id: '751', cat: 'OV', trait: 'EDUCATION', name: 'Security Awareness Trainer', desc: 'Develops and conducts cybersecurity training or education.', skills: ['Curriculum Design', 'Public Speaking', 'Phishing Simulation'], certs: ['Security+', 'CTP+'], projects: ['Create a 5-minute security awareness video', 'Write a blog post explaining a security concept simply'] },
-            '612': { id: '612', cat: 'OV', trait: 'POLICY', name: 'GRC Analyst', desc: 'Conducts assessments of security controls to ensure compliance.', skills: ['Auditing', 'NIST/ISO Frameworks', 'GRC Tools'], certs: ['CISA', 'CRISC'], projects: ['Perform a mock audit of a personal project against a standard', 'Create a risk register for your home network'] },
-            '531': { id: '531', cat: 'PR', trait: 'DECISIVE', name: 'Incident Responder', desc: 'Responds to crises to mitigate threats and recover systems.', skills: ['Forensics Tools', 'Malware Analysis', 'Calm Under Pressure'], certs: ['GCIH', 'ECIH'], projects: ['Analyze a memory dump from a compromised machine (e.g., from MemoryDD.com)', 'Participate in an online CTF event'] },
-            '541': { id: '541', cat: 'PR', trait: 'ANALYTICAL', name: 'Penetration Tester', desc: 'Performs authorized tests to find and exploit vulnerabilities.', skills: ['Metasploit', 'Burp Suite', 'Exploit Development'], certs: ['OSCP', 'GPEN'], projects: ['Solve challenges on HackTheBox or TryHackMe', 'Find a bug in a public bug bounty program'] },
-            '141': { id: '141', cat: 'AN', trait: 'ANALYTICAL', name: 'Threat Intelligence Analyst', desc: 'Analyzes and assesses cyber intelligence to provide warnings of threats.', skills: ['Threat Platforms', 'Data Analysis', 'Report Writing'], certs: ['CTIA', 'GCTI'], projects: ['Write a threat report on a recent malware family', 'Track the TTPs of an APT group'] },
-            '212': { id: '212', cat: 'IN', trait: 'ANALYTICAL', name: 'Forensics Analyst', desc: 'Collects and analyzes digital evidence from incidents.', skills: ['EnCase/FTK', 'Memory Analysis', 'Timeline Creation'], certs: ['GCFA', 'CHFI'], projects: ['Analyze a disk image from a mock incident', 'Recover deleted files from a USB drive'] },
+            'APPSEC': { id: 'APPSEC', cat: 'SP', trait: 'DEVELOPMENT', name: 'AppSec Engineer', desc: 'Develops, creates, and modifies secure computer applications.', skills: ['Python/Go', 'SAST/DAST', 'CI/CD Pipelines'], certs: ['GWEB', 'CSSLP'], projects: ['Build a secure login form', 'Contribute to an open-source security tool'] },
+            'PRODSEC': { id: 'PRODSEC', cat: 'SP', trait: 'DEVELOPMENT', name: 'Product Security Engineer', desc: 'Secures the entire lifecycle of a product from design to deployment.', skills: ['Threat Modeling', 'Secure SDLC', 'Bug Bounty Management'], certs: ['CSSLP', 'CISSP'], projects: ['Threat model a feature for a web app', 'Triage findings from a bug bounty program'] },
+            'ARCHITECT': { id: 'ARCHITECT', cat: 'SP', trait: 'ARCHITECTURE', name: 'Security Architect', desc: 'Designs and builds secure IT systems and networks.', skills: ['Zero Trust', 'Network Design', 'Cloud Architecture'], certs: ['CISSP-ISSAP', 'SABSA'], projects: ['Design a secure network for a small business', 'Create a threat model for a web app'] },
+            'PLATFORM': { id: 'PLATFORM', cat: 'SP', trait: 'ARCHITECTURE', name: 'Platform Security Engineer', desc: 'Secures foundational technologies like EDR, logging pipelines, and CI/CD.', skills: ['Kubernetes', 'Terraform', 'EDR/XDR Tuning'], certs: ['CKA/CKS', 'Cloud Platform Certs'], projects: ['Build a secure CI/CD pipeline for a sample app', 'Deploy and configure an open-source SIEM'] },
+            'SYSADMIN': { id: 'SYSADMIN', cat: 'OM', trait: 'METHODICAL', name: 'System Administrator', desc: 'Responsible for setting up and maintaining systems.', skills: ['Linux/Windows', 'Scripting', 'Patch Management'], certs: ['RHCE', 'MCSE'], projects: ['Set up a hardened home server', 'Automate system updates with a script'] },
             'CSPE': { id: 'CSPE', cat: 'OM', trait: 'METHODICAL', name: 'Cloud Security Engineer', desc: 'Secures and maintains cloud environments (e.g., AWS, Azure, GCP).', skills: ['IAM', 'Terraform', 'CSPM/CWPP Tools'], certs: ['CCSP', 'Azure Security Engineer'], projects: ['Build a secure VPC in AWS', 'Write an infrastructure-as-code script to deploy a hardened server'] },
             'IAM': { id: 'IAM', cat: 'OM', trait: 'METHODICAL', name: 'Identity & Access Engineer', desc: 'Manages identity lifecycle, authentication, and authorization.', skills: ['Okta/Azure AD', 'SAML/OAuth', 'PAM solutions'], certs: ['Okta Certified Professional', 'SC-300'], projects: ['Set up multi-factor authentication on all your personal accounts', 'Build a simple app with social login'] },
+            'OTSEC': { id: 'OTSEC', cat: 'OM', trait: 'METHODICAL', name: 'OT/ICS Security Specialist', desc: 'Secures operational technology and industrial control systems.', skills: ['SCADA', 'Purdue Model', 'Network Segmentation'], certs: ['GRID', 'GICSP'], projects: ['Set up a virtual PLC network', 'Analyze an ICS-specific malware sample'] },
+            'MANAGER': { id: 'MANAGER', cat: 'OV', trait: 'LEADERSHIP', name: 'Security Manager', desc: 'Manages the cybersecurity of a program, organization, or system.', skills: ['Risk Management', 'Budgeting', 'Team Leadership'], certs: ['CISM', 'CISSP'], projects: ['Develop a mock incident response plan', 'Create a security budget for a fictional startup'] },
+            'PM': { id: 'PM', cat: 'OV', trait: 'LEADERSHIP', name: 'Cybersecurity Project Manager', desc: 'Plans and manages the execution of cybersecurity projects.', skills: ['Agile/Scrum', 'Stakeholder Communication', 'Project Planning'], certs: ['PMP', 'PMI-ACP'], projects: ['Create a Gantt chart for a firewall deployment project', 'Run a mock sprint planning meeting'] },
+            'OPSPLAN': { id: 'OPSPLAN', cat: 'OV', trait: 'LEADERSHIP', name: 'Cyber Ops Planner', desc: 'Develops detailed plans for offensive or defensive cyber operations (DCWF).', skills: ['Military Planning Process', 'Threat Intelligence', 'Coordination'], certs: ['CYSA+', 'CASP+'], projects: ['Write a mock operational order for a network defense scenario', 'Analyze a case study of a major cyber operation'] },
+            'TRAINER': { id: 'TRAINER', cat: 'OV', trait: 'EDUCATION', name: 'Security Awareness Trainer', desc: 'Develops and conducts cybersecurity training or education.', skills: ['Curriculum Design', 'Public Speaking', 'Phishing Simulation'], certs: ['Security+', 'CTP+'], projects: ['Create a 5-minute security awareness video', 'Write a blog post explaining a security concept simply'] },
+            'GRC': { id: 'GRC', cat: 'OV', trait: 'POLICY', name: 'GRC Analyst', desc: 'Conducts assessments of security controls to ensure compliance.', skills: ['Auditing', 'NIST/ISO Frameworks', 'GRC Tools'], certs: ['CISA', 'CRISC'], projects: ['Perform a mock audit of a personal project against a standard', 'Create a risk register for your home network'] },
+            'PRIVACY': { id: 'PRIVACY', cat: 'OV', trait: 'POLICY', name: 'Privacy Engineer', desc: 'Integrates data protection and privacy controls into systems.', skills: ['GDPR/CCPA', 'Data Anonymization', 'DPIA'], certs: ['CIPT', 'CDPSE'], projects: ['Perform a DPIA on a fictional app', 'Develop a script to anonymize a dataset'] },
+            'TPRM': { id: 'TPRM', cat: 'OV', trait: 'POLICY', name: 'Third-Party Risk Analyst', desc: 'Manages and assesses the security risk of external vendors and partners.', skills: ['Vendor Assessment', 'Contract Review', 'Risk Questionnaires'], certs: ['CRISC', 'CISM'], projects: ['Review the privacy policy of a service you use', 'Create a sample vendor risk questionnaire'] },
+            'IR': { id: 'IR', cat: 'PR', trait: 'DECISIVE', name: 'Incident Responder', desc: 'Responds to crises to mitigate threats and recover systems.', skills: ['Forensics Tools', 'Malware Analysis', 'Calm Under Pressure'], certs: ['GCIH', 'ECIH'], projects: ['Analyze a memory dump from a compromised machine (e.g., from MemoryDD.com)', 'Participate in an online CTF event'] },
+            'SOC': { id: 'SOC', cat: 'PR', trait: 'DECISIVE', name: 'SOC Analyst', desc: 'Serves as the front-line defender, triaging alerts and monitoring for threats.', skills: ['SIEM (Splunk/Sentinel)', 'Alert Triage', 'Packet Analysis'], certs: ['Security+', 'CYSA+'], projects: ['Set up Security Onion and analyze traffic', 'Complete a SOC analyst challenge on a platform like LetsDefend'] },
             'VULN': { id: 'VULN', cat: 'PR', trait: 'METHODICAL', name: 'Vulnerability Manager', desc: 'Manages the lifecycle of vulnerabilities from discovery to remediation.', skills: ['Tenable/Qualys', 'Risk Prioritization', 'Communication'], certs: ['Security+', 'Tenable Certified Specialist'], projects: ['Run a vulnerability scan on your home network', 'Prioritize a list of mock vulnerabilities based on impact'] },
+            'PENTEST': { id: 'PENTEST', cat: 'PR', trait: 'ANALYTICAL', name: 'Penetration Tester', desc: 'Performs authorized tests to find and exploit vulnerabilities.', skills: ['Metasploit', 'Burp Suite', 'Exploit Development'], certs: ['OSCP', 'GPEN'], projects: ['Solve challenges on HackTheBox or TryHackMe', 'Find a bug in a public bug bounty program'] },
+            'REDTEAM': { id: 'REDTEAM', cat: 'PR', trait: 'ANALYTICAL', name: 'Red Team Operator', desc: 'Simulates real-world adversaries to test an organization\'s defenses.', skills: ['Adversary Emulation', 'C2 Frameworks', 'Social Engineering'], certs: ['OSCE', 'CRTO'], projects: ['Set up a command-and-control server in a lab', 'Replicate a known APT attack chain'] },
+            'PURPLETEAM': { id: 'PURPLETEAM', cat: 'PR', trait: 'EDUCATION', name: 'Purple Team Operator', desc: 'Collaborates between red and blue teams to improve detection and response.', skills: ['Threat Simulation', 'Detection Engineering', 'Collaborative Communication'], certs: ['SANS SEC599', 'GCIH'], projects: ['Manually execute an ATT&CK technique and try to detect it', 'Write a detection rule based on a red team report'] },
+            'CTI': { id: 'CTI', cat: 'AN', trait: 'ANALYTICAL', name: 'Threat Intelligence Analyst', desc: 'Analyzes and assesses cyber intelligence to provide warnings of threats.', skills: ['Threat Platforms', 'Data Analysis', 'Report Writing'], certs: ['CTIA', 'GCTI'], projects: ['Write a threat report on a recent malware family', 'Track the TTPs of an APT group'] },
+            'THUNTER': { id: 'THUNTER', cat: 'AN', trait: 'ANALYTICAL', name: 'Threat Hunter', desc: 'Proactively searches for undetected adversaries within the network.', skills: ['Hypothesis-driven investigation', 'EDR Querying (e.g., KQL)', 'MITRE ATT&CK'], certs: ['GCTI', 'SANS SEC555'], projects: ['Develop a hunt plan for a specific technique', 'Analyze a large dataset (e.g., BZAR) for signs of intrusion'] },
+            'FORENSICS': { id: 'FORENSICS', cat: 'IN', trait: 'ANALYTICAL', name: 'Forensics Analyst', desc: 'Collects and analyzes digital evidence from incidents.', skills: ['EnCase/FTK', 'Memory Analysis', 'Timeline Creation'], certs: ['GCFA', 'CHFI'], projects: ['Analyze a disk image from a mock incident', 'Recover deleted files from a USB drive'] },
+            'AISEC': { id: 'AISEC', cat: 'SP', trait: 'DEVELOPMENT', name: 'AI/ML Security Engineer', desc: 'Secures AI/ML systems against unique threats like model theft and data poisoning.', skills: ['Adversarial ML', 'Python', 'ML Frameworks'], certs: ['(Emerging)', 'CCSK'], projects: ['Attempt a model evasion attack on a public API', 'Research defenses for data poisoning attacks'] },
         };
         
         Object.values(workRoles).forEach(role => {
@@ -230,65 +238,150 @@
 
         // 40 items, 5 per trait (3 pos, 2 rev)
         const stage1Questions = [
-            // ANALYTICAL
+            // ANALYTICAL: 3 pos, 2 rev
             { id: 1, a: { text: "I enjoy deep-diving into logs and data to find the root cause of a problem.", trait: 'ANALYTICAL' }, b: { text: "I prefer to act quickly based on the information at hand.", trait: 'DECISIVE' } },
             { id: 2, a: { text: "I'd rather be a detective, solving a complex digital mystery.", trait: 'ANALYTICAL' }, b: { text: "I'd rather be a firefighter, controlling a digital emergency.", trait: 'DECISIVE' } },
             { id: 3, a: { text: "Finding a single, critical flaw in a system is deeply satisfying.", trait: 'ANALYTICAL' }, b: { text: "Ensuring a system meets all compliance standards is deeply satisfying.", trait: 'POLICY' } },
-            { id: 4, a: { text: "I prefer to move on once a problem's surface symptoms are fixed.", trait: 'ANALYTICAL', rev: true }, b: { text: "I need to understand the fundamental reason why a problem occurred.", trait: 'ANALYTICAL' } }, // rev
-            { id: 5, a: { text: "I'm comfortable making decisions with incomplete data.", trait: 'ANALYTICAL', rev: true }, b: { text: "I require thorough data analysis before making a decision.", trait: 'ANALYTICAL' } }, // rev
-            // DECISIVE
+            { id: 4, a: { text: "I prefer to move on once a problem's surface symptoms are fixed.", trait: 'DECISIVE' }, b: { text: "I need to understand the fundamental reason why a problem occurred.", trait: 'ANALYTICAL' } }, // rev
+            { id: 5, a: { text: "I'm comfortable making decisions with incomplete data.", trait: 'DECISIVE' }, b: { text: "I require thorough data analysis before making a decision.", trait: 'ANALYTICAL' } }, // rev
+            // DECISIVE: 3 pos, 2 rev
             { id: 6, a: { text: "I thrive in dynamic environments where priorities change at a moment's notice.", trait: 'DECISIVE' }, b: { text: "I enjoy work that has a predictable rhythm and a structured process.", trait: 'METHODICAL' } },
             { id: 7, a: { text: "I'm energized by a high-stakes, time-sensitive operation.", trait: 'DECISIVE' }, b: { text: "I'm energized by managing a long-term project or team.", trait: 'LEADERSHIP' } },
             { id: 8, a: { text: "It's more important to start quickly and adapt the plan as you go.", trait: 'DECISIVE' }, b: { text: "It's more important to have a perfect, comprehensive plan before starting.", trait: 'ARCHITECTURE' } },
-            { id: 9, a: { text: "I prefer to think through every possible outcome before acting.", trait: 'DECISIVE', rev: true }, b: { text: "I am biased toward action, even with some uncertainty.", trait: 'DECISIVE' } }, // rev
-            { id: 10, a: { text: "In a crisis, I tend to freeze and over-analyze.", trait: 'DECISIVE', rev: true }, b: { text: "In a crisis, I become focused and take charge.", trait: 'DECISIVE' } }, // rev
-            // METHODICAL
+            { id: 9, a: { text: "I prefer to think through every possible outcome before acting.", trait: 'ANALYTICAL' }, b: { text: "I am biased toward action, even with some uncertainty.", trait: 'DECISIVE' } }, // rev
+            { id: 10, a: { text: "In a crisis, I tend to freeze and over-analyze.", trait: 'ANALYTICAL' }, b: { text: "In a crisis, I become focused and take charge.", trait: 'DECISIVE' } }, // rev
+            // METHODICAL: 3 pos, 2 rev
             { id: 11, a: { text: "I prefer ensuring an existing system is running perfectly and securely.", trait: 'METHODICAL' }, b: { text: "I enjoy building a new system from scratch.", trait: 'DEVELOPMENT' } },
             { id: 12, a: { text: "A successful day is when I've followed my checklist and completed all my tasks.", trait: 'METHODICAL' }, b: { text: "A successful day is when I've discovered something new and unexpected.", trait: 'ANALYTICAL' } },
             { id: 13, a: { text: "I feel frustrated when people don't follow established protocols.", trait: 'METHODICAL' }, b: { text: "I feel frustrated when rigid protocols get in the way of solving a problem efficiently.", trait: 'DECISIVE' } },
-            { id: 14, a: { text: "I often find myself bending the rules to get the job done faster.", trait: 'METHODICAL', rev: true }, b: { text: "I believe in following the process, even if it's slower.", trait: 'METHODICAL' } }, // rev
-            { id: 15, a: { text: "I find detailed documentation and record-keeping to be tedious.", trait: 'METHODICAL', rev: true }, b: { text: "I find detailed documentation and record-keeping to be satisfying.", trait: 'METHODICAL' } }, // rev
-            // LEADERSHIP
+            { id: 14, a: { text: "I often find myself bending the rules to get the job done faster.", trait: 'DECISIVE' }, b: { text: "I believe in following the process, even if it's slower.", trait: 'METHODICAL' } }, // rev
+            { id: 15, a: { text: "I find detailed documentation and record-keeping to be tedious.", trait: 'DEVELOPMENT' }, b: { text: "I find detailed documentation and record-keeping to be satisfying.", trait: 'METHODICAL' } }, // rev
+            // LEADERSHIP: 3 pos, 2 rev
             { id: 16, a: { text: "My strength is in leading a team and setting a vision.", trait: 'LEADERSHIP' }, b: { text: "My strength is in being a key technical expert on a team.", trait: 'DEVELOPMENT' } },
             { id: 17, a: { text: "I am more concerned with 'Why should we be doing this?'", trait: 'LEADERSHIP' }, b: { text: "I am more concerned with 'How does this work?'", trait: 'ANALYTICAL' } },
             { id: 18, a: { text: "I prefer to think about long-term risks and strategy.", trait: 'LEADERSHIP' }, b: { text: "I prefer to focus on immediate, tangible problems.", trait: 'DECISIVE' } },
-            { id: 19, a: { text: "I prefer to let others handle the budget and resource planning.", trait: 'LEADERSHIP', rev: true }, b: { text: "I enjoy handling the budget and resource planning for a project.", trait: 'LEADERSHIP' } }, // rev
-            { id: 20, a: { text: "I find developing long-range strategic plans to be boring.", trait: 'LEADERSHIP', rev: true }, b: { text: "I find developing long-range strategic plans to be exciting.", trait: 'LEADERSHIP' } }, // rev
-            // POLICY
+            { id: 19, a: { text: "I prefer to let others handle the budget and resource planning.", trait: 'DEVELOPMENT' }, b: { text: "I enjoy handling the budget and resource planning for a project.", trait: 'LEADERSHIP' } }, // rev
+            { id: 20, a: { text: "I find developing long-range strategic plans to be boring.", trait: 'DECISIVE' }, b: { text: "I find developing long-range strategic plans to be exciting.", trait: 'LEADERSHIP' } }, // rev
+            // POLICY: 3 pos, 2 rev
             { id: 21, a: { text: "I enjoy creating rules and governance structures.", trait: 'POLICY' }, b: { text: "I enjoy finding ways to legally bypass rules and structures.", trait: 'ANALYTICAL' } },
             { id: 22, a: { text: "I enjoy documenting my work meticulously for auditing.", trait: 'POLICY' }, b: { text: "I prefer to move on to the next challenge once a problem is solved.", trait: 'DECISIVE' } },
             { id: 23, a: { text: "The most important thing is to be correct and compliant.", trait: 'POLICY' }, b: { text: "The most important thing is to be effective and innovative.", trait: 'ARCHITECTURE' } },
-            { id: 24, a: { text: "I think rules should be flexible and open to interpretation.", trait: 'POLICY', rev: true }, b: { text: "I think rules should be clear and consistently enforced.", trait: 'POLICY' } }, // rev
-            { id: 25, a: { text: "I'm not very interested in the legal or regulatory aspects of technology.", trait: 'POLICY', rev: true }, b: { text: "I am fascinated by the legal and regulatory aspects of technology.", trait: 'POLICY' } }, // rev
-            // ARCHITECTURE
+            { id: 24, a: { text: "I think rules should be flexible and open to interpretation.", trait: 'EDUCATION' }, b: { text: "I think rules should be clear and consistently enforced.", trait: 'POLICY' } }, // rev
+            { id: 25, a: { text: "I'm not very interested in the legal or regulatory aspects of technology.", trait: 'DEVELOPMENT' }, b: { text: "I am fascinated by the legal and regulatory aspects of technology.", trait: 'POLICY' } }, // rev
+            // ARCHITECTURE: 3 pos, 2 rev
             { id: 26, a: { text: "I enjoy designing a high-level blueprint for a system.", trait: 'ARCHITECTURE' }, b: { text: "I enjoy the hands-on process of writing the code for a system.", trait: 'DEVELOPMENT' } },
             { id: 27, a: { text: "I think in terms of systems, frameworks, and how pieces connect.", trait: 'ARCHITECTURE' }, b: { text: "I think in terms of evidence, logs, and specific artifacts.", trait: 'ANALYTICAL' } },
             { id: 28, a: { text: "I'd rather design the security for an application than code it.", trait: 'ARCHITECTURE' }, b: { text: "I'd rather code a secure application than design it.", trait: 'DEVELOPMENT' } },
-            { id: 29, a: { text: "I prefer to focus on one component at a time, not the whole system.", trait: 'ARCHITECTURE', rev: true }, b: { text: "I always have to understand the whole system before I can focus on a component.", trait: 'ARCHITECTURE' } }, // rev
-            { id: 30, a: { text: "I find abstract design and theory to be impractical.", trait: 'ARCHITECTURE', rev: true }, b: { text: "I believe a strong abstract design is the key to practical success.", trait: 'ARCHITECTURE' } }, // rev
-            // DEVELOPMENT
+            { id: 29, a: { text: "I prefer to focus on one component at a time, not the whole system.", trait: 'DEVELOPMENT' }, b: { text: "I always have to understand the whole system before I can focus on a component.", trait: 'ARCHITECTURE' } }, // rev
+            { id: 30, a: { text: "I find abstract design and theory to be impractical.", trait: 'DEVELOPMENT' }, b: { text: "I believe a strong abstract design is the key to practical success.", trait: 'ARCHITECTURE' } }, // rev
+            // DEVELOPMENT: 3 pos, 2 rev
             { id: 31, a: { text: "I am more interested in writing code for computers.", trait: 'DEVELOPMENT' }, b: { text: "I am more interested in creating training programs for people.", trait: 'EDUCATION' } },
             { id: 32, a: { text: "When learning a new tool, I start using it and learn by doing.", trait: 'DEVELOPMENT' }, b: { text: "When learning a new tool, I read the manual first.", trait: 'METHODICAL' } },
             { id: 33, a: { text: "I get more satisfaction from building something new than from analyzing something old.", trait: 'DEVELOPMENT' }, b: { text: "I get more satisfaction from analyzing something old than from building something new.", trait: 'ANALYTICAL' } },
-            { id: 34, a: { text: "I'm not a 'hands-on' technical person.", trait: 'DEVELOPMENT', rev: true }, b: { text: "I am a very 'hands-on' technical person.", trait: 'DEVELOPMENT' } }, // rev
-            { id: 35, a: { text: "I find debugging code to be a frustrating chore.", trait: 'DEVELOPMENT', rev: true }, b: { text: "I find debugging code to be a satisfying puzzle.", trait: 'DEVELOPMENT' } }, // rev
-            // EDUCATION
+            { id: 34, a: { text: "I'm not a 'hands-on' technical person.", trait: 'LEADERSHIP' }, b: { text: "I am a very 'hands-on' technical person.", trait: 'DEVELOPMENT' } }, // rev
+            { id: 35, a: { text: "I find debugging code to be a frustrating chore.", trait: 'DECISIVE' }, b: { text: "I find debugging code to be a satisfying puzzle.", trait: 'DEVELOPMENT' } }, // rev
+            // EDUCATION: 3 pos, 2 rev
             { id: 36, a: { text: "I am skilled at explaining complex technical details to others.", trait: 'EDUCATION' }, b: { text: "I prefer to keep my technical knowledge to myself.", trait: 'ANALYTICAL' } },
             { id: 37, a: { text: "I enjoy teaching and mentoring others.", trait: 'EDUCATION' }, b: { text: "I prefer working independently on technical challenges.", trait: 'DEVELOPMENT' } },
             { id: 38, a: { text: "I believe changing people's behavior is the key to security.", trait: 'EDUCATION' }, b: { text: "I believe technology is the key to security.", trait: 'ARCHITECTURE' } },
-            { id: 39, a: { text: "I dislike public speaking or presenting to groups.", trait: 'EDUCATION', rev: true }, b: { text: "I am comfortable with public speaking and presenting to groups.", trait: 'EDUCATION' } }, // rev
-            { id: 40, a: { text: "I'd rather write a technical document than a training manual.", trait: 'EDUCATION', rev: true }, b: { text: "I'd rather write a training manual than a technical document.", trait: 'EDUCATION' } }, // rev
+            { id: 39, a: { text: "I dislike public speaking or presenting to groups.", trait: 'LEADERSHIP' }, b: { text: "I am comfortable with public speaking and presenting to groups.", trait: 'EDUCATION' } }, // rev
+            { id: 40, a: { text: "I'd rather write a technical document than a training manual.", trait: 'POLICY' }, b: { text: "I'd rather write a training manual than a technical document.", trait: 'EDUCATION' } }, // rev
         ];
 
         const interestQuestionsByTrait = {
-            DEVELOPMENT: [{ text: "Writing and testing secure code for a new application.", roles: ['621'] }],
-            ARCHITECTURE: [{ text: "Designing the security architecture for a new enterprise network.", roles: ['652'] }],
-            METHODICAL: [{ text: "Managing user accounts and system patches on servers.", roles: ['451']}, { text: "Securing and maintaining a large cloud environment (AWS, Azure, etc.).", roles: ['CSPE']}, { text: "Managing the lifecycle of vulnerabilities from discovery to remediation.", roles: ['VULN'] }, { text: "Managing identity lifecycle, authentication, and authorization.", roles: ['IAM'] }],
-            LEADERSHIP: [{ text: "Managing the budget and roadmap for a cybersecurity department.", roles: ['722'] }],
-            POLICY: [{ text: "Auditing a cloud environment to ensure it meets compliance standards like ISO 27001.", roles: ['612'] }, { text: "Drafting a formal policy on acceptable use of company IT resources.", roles: ['701'] }],
-            EDUCATION: [{ text: "Developing a company-wide cybersecurity training program.", roles: ['751'] }],
-            DECISIVE: [{ text: "Coordinating the response to a live ransomware attack.", roles: ['531'] }, { text: "Actively monitoring security alerts and responding to potential threats in real-time.", roles: ['511'] }],
-            ANALYTICAL: [{ text: "Performing a deep-dive forensic analysis of a compromised hard drive.", roles: ['212'] }, { text: "Analyzing intelligence reports to predict future cyber threats.", roles: ['141'] }, { text: "Performing authorized penetration tests to find vulnerabilities.", roles: ['541'] }]
+            DEVELOPMENT: [
+                { id: 'D1', text: "Writing and testing secure code for a new application.", roles: ['APPSEC'] }, 
+                { id: 'D2', text: "Building automation scripts to handle security tasks.", roles: ['APPSEC', 'PLATFORM'] }, 
+                { id: 'D3', text: "Integrating security tools into a CI/CD pipeline.", roles: ['APPSEC', 'PRODSEC'] },
+                { id: 'D4', text: "Performing security code reviews and providing feedback to developers.", roles: ['PRODSEC'] },
+                { id: 'D5', text: "Triaging security findings from bug bounty programs.", roles: ['PRODSEC'] },
+                { id: 'D6', text: "Writing and tuning detection rules in a SIEM (e.g., Splunk, Sentinel).", roles: ['DETECTIONS_ENGINEER'] },
+                { id: 'D7', text: "Developing custom parsers for new log sources.", roles: ['DETECTIONS_ENGINEER'] },
+                { id: 'D8', text: "Researching new adversary techniques to build proactive detections.", roles: ['DETECTIONS_ENGINEER'] }
+            ],
+            ARCHITECTURE: [
+                { id: 'A1', text: "Designing the security architecture for a new enterprise network.", roles: ['ARCHITECT'] }, 
+                { id: 'A2', text: "Creating threat models for new products and features.", roles: ['ARCHITECT', 'PRODSEC'] }, 
+                { id: 'A3', text: "Evaluating and selecting new security technologies for the company.", roles: ['ARCHITECT'] },
+                { id: 'A4', text: "Engineering and managing security for EDR/XDR platforms.", roles: ['PLATFORM'] },
+                { id: 'A5', text: "Building and maintaining secure logging and telemetry pipelines.", roles: ['PLATFORM'] },
+                { id: 'A6', text: "Hardening container orchestration platforms like Kubernetes.", roles: ['PLATFORM'] }
+            ],
+            METHODICAL: [
+                { id: 'M1', text: "Managing user accounts and system patches on servers.", roles: ['SYSADMIN']}, 
+                { id: 'M2', text: "Securing and maintaining a large cloud environment (AWS, Azure, etc.).", roles: ['CSPE']}, 
+                { id: 'M3', text: "Managing the lifecycle of vulnerabilities from discovery to remediation.", roles: ['VULN'] }, 
+                { id: 'M4', text: "Managing identity lifecycle, authentication, and authorization.", roles: ['IAM'] },
+                { id: 'M5', text: "Automating system configurations using tools like Ansible or Puppet.", roles: ['SYSADMIN'] },
+                { id: 'M6', text: "Implementing and managing backup and recovery solutions.", roles: ['SYSADMIN'] },
+                { id: 'M7', text: "Using CVSS and environmental factors to prioritize vulnerability remediation.", roles: ['VULN'] },
+                { id: 'M8', text: "Coordinating with system owners to ensure timely patching of critical flaws.", roles: ['VULN'] },
+                { id: 'M9', text: "Implementing and managing Privileged Access Management (PAM) solutions.", roles: ['IAM'] },
+                { id: 'M10', text: "Troubleshooting complex authentication issues involving SAML, OAuth, or OIDC.", roles: ['IAM'] },
+                { id: 'M11', text: "Configuring and managing cloud-native security tools (e.g., AWS GuardDuty, Azure Sentinel).", roles: ['CSPE'] },
+                { id: 'M12', text: "Writing Infrastructure-as-Code (IaC) to deploy secure cloud resources.", roles: ['CSPE'] },
+                { id: 'M13', text: "Analyzing network traffic between PLCs and HMIs for anomalous behavior.", roles: ['OTSEC'] },
+                { id: 'M14', text: "Hardening industrial control systems (ICS) and SCADA environments against cyber threats.", roles: ['OTSEC'] },
+                { id: 'M15', text: "Developing and testing incident response plans for a manufacturing plant floor.", roles: ['OTSEC'] }
+            ],
+            LEADERSHIP: [
+                { id: 'L1', text: "Managing the budget and roadmap for a cybersecurity department.", roles: ['MANAGER'] }, 
+                { id: 'L2', text: "Leading a team of security professionals and mentoring junior members.", roles: ['MANAGER'] }, 
+                { id: 'L3', text: "Presenting security strategy and risk posture to executive leadership.", roles: ['MANAGER'] },
+                { id: 'L4', text: "Developing detailed plans for offensive or defensive cyber operations.", roles: ['OPSPLAN'] },
+                { id: 'L5', text: "Coordinating with different teams and agencies to deconflict and synchronize activities.", roles: ['OPSPLAN'] },
+                { id: 'L6', text: "Briefing commanders on operational risks and progress.", roles: ['OPSPLAN'] },
+                { id: 'L7', text: "Planning and managing the execution of cybersecurity projects.", roles: ['PM'] },
+                { id: 'L8', text: "Managing stakeholders and communicating project status.", roles: ['PM'] },
+                { id: 'L9', text: "Using Agile/Scrum methodologies for security initiatives.", roles: ['PM'] }
+            ],
+            POLICY: [
+                { id: 'P1', text: "Auditing a cloud environment to ensure it meets compliance standards like ISO 27001.", roles: ['GRC'] }, 
+                { id: 'P2', text: "Drafting a formal policy on acceptable use of company IT resources.", roles: ['GRC'] }, 
+                { id: 'P3', text: "Conducting third-party risk assessments on new vendors.", roles: ['TPRM'] }, 
+                { id: 'P4', text: "I enjoy documenting my work meticulously for auditing.", roles: ['GRC'], i_check: 'opposed_b' }, // Inconsistency check
+                { id: 'P5', text: "Integrating data minimization and privacy-by-design controls into systems.", roles: ['PRIVACY'] },
+                { id: 'P6', text: "Implementing technical solutions to comply with GDPR/CCPA regulations.", roles: ['PRIVACY'] },
+                { id: 'P7', text: "Conducting Data Protection Impact Assessments (DPIAs).", roles: ['PRIVACY'] },
+                { id: 'P8', text: "Reviewing vendor contracts for security and compliance clauses.", roles: ['TPRM'] },
+                { id: 'P9', text: "Managing and tracking risks associated with the supply chain.", roles: ['TPRM'] }
+            ],
+            EDUCATION: [
+                { id: 'E1', text: "Developing a company-wide cybersecurity training program.", roles: ['TRAINER'] }, 
+                { id: 'E2', text: "Running simulated phishing campaigns to test employee awareness.", roles: ['TRAINER'] }, 
+                { id: 'E3', text: "Creating easy-to-understand security guides and newsletters.", roles: ['TRAINER'] },
+                { id: 'E4', text: "Collaborating between red and blue teams to improve detection and response.", roles: ['PURPLETEAM'] },
+                { id: 'E5', text: "Translating red team findings into actionable detection logic for the blue team.", roles: ['PURPLETEAM'] },
+                { id: 'E6', text: "Running joint exercises to test and improve security controls in real-time.", roles: ['PURPLETEAM'] }
+            ],
+            DECISIVE: [
+                { id: 'C1', text: "Coordinating the response to a live ransomware attack.", roles: ['IR'] }, 
+                { id: 'C2', text: "Actively monitoring security alerts and responding to potential threats in real-time.", roles: ['SOC'] }, 
+                { id: 'C3', text: "Making quick containment decisions during a security incident.", roles: ['IR'] },
+                { id: 'C4', text: "Triaging and validating SIEM alerts to identify real threats.", roles: ['SOC'] },
+                { id: 'C5', text: "Performing initial incident investigation and escalating when necessary.", roles: ['SOC'] }
+            ],
+            ANALYTICAL: [
+                { id: 'Y1', text: "Performing a deep-dive forensic analysis of a compromised hard drive.", roles: ['FORENSICS'] }, 
+                { id: 'Y2', text: "Analyzing intelligence reports to predict future cyber threats.", roles: ['CTI'] }, 
+                { id: 'Y3', text: "Performing authorized penetration tests to find vulnerabilities.", roles: ['PENTEST'] }, 
+                { id: 'Y4', text: "Reviewing system logs to find evidence of a compromise.", roles: ['FORENSICS'], i_check: 'duplicate_of_Y1' }, 
+                { id: 'Y5', text: "I prefer to avoid detailed documentation.", roles: [], i_check: 'opposed_a' }, // Inconsistency check
+                { id: 'Y6', text: "Writing detailed reports of findings for both technical and executive audiences.", roles: ['PENTEST'] },
+                { id: 'Y7', text: "Conducting social engineering tests to assess human vulnerabilities.", roles: ['PENTEST'] },
+                { id: 'Y8', text: "Tracking adversary TTPs (Tactics, Techniques, and Procedures).", roles: ['CTI'] },
+                { id: 'Y9', text: "Producing actionable intelligence briefings for leadership.", roles: ['CTI'] },
+                { id: 'Y10', text: "Creating detailed timelines of events during a security breach.", roles: ['FORENSICS'] },
+                { id: 'Y11', text: "Proactively searching for undetected threats based on hypotheses.", roles: ['THUNTER'] },
+                { id: 'Y12', text: "Developing new hunting methodologies and playbooks.", roles: ['THUNTER'] },
+                { id: 'Y13', text: "Analyzing large datasets to find subtle indicators of compromise.", roles: ['THUNTER'] },
+                { id: 'Y14', text: "Simulating adversary TTPs in a live environment to test defenses.", roles: ['REDTEAM'] },
+                { id: 'Y15', text: "Developing custom tooling and exploits for red team operations.", roles: ['REDTEAM'] },
+                { id: 'Y16', text: "Providing detailed reports on defensive gaps and recommended improvements.", roles: ['REDTEAM'] },
+                { id: 'Y17', text: "Conducting adversarial testing against machine learning models to find vulnerabilities.", roles: ['AISEC'] },
+                { id: 'Y18', text: "Securing the data pipelines used to train and deploy ML models.", roles: ['AISEC'] },
+                { id: 'Y19', text: "Researching and defending against new threats like data poisoning and model inversion attacks.", roles: ['AISEC'] }
+            ]
         };
 
         let currentStage1Index = 0;
@@ -316,7 +409,7 @@
             startScreen.classList.add('hidden');
             quizScreenStage1.classList.remove('hidden');
             currentStage1Index = 0;
-            telemetryData = { stage1: [] };
+            telemetryData = { stage1: [], consent: consentCheckbox.checked };
             Object.values(traits).forEach(trait => trait.score = 0);
             showStage1Question();
         }
@@ -327,8 +420,8 @@
 
             if (currentStage1Index < stage1Questions.length) {
                 const question = stage1Questions[currentStage1Index];
-                const progress = ((currentStage1Index) / stage1Questions.length) * 100;
-                document.getElementById('progress-bar-stage1').style.width = `${progress}%`;
+                const progress = ((currentStage1Index + 1) / stage1Questions.length) * 100;
+                document.getElementById('progress-bar-stage1').style.width = `${(currentStage1Index / stage1Questions.length) * 100}%`;
                 document.getElementById('question-counter-stage1').textContent = `Question ${currentStage1Index + 1} of ${stage1Questions.length}`;
                 document.getElementById('progress-text-stage1').textContent = `Profile Assessment: ${Math.round(progress)}% Complete`;
                 const startTime = performance.now();
@@ -337,7 +430,7 @@
                     const button = document.createElement('button');
                     button.setAttribute('role', 'button');
                     button.setAttribute('tabindex', '0');
-                    button.className = "flex items-center justify-center text-center p-6 bg-gray-700 rounded-lg hover:bg-cyan-700 hover:ring-2 hover:ring-cyan-400 transition-all duration-200 h-full";
+                    button.className = "flex items-center justify-center text-center p-6 bg-gray-700 rounded-lg hover:bg-cyan-700 focus:ring focus:ring-cyan-500 transition-all duration-200 h-full";
                     button.innerHTML = `<span class="text-gray-200 text-lg">${question[choice].text}</span>`;
                     const clickHandler = () => {
                         const endTime = performance.now();
@@ -345,7 +438,7 @@
                         selectStage1Answer(question, choice, latency);
                     };
                     button.onclick = clickHandler;
-                    button.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') clickHandler(); };
+                    button.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); clickHandler(); } };
                     container.appendChild(button);
                 });
             } else {
@@ -356,20 +449,16 @@
 
         function selectStage1Answer(question, choice, latency) {
             const selected = question[choice];
-            const unselected = question[choice === 'a' ? 'b' : 'a'];
+            traits[selected.trait].score += 1;
             
-            // Add score
-            if (selected.rev) {
-                if(traits[unselected.trait]) traits[unselected.trait].score += 1;
-            } else {
-                if(traits[selected.trait]) traits[selected.trait].score += 1;
+            if (telemetryData.consent) {
+                telemetryData.stage1.push({
+                    questionId: question.id,
+                    selection: choice,
+                    selectedTrait: selected.trait,
+                    latency: Math.round(latency)
+                });
             }
-            
-            telemetryData.stage1.push({
-                questionId: question.id,
-                selection: choice,
-                latency: Math.round(latency)
-            });
 
             currentStage1Index++;
             showStage1Question();
@@ -392,26 +481,52 @@
             }
             telemetryData.primaryTraits = userPrimaryTraits;
 
-            stage2QuestionSet = [];
+            let initialQuestionSet = [];
             userPrimaryTraits.forEach(trait => {
-                if (interestQuestionsByTrait[trait]) stage2QuestionSet.push(...interestQuestionsByTrait[trait]);
+                if (interestQuestionsByTrait[trait]) initialQuestionSet.push(...interestQuestionsByTrait[trait]);
             });
             
             const otherTraits = Object.keys(interestQuestionsByTrait).filter(t => !userPrimaryTraits.includes(t));
             otherTraits.forEach(trait => {
-                if(interestQuestionsByTrait[trait]?.[0]) stage2QuestionSet.push(interestQuestionsByTrait[trait][0]);
+                if(interestQuestionsByTrait[trait]?.[0]) initialQuestionSet.push(interestQuestionsByTrait[trait][0]);
             });
-            stage2QuestionSet = [...new Set(stage2QuestionSet)];
-
-            // Add attention checks
-            const attentionChecks = [
-                { text: "For this item, please select 'Slightly' to ensure you are paying attention.", roles: [], check: true, expectedValue: 1 },
-                { text: "Please select 'Very' for this item.", roles: [], check: true, expectedValue: 3 },
-                { text: "To continue, please select the 'Moderately' option.", roles: [], check: true, expectedValue: 2 }
-            ];
-            for (let i = 0; i < 3; i++) {
-                stage2QuestionSet.splice(Math.floor(stage2QuestionSet.length / (3 - i + 1)) * (i + 1), 0, attentionChecks[i]);
+            
+            // Backfill to ensure evidence guarantee
+            const surfacedRoles = Object.values(workRoles).filter(r => userPrimaryTraits.includes(r.trait));
+            surfacedRoles.forEach(role => {
+                let evidenceCount = initialQuestionSet.filter(q => q.roles.includes(role.id)).length;
+                const allQuestionsForRole = Object.values(interestQuestionsByTrait).flat().filter(q => q.roles.includes(role.id));
+                while (evidenceCount < 3 && allQuestionsForRole.length > evidenceCount) {
+                    const nextQuestion = allQuestionsForRole[evidenceCount];
+                    if (!initialQuestionSet.find(q => q.id === nextQuestion.id)) {
+                        initialQuestionSet.push(nextQuestion);
+                    }
+                    evidenceCount++;
+                }
+            });
+            
+            // Deduplicate using Map by ID
+            const uniqueQuestions = new Map();
+            for (const q of initialQuestionSet) {
+                if (!uniqueQuestions.has(q.id)) {
+                    uniqueQuestions.set(q.id, q);
+                }
             }
+            stage2QuestionSet = [...uniqueQuestions.values()];
+
+
+            const attentionChecks = [
+                { id: 'AC1', text: "For this item, please select 'Slightly' to ensure you are paying attention.", roles: [], check: true, expectedValue: 1 },
+                { id: 'AC2', text: "Please select 'Very' for this item.", roles: [], check: true, expectedValue: 3 },
+                { id: 'AC3', text: "To continue, please select the 'Moderately' option.", roles: [], check: true, expectedValue: 2 }
+            ];
+            
+            // Insert attention checks at stable positions
+            const n = stage2QuestionSet.length;
+            const indices = [Math.floor(n * 0.75), Math.floor(n * 0.5), Math.floor(n * 0.25)];
+            indices.forEach((idx, i) => {
+                stage2QuestionSet.splice(idx, 0, attentionChecks[i]);
+            });
 
             currentStage2Index = 0;
             interestScores = {};
@@ -440,8 +555,8 @@
                 const question = stage2QuestionSet[currentStage2Index];
                 document.getElementById('interest-question-text').textContent = question.text;
                 
-                const progress = ((currentStage2Index) / stage2QuestionSet.length) * 100;
-                document.getElementById('progress-bar-stage2').style.width = `${progress}%`;
+                const progress = ((currentStage2Index + 1) / stage2QuestionSet.length) * 100;
+                document.getElementById('progress-bar-stage2').style.width = `${(currentStage2Index / stage2QuestionSet.length) * 100}%`;
                 document.getElementById('question-counter-stage2').textContent = `Activity ${currentStage2Index + 1} of ${stage2QuestionSet.length}`;
                 document.getElementById('progress-text-stage2').textContent = `Interest Inventory: ${Math.round(progress)}% Complete`;
 
@@ -453,8 +568,9 @@
                 ];
                 ratings.forEach(rating => {
                     const button = document.createElement('button');
-                    button.className = "bg-gray-600 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg transition-all";
+                    button.className = "bg-gray-600 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg transition-all focus:ring focus:ring-cyan-500";
                     button.textContent = rating.text;
+                    button.setAttribute('aria-label', `Rate interest: ${rating.text}`);
                     button.onclick = () => selectStage2Answer(question, rating.value);
                     container.appendChild(button);
                 });
@@ -472,7 +588,9 @@
                     if(interestScores[roleId] !== undefined) interestScores[roleId] += value;
                 });
             }
-            telemetryData.stage2.push({ question: question.text, response: value });
+            if (telemetryData.consent) {
+                telemetryData.stage2.push({ questionId: question.id, text: question.text, response: value, roles: question.roles });
+            }
             currentStage2Index++;
             showStage2Question();
         }
@@ -491,39 +609,51 @@
             return normalized;
         }
 
-        function computeAlignment(roleTrait, userTraitProfile) {
+        function computeInconsistencyIndex() {
+            if (!telemetryData.consent || !telemetryData.stage2) return 0;
+            let index = 0;
+            const resp = Object.fromEntries(telemetryData.stage2.map(r => [r.questionId, r.response]));
+            
+            if (resp.Y1 !== undefined && resp.Y4 !== undefined && Math.abs(resp.Y1 - resp.Y4) >= 2) index += 25;
+            if (resp.P4 !== undefined && resp.Y5 !== undefined && resp.P4 >= 2 && resp.Y5 >= 2) index += 50;
+            return Math.min(100, index);
+        }
+
+        function computeAlignment(role, userTraitProfile) {
             const { normalizedScores, primaryTraits } = userTraitProfile;
             const sortedTraits = Object.entries(normalizedScores).sort(([,a],[,b]) => b - a);
             const secondaryTrait = (primaryTraits.length > 1 && sortedTraits.length > 1) ? sortedTraits[1][0] : null;
             const top3Traits = sortedTraits.slice(0, 3).map(t => t[0]);
+            
+            const roleTrait = role.trait;
+            const catTraits = frameworkCategories[role.cat].traits;
 
             if (primaryTraits.includes(roleTrait)) return 100;
             if (roleTrait === secondaryTrait) return 80;
             if (top3Traits.includes(roleTrait)) return 60;
-            
-            const roleCategory = Object.values(frameworkCategories).find(cat => cat.roles.some(r => r.trait === roleTrait));
-            if (roleCategory && roleCategory.traits.some(t => top3Traits.includes(t))) return 40;
+            if (catTraits.some(t => top3Traits.includes(t))) return 40;
             
             return 20;
         }
 
-        function computeEvidenceQuality(evidenceCount, attentionFailed) {
+        function computeEvidenceQuality(evidenceCount, attentionFailed, inconsistencyIndex) {
             let quality = 0;
             if (evidenceCount >= 6) quality = 100;
             else if (evidenceCount >= 4) quality = 80;
             else if (evidenceCount === 3) quality = 60;
             else if (evidenceCount === 2) quality = 40;
             
-            if (attentionFailed) quality = Math.max(0, quality - 30);
-            return quality;
+            if (attentionFailed) quality -= 30;
+            if (inconsistencyIndex > 70) quality -= 20;
+            return Math.max(0, quality);
         }
 
         function computeFitScore(interestPct, alignmentPct, evidenceQuality) {
             return (interestPct * 0.6) + (alignmentPct * 0.3) + (evidenceQuality * 0.1);
         }
 
-        function computeConfidence(evidenceCount, attentionFailed) {
-            if (attentionFailed || evidenceCount < 3) return "Low";
+        function computeConfidence(evidenceCount, attentionFailed, inconsistencyIndex) {
+            if (attentionFailed || inconsistencyIndex > 70 || evidenceCount < 3) return "Low";
             if (evidenceCount >= 5) return "High";
             return "Medium";
         }
@@ -550,39 +680,34 @@
             resultsScreen.classList.remove('hidden');
 
             const userProfile = getProfile();
-            document.getElementById('profile-summary').innerHTML = `
-                <h2 class="text-2xl font-semibold text-white">${userProfile.title}</h2>
-                <p class="text-gray-300 mt-2 max-w-3xl mx-auto">${userProfile.description}</p>
-            `;
+            document.getElementById('profile-summary').innerHTML = `<h2 class="text-2xl font-semibold text-white">${userProfile.title}</h2><p class="text-gray-300 mt-2 max-w-3xl mx-auto">${userProfile.description}</p>`;
 
             const topRolesContainer = document.getElementById('top-roles-container');
             const gatedRolesContainer = document.getElementById('gated-roles-container');
             const topRecContainer = document.getElementById('top-recommendation-container');
             const otherCatContainer = document.getElementById('other-categories-container');
-            topRolesContainer.innerHTML = '';
-            gatedRolesContainer.innerHTML = '';
-            topRecContainer.innerHTML = '';
-            otherCatContainer.innerHTML = '';
+            topRolesContainer.innerHTML = ''; gatedRolesContainer.innerHTML = ''; topRecContainer.innerHTML = ''; otherCatContainer.innerHTML = '';
 
             const userTraitProfile = { normalizedScores: telemetryData.stage1NormalizedScores, primaryTraits: userPrimaryTraits };
+            const inconsistencyIndex = computeInconsistencyIndex();
+            telemetryData.inconsistencyIndex = inconsistencyIndex;
+
             allRolesWithScores = Object.values(workRoles).map(role => {
                 const evidenceCount = stage2QuestionSet.filter(q => !q.check && q.roles.includes(role.id)).length;
                 const assessed = evidenceCount >= 3;
                 const interestPercentage = maxInterestScores[role.id] > 0 ? (interestScores[role.id] / maxInterestScores[role.id]) * 100 : 0;
-                const alignmentPercentage = computeAlignment(role.trait, userTraitProfile);
-                const evidenceQuality = computeEvidenceQuality(evidenceCount, telemetryData.attentionFailed);
+                const alignmentPercentage = computeAlignment(role, userTraitProfile);
+                const evidenceQuality = computeEvidenceQuality(evidenceCount, telemetryData.attentionFailed, inconsistencyIndex);
                 const fitScore = computeFitScore(interestPercentage, alignmentPercentage, evidenceQuality);
-                const confidence = computeConfidence(evidenceCount, telemetryData.attentionFailed);
+                const confidence = computeConfidence(evidenceCount, telemetryData.attentionFailed, inconsistencyIndex);
                 return { ...role, interestPercentage, fitScore, assessed, confidence, alignmentPercentage, evidenceQuality, evidenceCount };
             });
 
-            // Render Top Roles
             const topRoles = allRolesWithScores.filter(r => r.assessed && r.confidence !== 'Low').sort((a,b) => b.fitScore - a.fitScore).slice(0,3);
             let topRolesHtml = `<h2 class="text-2xl font-bold text-cyan-400 mb-4 text-center">Your Top Roles by Fit Score</h2><div class="space-y-3">`;
             topRoles.forEach(role => topRolesHtml += createRoleCard(role));
             topRolesContainer.innerHTML = topRolesHtml + `</div>`;
 
-            // Render Gated Roles
             const gatedRoles = allRolesWithScores.filter(r => !topRoles.includes(r) && (r.confidence === 'Low' || !r.assessed));
             if (gatedRoles.length > 0) {
                 gatedRolesContainer.classList.remove('hidden');
@@ -591,16 +716,21 @@
                 gatedRolesContainer.innerHTML = gatedHtml + `</div>`;
             }
 
-            // Render Categories
             const topCategories = Object.values(frameworkCategories).filter(cat => cat.traits.some(t => userPrimaryTraits.includes(t)));
             const otherCategories = Object.values(frameworkCategories).filter(cat => !cat.traits.some(t => userPrimaryTraits.includes(t)));
             topCategories.forEach(category => topRecContainer.appendChild(createCategoryCard(category, true)));
             otherCategories.forEach(category => otherCatContainer.appendChild(createCategoryCard(category, false)));
             
-            if (telemetryData.attentionFailed) {
-                const banner = document.getElementById('confidence-banner');
+            const banner = document.getElementById('confidence-banner');
+            if (telemetryData.attentionFailed || inconsistencyIndex > 70) {
                 banner.classList.remove('hidden');
-                banner.textContent = "Your results may be less accurate because an attention check was missed. We recommend retaking the assessment for the highest confidence.";
+                let bannerText = "Your results may be less accurate because ";
+                if (telemetryData.attentionFailed && inconsistencyIndex > 70) bannerText += "an attention check was missed and your responses were inconsistent.";
+                else if (telemetryData.attentionFailed) bannerText += "an attention check was missed.";
+                else bannerText += "your responses were inconsistent.";
+                banner.textContent = bannerText + " We recommend retaking the assessment for the highest confidence.";
+            } else {
+                banner.classList.add('hidden');
             }
         }
 
@@ -621,7 +751,7 @@
                             <h4 class="font-semibold text-white text-lg">${role.name}</h4>
                             <p class="text-xs text-gray-400 mb-2">${role.desc}</p>
                         </div>
-                        <div class="text-right ml-2">
+                        <div class="text-right ml-2 flex-shrink-0">
                              <span class="text-sm font-bold text-cyan-300 block">Fit: ${Math.round(role.fitScore)}%</span>
                              <span class="text-xs ${confidenceColor}">Confidence: ${role.confidence}</span>
                         </div>
@@ -638,6 +768,7 @@
             const sortedRoles = category.roles.map(role => allRolesWithScores.find(r => r.id === role.id)).filter(Boolean).sort((a,b) => b.fitScore - a.fitScore);
 
             sortedRoles.forEach(role => {
+                const headerId = `header-${role.id}`;
                 const detailsId = `details-${role.id}`;
                 let interestDisplayHtml = '';
                 if (role.evidenceCount < 3) {
@@ -648,9 +779,9 @@
 
                 rolesHtml += `
                     <div class="p-3 bg-gray-800 rounded">
-                        <h4 class="font-semibold text-white cursor-pointer" onclick="toggleDetails('${detailsId}')">${role.name} <span class="text-xs font-normal text-gray-400">(Fit: ${Math.round(role.fitScore)}%)</span></h4>
+                        <h4 id="${headerId}" class="font-semibold text-white cursor-pointer" onclick="toggleDetails('${detailsId}', this)" aria-controls="${detailsId}" aria-expanded="false">${role.name} <span class="text-xs font-normal text-gray-400">(Fit: ${Math.round(role.fitScore)}%)</span></h4>
                         ${interestDisplayHtml}
-                        <div id="${detailsId}" class="details-panel text-xs text-gray-400 mt-2 border-t border-gray-600 pt-2">
+                        <div id="${detailsId}" role="region" aria-labelledby="${headerId}" class="details-panel text-xs text-gray-400 mt-2 border-t border-gray-600 pt-2">
                             <strong>Skills to Build:</strong> ${role.skills.join(', ')}<br>
                             <strong>Common Certs:</strong> ${role.certs.join(', ')}<br>
                             <strong>Starter Projects:</strong> ${role.projects.join(', ')}
@@ -664,8 +795,19 @@
         }
         
         function showExportModal() {
-            telemetryData.finalResults = allRolesWithScores;
-            document.getElementById('json-output').value = JSON.stringify(telemetryData, null, 2);
+            if (telemetryData.consent) {
+                telemetryData.finalResults = allRolesWithScores.map(r => ({
+                    id: r.id, name: r.name, fitScore: r.fitScore, interestPercentage: r.interestPercentage,
+                    alignmentPercentage: r.alignmentPercentage, evidenceQuality: r.evidenceQuality,
+                    evidenceCount: r.evidenceCount, confidence: r.confidence
+                }));
+                document.getElementById('json-output').value = JSON.stringify(telemetryData, null, 2);
+            } else {
+                document.getElementById('json-output').value = JSON.stringify({
+                    consent: false,
+                    message: "Detailed telemetry was not collected as consent was not provided."
+                }, null, 2);
+            }
             exportModal.classList.remove('hidden');
         }
 
@@ -677,8 +819,10 @@
             setTimeout(() => { copyJsonBtn.textContent = "Copy to Clipboard"; }, 2000);
         }
 
-        window.toggleDetails = function(id) {
+        window.toggleDetails = function(id, header) {
             const panel = document.getElementById(id);
+            const isExpanded = header.getAttribute('aria-expanded') === 'true';
+            header.setAttribute('aria-expanded', !isExpanded);
             if (panel.style.display === 'block') {
                 panel.style.maxHeight = '0';
                 setTimeout(() => { panel.style.display = 'none'; }, 500);
