@@ -68,7 +68,7 @@
 
         .active-term {
             background-color: var(--primary-color) !important;
-            color: black !important;
+            color: white !important;
             transform: scale(1.03);
         }
         
@@ -78,7 +78,7 @@
         
         .view-btn.active-view-btn {
             background-color: var(--primary-color);
-            color: black;
+            color: white;
             box-shadow: 0 4px 6px -1px rgba(8, 145, 178, 0.3), 0 2px 4px -2px rgba(8, 145, 178, 0.2);
         }
         .terms-list-item {
@@ -86,12 +86,12 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-black flex flex-col items-center min-h-screen p-4 sm:p-6 lg:p-8">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center min-h-screen p-4 sm:p-6 lg:p-8">
 
     <div class="w-full max-w-5xl mx-auto">
         <header class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-black">Programming Fundamentals</h1>
-            <p class="text-lg mt-3 max-w-2xl mx-auto text-black">A modern, interactive tool to help you master the core concepts of programming.</p>
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white">Programming Fundamentals</h1>
+            <p class="text-lg mt-3 max-w-2xl mx-auto text-slate-600 dark:text-slate-400">A modern, interactive tool to help you master the core concepts of programming.</p>
         </header>
 
         <main class="flex flex-col lg:flex-row gap-8 lg:gap-12">
@@ -101,17 +101,17 @@
                     <div id="cube" class="cube">
                         <!-- Front Face: Term -->
                         <div class="cube__face cube__face--front">
-                             <h2 id="card-term" class="text-4xl md:text-5xl font-bold text-black"></h2>
+                             <h2 id="card-term" class="text-4xl md:text-5xl font-bold text-blue-600 dark:text-blue-400"></h2>
                         </div>
                         <!-- Back Face: Definition -->
-                        <div class="cube__face cube__face--back">
-                             <p id="card-definition" class="text-2xl md:text-3xl leading-relaxed font-medium text-black"></p>
+                        <div class="cube__face cube__face--back text-blue-600 dark:text-blue-400">
+                             <p id="card-definition" class="text-2xl md:text-3xl leading-relaxed font-medium"></p>
                         </div>
                         <!-- Right Face: Example -->
                         <div class="cube__face cube__face--right">
                             <div class="p-2 w-full h-full overflow-auto text-left">
-                                <h4 class="text-xl font-semibold mb-3 text-black">Code Example:</h4>
-                                <pre class="bg-gray-100 dark:bg-gray-900/50 rounded-lg p-4 text-base w-full h-full"><code id="card-example" class="font-mono text-black"></code></pre>
+                                <h4 class="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-100">Code Example:</h4>
+                                <pre class="bg-gray-100 dark:bg-gray-900/50 rounded-lg p-4 text-base w-full h-full"><code id="card-example" class="font-mono text-gray-900 dark:text-white"></code></pre>
                             </div>
                         </div>
                     </div>
@@ -119,18 +119,18 @@
 
                 <!-- View Controls -->
                 <div class="flex justify-center gap-3 md:gap-4 my-6">
-                    <button id="show-term-btn" class="view-btn flex items-center gap-2 px-5 py-2 rounded-full font-semibold bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-black"><i data-lucide="book-open"></i>Term</button>
-                    <button id="show-def-btn" class="view-btn flex items-center gap-2 px-5 py-2 rounded-full font-semibold bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-black"><i data-lucide="text"></i>Definition</button>
-                    <button id="show-ex-btn" class="view-btn flex items-center gap-2 px-5 py-2 rounded-full font-semibold bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-black"><i data-lucide="code-2"></i>Example</button>
+                    <button id="show-term-btn" class="view-btn flex items-center gap-2 px-5 py-2 rounded-full font-semibold bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-slate-700 dark:text-slate-200"><i data-lucide="book-open"></i>Term</button>
+                    <button id="show-def-btn" class="view-btn flex items-center gap-2 px-5 py-2 rounded-full font-semibold bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-slate-700 dark:text-slate-200"><i data-lucide="text"></i>Definition</button>
+                    <button id="show-ex-btn" class="view-btn flex items-center gap-2 px-5 py-2 rounded-full font-semibold bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-slate-700 dark:text-slate-200"><i data-lucide="code-2"></i>Example</button>
                 </div>
 
                 <!-- Controls -->
                 <div class="flex items-center justify-between">
-                    <button id="prev-btn" class="flex items-center justify-center bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-black font-bold py-3 px-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-transform transform hover:scale-105">
+                    <button id="prev-btn" class="flex items-center justify-center bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-slate-700 dark:text-slate-200 font-bold py-3 px-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-transform transform hover:scale-105">
                         <i data-lucide="arrow-left" class="mr-2 h-5 w-5"></i> Prev
                     </button>
-                    <div id="progress-text" class="font-medium text-lg text-black">1 / 10</div>
-                    <button id="next-btn" class="flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-black font-bold py-3 px-6 rounded-xl shadow-lg shadow-cyan-500/20 transition-all transform hover:scale-105">
+                    <div id="progress-text" class="font-medium text-lg text-slate-500 dark:text-slate-400">1 / 10</div>
+                    <button id="next-btn" class="flex items-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-cyan-500/20 transition-all transform hover:scale-105">
                         Next <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
                     </button>
                 </div>
@@ -144,8 +144,8 @@
             <!-- Right side: List of terms -->
             <aside class="w-full lg:w-1/3 bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-200/50 dark:border-gray-700/50">
                 <div class="flex justify-between items-center mb-4 border-b pb-3 border-gray-200 dark:border-gray-600">
-                    <h3 class="text-2xl font-bold text-black">Terms</h3>
-                    <button id="shuffle-btn" title="Shuffle Deck" class="text-black transition-colors">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Terms</h3>
+                    <button id="shuffle-btn" title="Shuffle Deck" class="text-slate-500 hover:text-cyan-500 dark:text-slate-400 dark:hover:text-cyan-400 transition-colors">
                         <i data-lucide="shuffle"></i>
                     </button>
                 </div>
@@ -227,7 +227,7 @@
                 const li = document.createElement('li');
                 li.textContent = term.term;
                 li.dataset.index = index;
-                li.className = 'terms-list-item text-lg p-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-black';
+                li.className = 'terms-list-item text-lg p-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-slate-700 dark:text-slate-300';
                 termsList.appendChild(li);
             });
             updateActiveTerm();
@@ -302,4 +302,7 @@
     </script>
 </body>
 </html>
+
+
+
 
