@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comet Browser: Interactive Guide</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Load Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* tailwind css gray-50 */
+        }
+        
+        /* Custom styles for the simulated browser */
+        .browser-frame {
+            border: 1px solid #e2e8f0; /* gray-200 */
+            border-top-width: 32px;
+            position: relative;
+        }
+
+        .browser-frame::before {
+            content: ' ';
+            position: absolute;
+            top: -22px;
+            left: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #fecaca; /* red-300 */
+            box-shadow: 20px 0 0 #fde68a, 40px 0 0 #a7f3d0; /* yellow-300, green-300 */
+        }
+        
+        .tab-active {
+            background-color: white;
+            border-bottom: 2px solid #3b82f6; /* blue-500 */
+            color: #1e3a8a; /* blue-900 */
+        }
+
+        .tab-inactive {
+            background-color: #f1f5f9; /* gray-100 */
+            color: #64748b; /* gray-500 */
+        }
+        
+        /* Custom styles for the interactive scenarios */
+        .scenario-tab-active {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+
+        .scenario-tab-inactive {
+            background-color: #e0e7ff; /* indigo-100 */
+            color: #3730a3; /* indigo-800 */
+        }
+        
+        /* Typing cursor effect for the fake prompt */
+        .fake-prompt input[type="text"] {
+            caret-color: #3b82f6;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="max-w-6xl mx-auto p-4 md:p-8">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="inline-flex items-center justify-center bg-blue-100 text-blue-700 w-16 h-16 rounded-full mb-4">
+                <i class="ph-bold ph-comet text-4xl"></i>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-2">The Future of Browsing</h1>
+            <p class="text-lg md:text-xl text-gray-600">An Interactive Guide to <span class="font-bold text-blue-600">Comet</span> for Academia</p>
+        </header>
+
+        <!-- What is Comet? -->
+        <section class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-sm mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What is an "Agentic" Browser?</h2>
+            <p class="text-gray-700 mb-4">
+                Traditional browsers help you <span class="font-semibold">find</span> information. An "agentic" browser like Comet, powered by Perplexity AI, helps you <span class="font-semibold">act</span> on it.
+            </p>
+            <p class="text-gray-700">
+                It's a browser with a built-in assistant that can understand your goals in plain English. It can read your open tabs, connect to your email or calendar (with permission), summarize content, and even take actions on your behalf, like drafting emails or organizing research.
+            </p>
+        </section>
+
+        <!-- Interactive Scenarios Section -->
+        <section>
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8">Real-World Scenarios</h2>
+
+            <!-- Scenario Tabs -->
+            <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                <button id="tab-student-tasks" class="scenario-tab-active font-semibold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onclick="showScenario('student-tasks')">
+                    <i class="ph-fill ph-student mr-2"></i>
+                    Student (Tasks)
+                </button>
+                <button id="tab-faculty-schedule" class="scenario-tab-inactive font-semibold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onclick="showScenario('faculty-schedule')">
+                    <i class="ph-fill ph-chalkboard-teacher mr-2"></i>
+                    Faculty (Scheduling)
+                </button>
+                <button id="tab-student-research" class="scenario-tab-inactive font-semibold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onclick="showScenario('student-research')">
+                    <i class="ph-fill ph-books mr-2"></i>
+                    Student (Research)
+                </button>
+                <button id="tab-faculty-development" class="scenario-tab-inactive font-semibold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onclick="showScenario('faculty-development')">
+                    <i class="ph-fill ph-atom mr-2"></i>
+                    Faculty (Course Dev)
+                </button>
+            </div>
+
+            <!-- Student Scenario -->
+            <div id="scenario-student-tasks" class="scenario-content">
+                <p class="text-lg text-gray-700 text-center max-w-2xl mx-auto mb-8">
+                    <span class="font-bold">The Challenge:</span> You're juggling a research paper, a PDF lecture, and your inbox. You have 10+ tabs open and are worried you missed a deadline.
+                </p>
+                <!-- Simulated Browser -->
+                <div id="student-browser" class="browser-frame bg-white rounded-lg shadow-xl overflow-hidden min-h-[500px]">
+                    <!-- Browser Chrome / Tabs -->
+                    <div class="flex bg-gray-100 border-b border-gray-200">
+                        <div class="tab-active py-2 px-4 font-medium text-sm rounded-t-md relative -bottom-px">
+                            <i class="ph ph-file-pdf text-red-600 mr-1"></i> AI_Ethics_Lecture.pdf
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm border-r border-gray-200">
+                            <i class="ph ph-article text-green-600 mr-1"></i> JSTOR: AI Bias
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm border-r border-gray-200">
+                            <i class="ph ph-envelope text-blue-600 mr-1"></i> Gmail (2)
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm">
+                            + 7 more tabs
+                        </div>
+                    </div>
+
+                    <!-- Browser Content Area -->
+                    <div class="flex flex-col md:flex-row">
+                        <!-- Left Pane: Content -->
+                        <div class="w-full md:w-3/5 p-6 border-r border-gray-100">
+                            <h3 class="text-xl font-bold mb-4">Simulated Browser Content</h3>
+                            <p class="text-gray-600 mb-2">Your PDF lecture notes are open here.</p>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 h-64 overflow-y-auto">
+                                <p class="font-mono text-sm text-gray-700">
+                                    <strong>Week 10: Ethical Frameworks for AI</strong><br>
+                                    Introduction: As large language models (LLMs) become more integrated...
+                                    <br><br>
+                                    ...this raises significant concerns regarding algorithmic bias, data privacy, and the "black box" problem.
+                                    <br><br>
+                                    ...next week's assignment will require you to analyze a real-world case study. See the syllabus for details.
+                                </p>
+                            </div>
+                            <p class="text-gray-600 mt-4">Your other tabs contain research articles and your inbox.</p>
+                        </div>
+                        
+                        <!-- Right Pane: Comet Assistant -->
+                        <div class="w-full md:w-2/5 p-6 bg-blue-50/50">
+                            <div class="flex items-center mb-4">
+                                <i class="ph-bold ph-comet text-2xl text-blue-600 mr-2"></i>
+                                <h3 class="text-xl font-bold text-gray-800">Comet Assistant</h3>
+                            </div>
+                            <!-- Comet Prompt -->
+                            <div class="fake-prompt mb-4">
+                                <label for="student-tasks-prompt" class="text-sm font-semibold text-gray-700 block mb-2">Ask Comet anything...</label>
+                                <div class="relative">
+                                    <input type="text" id="student-tasks-prompt" class="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="Type your command here...">
+                                    <button onclick="runScenario('student-tasks')" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
+                                        <i class="ph-bold ph-paper-plane-tilt"></i>
+                                    </button>
+                                </div>
+                                <button class="text-sm text-blue-600 hover:underline mt-2 text-left" onclick="fillPrompt('student-tasks')">
+                                    <i class="ph ph-lightbulb mr-1"></i> Try this: "Summarize my research tabs, check my email for deadlines from Prof. Smith, and check this PDF for assignments."
+                                </button>
+                            </div>
+                            
+                            <!-- Comet Output -->
+                            <div id="student-tasks-output" class="bg-white p-4 rounded-lg border border-gray-200 min-h-[200px] overflow-y-auto">
+                                <p class="text-gray-500 italic text-center p-4">Your results will appear here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Faculty Scenario -->
+            <div id="scenario-faculty-schedule" class="scenario-content hidden">
+                 <p class="text-lg text-gray-700 text-center max-w-2xl mx-auto mb-8">
+                    <span class="font-bold">The Challenge:</span> You're co-designing a new course. You need to review several articles, find a meeting time with your colleague, and draft an agenda.
+                </p>
+                <!-- Simulated Browser -->
+                <div id="faculty-browser" class="browser-frame bg-white rounded-lg shadow-xl overflow-hidden min-h-[500px]">
+                    <!-- Browser Chrome / Tabs -->
+                    <div class="flex bg-gray-100 border-b border-gray-200">
+                        <div class="tab-active py-2 px-4 font-medium text-sm rounded-t-md relative -bottom-px">
+                            <i class="ph ph-calendar text-red-600 mr-1"></i> My Google Calendar
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm border-r border-gray-200">
+                            <i class="ph ph-article text-green-600 mr-1"></i> Article: Blended Learning
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm border-r border-gray-200">
+                            <i class="ph ph-article text-green-600 mr-1"></i> Case Study: Flipped Classroom
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm">
+                            + 2 more tabs
+                        </div>
+                    </div>
+
+                    <!-- Browser Content Area -->
+                    <div class="flex flex-col md:flex-row">
+                        <!-- Left Pane: Content -->
+                        <div class="w-full md:w-3/5 p-6 border-r border-gray-100">
+                            <h3 class="text-xl font-bold mb-4">Simulated Browser Content</h3>
+                            <p class="text-gray-600 mb-2">Your Google Calendar is open.</p>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 h-64 overflow-y-auto">
+                                <p class="font-mono text-sm text-gray-700">
+                                    <strong>Next Week (Nov 3-7)</strong><br>
+                                    <strong>Mon, Nov 3:</strong><br>
+                                    &nbsp;&nbsp;11:00 AM: Dept. Meeting<br>
+                                    &nbsp;&nbsp;2:00 PM: Office Hours<br>
+                                    <strong>Tues, Nov 4:</strong><br>
+                                    &nbsp;&nbsp;9:00 AM: Research Block<br>
+                                    &nbsp;&nbsp;1:00 PM: Thesis Defense (Sarah L.)<br>
+                                    <strong>Wed, Nov 5:</strong><br>
+                                    &nbsp;&nbsp;10:00 AM - 12:00 PM: Teaching<br>
+                                </p>
+                            </div>
+                            <p class="text-gray-600 mt-4">Your other tabs contain articles on pedagogy.</p>
+                        </div>
+                        
+                        <!-- Right Pane: Comet Assistant -->
+                        <div class="w-full md:w-2/5 p-6 bg-blue-50/50">
+                            <div class="flex items-center mb-4">
+                                <i class="ph-bold ph-comet text-2xl text-blue-600 mr-2"></i>
+                                <h3 class="text-xl font-bold text-gray-800">Comet Assistant</h3>
+                            </div>
+                            <!-- Comet Prompt -->
+                            <div class="fake-prompt mb-4">
+                                <label for="faculty-schedule-prompt" class="text-sm font-semibold text-gray-700 block mb-2">Ask Comet anything...</label>
+                                <div class="relative">
+                                    <input type="text" id="faculty-schedule-prompt" class="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="Type your command here...">
+                                    <button onclick="runScenario('faculty-schedule')" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
+                                        <i class="ph-bold ph-paper-plane-tilt"></i>
+                                    </button>
+                                </div>
+                                <button class="text-sm text-blue-600 hover:underline mt-2 text-left" onclick="fillPrompt('faculty-schedule')">
+                                    <i class="ph ph-lightbulb mr-1"></i> Try this: "Summarize my 2 open articles, find a 1-hour slot on my @calendar next week for Dr. Lee, and draft an agenda."
+                                </button>
+                            </div>
+                            
+                            <!-- Comet Output -->
+                            <div id="faculty-schedule-output" class="bg-white p-4 rounded-lg border border-gray-200 min-h-[200px] overflow-y-auto">
+                                <p class="text-gray-500 italic text-center p-4">Your results will appear here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW: Student Research Scenario -->
+            <div id="scenario-student-research" class="scenario-content hidden">
+                <p class="text-lg text-gray-700 text-center max-w-2xl mx-auto mb-8">
+                    <span class="font-bold">The Challenge:</span> You're starting a literature review. You have multiple dense academic papers open and need to find the core arguments and any conflicting viewpoints.
+                </p>
+                <!-- Simulated Browser -->
+                <div id="student-research-browser" class="browser-frame bg-white rounded-lg shadow-xl overflow-hidden min-h-[500px]">
+                    <!-- Browser Chrome / Tabs -->
+                    <div class="flex bg-gray-100 border-b border-gray-200">
+                        <div class="tab-active py-2 px-4 font-medium text-sm rounded-t-md relative -bottom-px">
+                            <i class="ph ph-article text-green-600 mr-1"></i> JSTOR: AI in Medicine
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm border-r border-gray-200">
+                            <i class="ph ph-article text-green-600 mr-1"></i> PubMed: ML Diagnostics
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm border-r border-gray-200">
+                            <i class="ph ph-article text-green-600 mr-1"></i> Nature: Genomic AI
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm">
+                            + 2 more tabs
+                        </div>
+                    </div>
+
+                    <!-- Browser Content Area -->
+                    <div class="flex flex-col md:flex-row">
+                        <!-- Left Pane: Content -->
+                        <div class="w-full md:w-3/5 p-6 border-r border-gray-100">
+                            <h3 class="text-xl font-bold mb-4">Simulated Browser Content</h3>
+                            <p class="text-gray-600 mb-2">Your JSTOR article is open.</p>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 h-64 overflow-y-auto">
+                                <p class="font-mono text-sm text-gray-700">
+                                    <strong>Abstract: AI in Modern Medicine</strong><br>
+                                    This paper explores the integration of artificial intelligence...
+                                    <br><br>
+                                    ...While many focus on diagnostics, our findings suggest the most significant immediate impact is in the optimization of clinical workflows, reducing administrative burden by up to 40%...
+                                    <br><br>
+                                    ...However, adoption faces regulatory and ethical barriers.
+                                </p>
+                            </div>
+                            <p class="text-gray-600 mt-4">Your other tabs contain related research papers.</p>
+                        </div>
+                        
+                        <!-- Right Pane: Comet Assistant -->
+                        <div class="w-full md:w-2/5 p-6 bg-blue-50/50">
+                            <div class="flex items-center mb-4">
+                                <i class="ph-bold ph-comet text-2xl text-blue-600 mr-2"></i>
+                                <h3 class="text-xl font-bold text-gray-800">Comet Assistant</h3>
+                            </div>
+                            <!-- Comet Prompt -->
+                            <div class="fake-prompt mb-4">
+                                <label for="student-research-prompt" class="text-sm font-semibold text-gray-700 block mb-2">Ask Comet anything...</label>
+                                <div class="relative">
+                                    <input type="text" id="student-research-prompt" class="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="Type your command here...">
+                                    <button onclick="runScenario('student-research')" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
+                                        <i class="ph-bold ph-paper-plane-tilt"></i>
+                                    </button>
+                                </div>
+                                <button class="text-sm text-blue-600 hover:underline mt-2 text-left" onclick="fillPrompt('student-research')">
+                                    <i class="ph ph-lightbulb mr-1"></i> Try this: "Find the main thesis of my 3 open articles (@JSTOR, @PubMed, @Nature) and identify any conflicting arguments."
+                                </button>
+                            </div>
+                            
+                            <!-- Comet Output -->
+                            <div id="student-research-output" class="bg-white p-4 rounded-lg border border-gray-200 min-h-[200px] overflow-y-auto">
+                                <p class="text-gray-500 italic text-center p-4">Your results will appear here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW: Faculty Course Development Scenario -->
+            <div id="scenario-faculty-development" class="scenario-content hidden">
+                 <p class="text-lg text-gray-700 text-center max-w-2xl mx-auto mb-8">
+                    <span class="font-bold">The Challenge:</span> You're updating your 'Intro to Sociology' course and want to find a new documentary and recent case studies to replace outdated examples.
+                </p>
+                <!-- Simulated Browser -->
+                <div id="faculty-development-browser" class="browser-frame bg-white rounded-lg shadow-xl overflow-hidden min-h-[500px]">
+                    <!-- Browser Chrome / Tabs -->
+                    <div class="flex bg-gray-100 border-b border-gray-200">
+                        <div class="tab-active py-2 px-4 font-medium text-sm rounded-t-md relative -bottom-px">
+                            <i class="ph ph-file-doc text-blue-600 mr-1"></i> Syllabus_SOC-101.docx
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm border-r border-gray-200">
+                            <i class="ph ph-youtube-logo text-red-600 mr-1"></i> YouTube: 'Top Soc Docs'
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm border-r border-gray-200">
+                            <i class="ph ph-newspaper text-gray-700 mr-1"></i> NYT: 'Social Trends 2024'
+                        </div>
+                        <div class="tab-inactive py-2 px-4 font-medium text-sm">
+                            + 3 more tabs
+                        </div>
+                    </div>
+
+                    <!-- Browser Content Area -->
+                    <div class="flex flex-col md:flex-row">
+                        <!-- Left Pane: Content -->
+                        <div class="w-full md:w-3/5 p-6 border-r border-gray-100">
+                            <h3 class="text-xl font-bold mb-4">Simulated Browser Content</h3>
+                            <p class="text-gray-600 mb-2">Your syllabus is open.</p>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 h-64 overflow-y-auto">
+                                <p class="font-mono text-sm text-gray-700">
+                                    <strong>Week 5: Media and Culture</strong><br>
+                                    &nbsp;&nbsp;Reading: "Mass Media in the 20th Century"<br>
+                                    &nbsp;&nbsp;Video: 'The Digital Tribe' (1998 film)<br>
+                                    <br>
+                                    <strong>Week 6: Urbanization</strong><br>
+                                    &nbsp;&nbsp;Reading: "The Growth of Cities"<br>
+                                    &nbsp;&nbsp;Case Study: Chicago School (1920s)<br>
+                                </p>
+                            </div>
+                            <p class="text-gray-600 mt-4">Your other tabs contain resource lists.</p>
+                        </div>
+                        
+                        <!-- Right Pane: Comet Assistant -->
+                        <div class="w-full md:w-2/5 p-6 bg-blue-50/50">
+                            <div class="flex items-center mb-4">
+                                <i class="ph-bold ph-comet text-2xl text-blue-600 mr-2"></i>
+                                <h3 class="text-xl font-bold text-gray-800">Comet Assistant</h3>
+                            </div>
+                            <!-- Comet Prompt -->
+                            <div class="fake-prompt mb-4">
+                                <label for="faculty-development-prompt" class="text-sm font-semibold text-gray-700 block mb-2">Ask Comet anything...</label>
+                                <div class="relative">
+                                    <input type="text" id="faculty-development-prompt" class="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="Type your command here...">
+                                    <button onclick="runScenario('faculty-development')" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
+                                        <i class="ph-bold ph-paper-plane-tilt"></i>
+                                    </button>
+                                </div>
+                                <button class="text-sm text-blue-600 hover:underline mt-2 text-left" onclick="fillPrompt('faculty-development')">
+                                    <i class="ph ph-lightbulb mr-1"></i> Try this: "Find a modern (post-2020) documentary from @YouTube and a recent case study on gentrification from @NYT to update my @Syllabus."
+                                </button>
+                            </div>
+                            
+                            <!-- Comet Output -->
+                            <div id="faculty-development-output" class="bg-white p-4 rounded-lg border border-gray-200 min-h-[200px] overflow-y-auto">
+                                <p class="text-gray-500 italic text-center p-4">Your results will appear here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implications -->
+        <section class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-sm mt-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Implications for Academia</h2>
+            <div class="space-y-4 text-gray-700">
+                <p>
+                    <span class="font-semibold text-green-700">Productivity Boost:</span> For students and faculty, agentic browsers can dramatically cut down on "digital admin" — time spent organizing tabs, searching emails, and scheduling. This frees up more time for deep work like critical analysis, writing, and teaching.
+                </p>
+                <p>
+                    <span class="font-semibold text-blue-700">Smarter Research:</span> The ability to summarize and synthesize information across multiple sources (including tabs, PDFs, and videos) can accelerate the research and learning process.
+                </p>
+                 <p>
+                    <span class="font-semibold text-yellow-700">New Ethical Questions:</span> These tools also raise important questions. With special "Learn Modes" that can generate quizzes and flashcards, and even assist with online exercises, educators must consider the line between a helpful assistant and a tool that undermines the learning process.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // --- Scenario Tab Switching ---
+        
+        const scenarios = ['student-tasks', 'faculty-schedule', 'student-research', 'faculty-development'];
+        const scenarioTabs = {
+            'student-tasks': document.getElementById('tab-student-tasks'),
+            'faculty-schedule': document.getElementById('tab-faculty-schedule'),
+            'student-research': document.getElementById('tab-student-research'),
+            'faculty-development': document.getElementById('tab-faculty-development'),
+        };
+        const scenarioContents = {
+            'student-tasks': document.getElementById('scenario-student-tasks'),
+            'faculty-schedule': document.getElementById('scenario-faculty-schedule'),
+            'student-research': document.getElementById('scenario-student-research'),
+            'faculty-development': document.getElementById('scenario-faculty-development'),
+        };
+
+        function showScenario(scenarioName) {
+            scenarios.forEach(name => {
+                const tab = scenarioTabs[name];
+                const content = scenarioContents[name];
+                
+                if (name === scenarioName) {
+                    // Activate tab
+                    tab.classList.remove('scenario-tab-inactive');
+                    tab.classList.add('scenario-tab-active');
+                    // Show content
+                    content.classList.remove('hidden');
+                } else {
+                    // Deactivate tab
+                    tab.classList.remove('scenario-tab-active');
+                    tab.classList.add('scenario-tab-inactive');
+                    // Hide content
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- Interactive Scenario Logic ---
+
+        const prompts = {
+            'student-tasks': "Summarize my research tabs, check my email for deadlines from Prof. Smith, and check this PDF for assignments.",
+            'faculty-schedule': "Summarize my 2 open articles, find a 1-hour slot on my @calendar next week for Dr. Lee, and draft an agenda.",
+            'student-research': "Find the main thesis of my 3 open articles (@JSTOR, @PubMed, @Nature) and identify any conflicting arguments.",
+            'faculty-development': "Find a modern (post-2020) documentary from @YouTube and a recent case study on gentrification from @NYT to update my @Syllabus."
+        };
+
+        const outputs = {
+            'student-tasks': `
+                <div class="p-3 space-y-4">
+                    <p class="font-semibold text-gray-800">Done! Here's your briefing:</p>
+                    
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-tabs mr-2"></i> @Tabs Summary (AI Bias)</h4>
+                        <p class="text-sm text-gray-700">Your research tabs indicate that AI bias is a major concern, often stemming from non-diverse training data and leading to inequitable outcomes.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-file-pdf mr-2"></i> @PDF (AI_Ethics_Lecture.pdf)</h4>
+                        <p class="text-sm text-gray-700">This PDF mentions a <span class="font-bold text-red-600">"real-world case study"</span> assignment for next week. No other deadlines found in this file.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-envelope mr-2"></i> @Gmail (Prof. Smith)</h4>
+                        <p class="text-sm text-gray-700">Found one email from Prof. Smith (2 hours ago):<br>
+                        <span class="font-semibold italic">"Reminder: Your case study outlines are due <strong>tomorrow at 5 PM</strong>."</span></p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-gray-200">
+                        <h4 class="font-semibold text-sm text-gray-800 mb-2">Next Steps?</h4>
+                        <button class="w-full text-left text-sm bg-blue-100 text-blue-800 p-2 rounded-md hover:bg-blue-200 transition">
+                            <i class="ph ph-calendar-plus mr-1"></i> Add "Case Study Outline" to calendar for tomorrow at 5 PM
+                        </button>
+                    </div>
+                </div>
+            `,
+            'faculty-schedule': `
+                <div class="p-3 space-y-4">
+                    <p class="font-semibold text-gray-800">Done! Here's your prep:</p>
+                    
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-article mr-2"></i> @Tabs (Article Summaries)</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
+                            <li><strong>Blended Learning:</strong> Combines in-person and online activities, focusing on student flexibility.</li>
+                            <li><strong>Flipped Classroom:</strong> Students review content *before* class, using in-person time for hands-on application.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-calendar mr-2"></i> @Calendar (vs. Dr. Lee)</h4>
+                        <p class="text-sm text-gray-700">Based on your shared calendars, you and Dr. Lee are both free on <span class="font-bold text-green-700">Tuesday, Nov 4th at 2:00 PM</span>.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-pencil-simple mr-2"></i> Drafted Email (to: Dr. Lee)</h4>
+                        <div class="text-sm text-gray-700 bg-gray-50 border p-2 rounded-md">
+                            <p><strong>Subject:</strong> Course Design Meeting (New Pedagogy)</p>
+                            <p class->Hi Lee, found a time we're both free. Agenda:</p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Review blended vs. flipped models</li>
+                                <li>Draft initial syllabus modules</li>
+                            </ul>
+                            <p>Does <strong>Tues, Nov 4th at 2 PM</strong> work for you?</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-gray-200">
+                        <h4 class="font-semibold text-sm text-gray-800 mb-2">Next Steps?</h4>
+                        <button class="w-full text-left text-sm bg-blue-100 text-blue-800 p-2 rounded-md hover:bg-blue-200 transition mb-2">
+                            <i class="ph ph-calendar-plus mr-1"></i> Create calendar event & send email
+                        </button>
+                        <button class="w-full text-left text-sm bg-gray-100 text-gray-800 p-2 rounded-md hover:bg-gray-200 transition">
+                            <i class="ph ph-pencil mr-1"></i> Let me edit the draft first
+                        </button>
+                    </div>
+                </div>
+            `,
+            'student-research': `
+                <div class="p-3 space-y-4">
+                    <p class="font-semibold text-gray-800">Done! Here's your synthesis:</p>
+                    
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-tabs mr-2"></i> @Tabs (Thesis Summary)</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
+                            <li><strong>@JSTOR:</strong> Argues AI's main value is in <strong>workflow optimization</strong> for clinicians, not just diagnostics.</li>
+                            <li><strong>@PubMed:</strong> Focuses on machine learning's superior <strong>diagnostic accuracy</strong> for early-stage tumor detection.</li>
+                            <li><strong>@Nature:</strong> Argues genomic AI is key, but warns of significant <strong>data privacy hurdles</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-arrows-split mr-2"></i> Identified Conflict</h4>
+                        <p class="text-sm text-gray-700">@PubMed is highly optimistic about diagnostic accuracy, but @JSTOR and @Nature suggest that practical (workflow) and ethical (privacy) barriers are more significant immediate challenges.</p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-gray-200">
+                        <h4 class="font-semibold text-sm text-gray-800 mb-2">Next Steps?</h4>
+                        <button class="w-full text-left text-sm bg-blue-100 text-blue-800 p-2 rounded-md hover:bg-blue-200 transition">
+                            <i class="ph ph-file-text mr-1"></i> Draft an outline for a lit review based on these points
+                        </button>
+                    </div>
+                </div>
+            `,
+            'faculty-development': `
+                <div class="p-3 space-y-4">
+                    <p class="font-semibold text-gray-800">Done! Here are your course development resources:</p>
+                    
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-film-strip mr-2"></i> @YouTube (Documentary)</h4>
+                        <p class="text-sm text-gray-700">Your tab mentions several, but the most relevant post-2020 option is <strong>"The Social Dilemma" (2020)</strong>. It directly addresses algorithm-driven social polarization, replacing your 1998 film.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-buildings mr-2"></i> @NYT (Case Study)</h4>
+                        <p class="text-sm text-gray-700">The article details a 2024 study on <strong>Austin, TX</strong>, focusing on "tech-driven displacement" in East Austin. This is a modern replacement for the 1920s Chicago School example.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-700 mb-1 flex items-center"><i class="ph-bold ph-lightbulb mr-2"></i> @Syllabus Suggestion</h4>
+                        <p class="text-sm text-gray-700">The @NYT article also mentions "gig economy labor rights." I can add this as a new discussion topic for Week 5, as it relates to modern media and culture.</p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-gray-200">
+                        <h4 class="font-semibold text-sm text-gray-800 mb-2">Next Steps?</h4>
+                        <button class="w-full text-left text-sm bg-blue-100 text-blue-800 p-2 rounded-md hover:bg-blue-200 transition">
+                            <i class="ph ph-pencil-simple mr-1"></i> Draft the syllabus update for Week 5 & 6
+                        </button>
+                    </div>
+                </div>
+            `
+        };
+
+        function fillPrompt(scenarioName) {
+            document.getElementById(`${scenarioName}-prompt`).value = prompts[scenarioName];
+        }
+
+        function runScenario(scenarioName) {
+            const outputElement = document.getElementById(`${scenarioName}-output`);
+            
+            // Show loading spinner
+            outputElement.innerHTML = `
+                <div class="flex flex-col items-center justify-center p-10 text-gray-600">
+                    <div class="spinner mb-3"></div>
+                    <p class="font-semibold">Comet is thinking...</p>
+                    <p class="text-sm">Reading your open tabs and documents...</p>
+                </div>
+            `;
+            
+            // Simulate AI delay
+            setTimeout(() => {
+                outputElement.innerHTML = outputs[scenarioName];
+            }, 1500); // 1.5 second delay
+        }
+        
+        // Initialize with student scenario
+        document.addEventListener('DOMContentLoaded', () => {
+            showScenario('student-tasks');
+        });
+
+    </script>
+
+</body>
+</html>
+
+
