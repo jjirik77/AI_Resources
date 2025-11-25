@@ -1,453 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Educational Library</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #e8f2ff 0%, #f5f7fa 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            color: white;
-            text-align: center;
-            padding: 3rem 2rem;
-            box-shadow: 0 4px 20px rgba(74, 144, 226, 0.3);
-        }
-
-        .header h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .header p {
-            font-size: 1.3rem;
-            font-weight: 300;
-            opacity: 0.95;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .intro-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2.5rem;
-            margin: -50px auto 3rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.8);
-            text-align: center;
-            position: relative;
-            z-index: 10;
-        }
-
-        .intro-card p {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            color: #555;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .section {
-            margin-bottom: 3rem;
-        }
-
-        .section-header {
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            color: white;
-            padding: 1.5rem 2rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.25);
-        }
-
-        .section-header h2 {
-            font-size: 2.2rem;
-            font-weight: 600;
-        }
-
-        .resources-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .resource-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            border: 1px solid #e8f2ff;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .resource-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #4a90e2, #357abd);
-        }
-
-        .resource-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-            border-color: #4a90e2;
-        }
-
-        .resource-card h3 {
-            color: #4a90e2;
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .resource-card p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-
-        .resource-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .tag {
-            background: #e8f2ff;
-            color: #4a90e2;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .resource-actions {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 0.7rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            font-size: 0.95rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #4a90e2;
-            border: 2px solid #4a90e2;
-        }
-
-        .btn-secondary:hover {
-            background: #4a90e2;
-            color: white;
-        }
-
-
-
-        .category-filter {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .filter-btn {
-            padding: 0.8rem 1.5rem;
-            background: white;
-            color: #666;
-            border: 2px solid #e8f2ff;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .filter-btn:hover,
-        .filter-btn.active {
-            background: #4a90e2;
-            color: white;
-            border-color: #4a90e2;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .header p {
-                font-size: 1.1rem;
-            }
-            
-            .container {
-                padding: 1rem;
-            }
-            
-            .resources-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .category-filter {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>AI Educational Library</title>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      color: #222;
+    }
+    header {
+      background: linear-gradient(90deg, #275cff 0%, #3d9eeb 100%);
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 10px #0002;
+    }
+    header h1 {
+      margin: 0 0 .5rem 0;
+      font-size: 2.5rem;
+      letter-spacing: -2px;
+    }
+    header p {
+      margin: 0;
+      font-size: 1.2rem;
+      opacity: 0.95;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    section {
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #275cff;
+      margin-bottom: 14px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: #fff;
+      padding: 1.25rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px #0001;
+      transition: box-shadow .18s;
+      border-left: 4px solid #275cff;
+    }
+    .card a {
+      color: #3d9eeb;
+      text-decoration: none;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .card a:hover {
+      text-decoration: underline;
+      color: #275cff;
+    }
+    @media (max-width: 650px) {
+      header h1 { font-size: 1.6rem; }
+      .section-title { font-size: 1.1rem; }
+      .container { padding: 0 .5rem; }
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>AI Educational Library</h1>
-        <p>Empowering Education Through Adoption of AI Learning Tools</p>
-    </div>
-
-    <div class="container">
-        <div class="intro-card">
-            <p>Welcome to our comprehensive collection of currated AI-generated teaching and learning resources.</p>
-        </div>
-
-
-         <div class="section">
-
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <h3>Dashboards and Reports</h3>
-                     <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/reports/epnc.html" class="btn btn-primary">EPNC Dashboard</a>
-                        <a href="https://jjirik77.github.io/reports/ai_report.html" class="btn btn-primary">MS AI Azure Report</a>
-                        <a href="https://jjirik77.github.io/reports/ramps.html" class="btn btn-primary">Illinois RAMPS Report</a>
-                        <a href="https://jjirik77.github.io/reports/ai_ilc.html" class="btn btn-primary">AI ILC</a>
-                    </div>
-                </div>
-            </div>
-        </div>       
-        
-        
-        
-        
-        <div class="section">
-
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <h3>Classroom Resources</h3>
-                     <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/AI_Resources/timer.html" class="btn btn-primary">Timer</a>
-                        <a href="https://jjirik77.github.io/AI_Resources/flashcards.html" class="btn btn-primary">3-D Flashcards</a>
-                        <a href="https://jjirik77.github.io/AI_Resources/career_asses.html" class="btn btn-primary">Career Aptitude Assessment</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-<div class="section">
-
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <h3>Azure AI Workshop</h3>
-                     <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/azure/ethics.html" class="btn btn-primary">Ethics</a>
-                        <a href="https://jjirik77.github.io/azure/levels.html" class="btn btn-primary">AI Levels</a>
-                        <a href="https://jjirik77.github.io/azure/ai_concepts.html" class="btn btn-primary">AI Concepts</a>
-                        <a href="https://jjirik77.github.io/azure/provenance.html" class="btn btn-primary">Digital Provenance</a>
-                        <a href="https://jjirik77.github.io/azure/image.html" class="btn btn-primary">Image Processing</a>
-                        <a href="https://jjirik77.github.io/azure/cnn.html" class="btn btn-primary">Convolutional Neural Networks</a>
-                        <a href="https://jjirik77.github.io/azure/ocr.html" class="btn btn-primary">Optical Character Recognition</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="section">
-
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <h3>AI Ethics</h3>
-                     <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/AI_Resources/AI_Ethics.html" class="btn btn-primary">AI Ethical Dilemas</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-<div class="section">
-
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <h3>Secure Coding</h3>
-                     <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/sec_code/interactive.html" class="btn btn-primary">Secure Coding</a>
-                        <a href="https://jjirik77.github.io/sec_code/privacy.html" class="btn btn-primary">Privacy Implications</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-<div class="section">
-
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <h3>CISM Workshop</h3>
-                     <div class="resource-actions">
-                         <a href="https://jjirik77.github.io/CISM/blue_home.html" class="btn btn-primary">CISM Comprehensive</a>
-                         <a href="https://jjirik77.github.io/CISM/blue_d1.html" class="btn btn-primary">Domain 1</a>
-                         <a href="https://jjirik77.github.io/CISM/blue_d2.html" class="btn btn-primary">Domain 2</a>
-                         <a href="https://jjirik77.github.io/CISM/blue_d3.html" class="btn btn-primary">Domain 3</a>
-                         <a href="https://jjirik77.github.io/CISM/blue_d4.html" class="btn btn-primary">Domain 4</a>
-                         <a href="https://jjirik77.github.io/CISM/blue_asses.html" class="btn btn-primary">Assessment</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <h3>AI for Math</h3>
-                     <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/AI_Math/ai_math.html" class="btn btn-primary">Resources</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    <div class="section">
-
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <h3>CMMC</h3>
-                     <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/cmmc/sar.html" class="btn btn-primary">Security Assessment Report</a>
-                        <a href="https://jjirik77.github.io/cmmc/cmp.html" class="btn btn-primary">Configuration Management Plan</a>
-                        <a href="https://jjirik77.github.io/cmmc/vsr.html" class="btn btn-primary">Vulnerability Scan Report</a>
-                        <a href="https://jjirik77.github.io/cmmc/case_studio.html" class="btn btn-primary">DefenseCore Manufacturing Case Scenario</a>
-                        <a href="https://jjirik77.github.io/cmmc/case_gem.html" class="btn btn-primary">Statum Defense Case Scenario</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="section">
-
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <h3>LLM Interfaces</h3>
-                     <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/AI_Resources/Comparative_Analysis.html" class="btn btn-primary">Comparative Analysis</a>
-                    </div>
-                    <p></p>
-                    <p>LLM interactive interfaces</p>
-                    <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/AI_Resources/Perplexity_AI.html" class="btn btn-primary">Perplexity</a>
-                        <a href="https://jjirik77.github.io/AI_Resources/Gemini_AI.html" class="btn btn-primary">Gemini</a>
-                        <a href="https://jjirik77.github.io/AI_Resources/ChatGPT_AI.html" class="btn btn-primary">ChatGPT</a>
-                        <a href="https://jjirik77.github.io/AI_Resources/Claude_AI.html" class="btn btn-primary">Claude</a>
-                        <a href="https://jjirik77.github.io/AI_Resources/Copilot_AI.html" class="btn btn-primary">Copilot</a>
-                        <a href="https://jjirik77.github.io/AI_Resources/Deepseek_AI.html" class="btn btn-primary">DeepSeek</a>
-                        <a href="https://jjirik77.github.io/AI_Resources/Grok_AI.html" class="btn btn-primary">Grok</a>
-                    </div> 
-                    <p></p>
-                    <p>Agentic Browsers</p>
-                    <div class="resource-actions">
-                        <a href="https://jjirik77.github.io/AI_Resources/comet.html" class="btn btn-primary">Comet</a>
-                        <a href="https://jjirik77.github.io/AI_Resources/comet_ex.html" class="btn btn-primary">Comet Example</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    
-    
-    <script>
-        // Simple filter functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const resourceCards = document.querySelectorAll('.resource-card');
-            
-            resourceCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    // Add ripple effect
-                    const ripple = document.createElement('div');
-                    ripple.style.position = 'absolute';
-                    ripple.style.borderRadius = '50%';
-                    ripple.style.background = 'rgba(74, 144, 226, 0.3)';
-                    ripple.style.transform = 'scale(0)';
-                    ripple.style.animation = 'ripple 0.6s linear';
-                    ripple.style.left = '50%';
-                    ripple.style.top = '50%';
-                    ripple.style.width = '20px';
-                    ripple.style.height = '20px';
-                    ripple.style.marginLeft = '-10px';
-                    ripple.style.marginTop = '-10px';
-                    
-                    this.appendChild(ripple);
-                    
-                    setTimeout(() => {
-                        ripple.remove();
-                    }, 600);
-                });
-            });
-        });
-
-        // Add CSS for ripple animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+  <header>
+    <h1>AI Educational Library</h1>
+    <p>Empowering Education Through Adoption of AI Learning Tools</p>
+    <p style="margin-top:.5rem;font-size:.99rem;">Comprehensive curated resources for teaching and learning with AI</p>
+  </header>
+  <div class="container">
+    <section>
+      <div class="section-title">Dashboards & Reports</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/reports/epnc.html">EPNC Dashboard</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/reports/ai_report.html">MS AI Azure Report</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/reports/ramps.html">Illinois RAMPS Report</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/reports/ai_ilc.html">AI ILC</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">Classroom Resources</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/timer.html">Timer</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/flashcards.html">3-D Flashcards</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/career_asses.html">Career Aptitude Assessment</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">Azure AI Workshop</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/azure/ethics.html">Ethics</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/levels.html">AI Levels</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/ai_concepts.html">AI Concepts</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/provenance.html">Digital Provenance</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/image.html">Image Processing</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/cnn.html">Convolutional Neural Networks</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/ocr.html">Optical Character Recognition</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">AI Ethics</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/AI_Ethics.html">AI Ethical Dilemmas</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">Secure Coding</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/sec_code/interactive.html">Secure Coding Interactive</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/sec_code/privacy.html">Privacy Implications</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">CISM Workshop</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_home.html">CISM Comprehensive</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_d1.html">Domain 1</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_d2.html">Domain 2</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_d3.html">Domain 3</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_d4.html">Domain 4</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_asses.html">Assessment</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">AI for Math</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Math/ai_math.html">Resources</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">CMMC</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/sar.html">Security Assessment Report</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/cmp.html">Configuration Management Plan</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/vsr.html">Vulnerability Scan Report</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/case_studio.html">DefenseCore Manufacturing Case</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/case_gem.html">Statum Defense Case</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">LLM Interfaces & Agentic Browsers</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Comparative_Analysis.html">Comparative Analysis</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Perplexity_AI.html">Perplexity</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Gemini_AI.html">Gemini</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/ChatGPT_AI.html">ChatGPT</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Claude_AI.html">Claude</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Copilot_AI.html">Copilot</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Deepseek_AI.html">DeepSeek</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Grok_AI.html">Grok</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/comet.html">Comet</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/comet_ex.html">Comet Example</a></div>
+      </div>
+    </section>
+  </div>
 </body>
 </html>
