@@ -110,6 +110,11 @@
             overflow-y: auto;
             background-color: var(--gray);
             position: relative;
+            
+            /* Center Content Vertically */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
         }
 
         /* Section Styles */
@@ -122,7 +127,8 @@
             display: none; /* Hidden by default */
             animation: fadeIn 0.5s ease-out forwards;
             max-width: 1000px;
-            margin: 0 auto 2rem auto;
+            width: 100%; /* Ensure it takes width up to max-width */
+            margin: 0 auto; /* Horizontally Center */
         }
 
         section.active-section {
@@ -147,42 +153,13 @@
             margin: 1rem 0 0.5rem;
         }
 
-        /* Stats Section (Styled to fit inside About) */
-        .stats-section {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            text-align: center;
-            padding: 2rem 0;
-            background-color: var(--light-blue);
-            border-radius: 8px;
-            margin-top: 2rem;
-        }
-
-        .stat-item {
-            padding: 1rem;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .stat-item h3 {
-            font-size: 2.5rem;
-            color: var(--primary-blue);
-            margin-bottom: 0.2rem;
-        }
-
-        .stat-item p {
-            color: var(--text-dark);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
         /* Card Grid System */
         .grid-container {
             display: grid;
             /* Use minmax of 250px to ensure 3 cards fit on standard desktop views within the container */
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         .card {
@@ -212,6 +189,27 @@
             font-size: 2rem;
             color: var(--secondary-blue);
             margin-bottom: 1rem;
+        }
+
+        /* Specific style for Stats Cards to center text */
+        .card.stat-card {
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .card.stat-card h3 {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.2rem;
+            margin-top: 0;
+        }
+
+        .card.stat-card p {
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-grow: 0; /* Stats don't need to grow like text content */
         }
 
         ul.feature-list {
@@ -327,6 +325,10 @@
             main {
                 height: auto;
                 padding: 1.5rem;
+                display: block; /* Reset centering for mobile scroll */
+            }
+            section {
+                margin-bottom: 2rem;
             }
         }
     </style>
@@ -369,17 +371,17 @@
                     With over 20 years of experience across industry and academia, Jiri is spearheading the development and implementation of comprehensive cybersecurity and AI curricula tailored for K-12 students, higher education, and adult learners. His work brings innovative approaches to CTE education and K-12 eco-systems.
                 </p>
 
-                <!-- Stats embedded in About -->
-                <div class="stats-section">
-                    <div class="stat-item">
+                <!-- Stats transformed into 3 Cards -->
+                <div class="grid-container">
+                    <div class="card stat-card">
                         <h3 class="counter" data-target="10">0</h3>
                         <p>Years of Service</p>
                     </div>
-                    <div class="stat-item">
+                    <div class="card stat-card">
                         <h3 class="counter" data-target="100">0</h3>
                         <p>Professional Development Events</p>
                     </div>
-                    <div class="stat-item">
+                    <div class="card stat-card">
                         <h3 class="counter" data-target="50">0</h3>
                         <p>Symposium & Conf. Presentations</p>
                     </div>
