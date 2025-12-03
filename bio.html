@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jiri Jirik - Professional Bio</title>
+    <style>
+        :root {
+            --primary-blue: #003366;
+            --secondary-blue: #00509E;
+            --accent-blue: #4A90E2;
+            --light-blue: #E6F3FF;
+            --white: #ffffff;
+            --gray: #f4f4f4;
+            --text-dark: #333333;
+            --text-light: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden; /* Prevent body scroll, handle in containers */
+        }
+
+        /* Layout Wrapper */
+        .layout-wrapper {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        aside {
+            width: 300px;
+            background: linear-gradient(160deg, var(--primary-blue), var(--secondary-blue));
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            z-index: 10;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .profile-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid var(--white);
+            object-fit: cover;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .profile-section h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-section p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Sidebar Navigation */
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 12px 15px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            display: block;
+            border-left: 4px solid transparent;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        /* Main Content Area */
+        main {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+            background-color: var(--gray);
+            position: relative;
+        }
+
+        /* Section Styles */
+        section {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--secondary-blue);
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease-out forwards;
+            max-width: 1000px;
+            margin: 0 auto 2rem auto;
+        }
+
+        section.active-section {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        h3 {
+            color: var(--secondary-blue);
+            margin: 1rem 0 0.5rem;
+        }
+
+        /* Stats Section (Styled to fit inside About) */
+        .stats-section {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            text-align: center;
+            padding: 2rem 0;
+            background-color: var(--light-blue);
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            padding: 1rem;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-item p {
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Card Grid System */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--light-blue);
+            padding: 1.5rem;
+            border-radius: 6px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,50,100,0.1);
+            background: var(--white);
+            border-color: var(--accent-blue);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            color: var(--secondary-blue);
+            margin-bottom: 1rem;
+        }
+
+        ul.feature-list {
+            list-style-position: inside;
+            margin-top: 1rem;
+        }
+        
+        ul.feature-list li {
+            margin-bottom: 0.8rem;
+            color: var(--text-dark);
+            padding-left: 1rem;
+            position: relative;
+        }
+        
+        ul.feature-list li::before {
+            content: "•";
+            color: var(--accent-blue);
+            font-weight: bold;
+            position: absolute;
+            left: -0.5rem;
+        }
+
+        /* Footer */
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-blue);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 1rem;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        /* Modal */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 15% auto; 
+            padding: 2rem;
+            border: 1px solid #888;
+            width: 90%; 
+            max-width: 500px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .layout-wrapper {
+                flex-direction: column;
+                height: auto;
+                overflow: auto;
+            }
+            body {
+                overflow: auto;
+            }
+            aside {
+                width: 100%;
+                height: auto;
+                padding: 1rem;
+                position: relative;
+            }
+            nav ul {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            nav a {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            main {
+                height: auto;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <!-- Left Sidebar -->
+        <aside>
+            <div class="profile-section">
+                <img src="Jirik_Headshot.jpg" alt="Jiri Jirik Headshot" class="profile-img">
+                <h1>Jiri Jirik</h1>
+                <p>Director, EPNC</p>
+                <p>Educator | Researcher</p>
+            </div>
+
+            <nav>
+                <ul>
+                    <li><a href="#about" class="nav-link active">About</a></li>
+                    <li><a href="#career" class="nav-link">Career Highlights</a></li>
+                    <li><a href="#leadership" class="nav-link">Leadership</a></li>
+                    <li><a href="#education" class="nav-link">Educational Activities</a></li>
+                    <li><a href="#impact" class="nav-link">Impact & Legacy</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div style="margin-top: 1rem;">
+                    <button id="contactBtn" class="btn" style="width: 100%; padding: 8px;">Contact</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <!-- About Section (Default Active) -->
+            <section id="about" class="content-section active-section">
+                <h2>About</h2>
+                <p>
+                    With over 20 years of experience across industry and academia, Jiri is spearheading the development and implementation of comprehensive cybersecurity and AI curricula tailored for K-12 students, higher education, and adult learners. His work brings innovative approaches to CTE education and K-12 eco-systems.
+                </p>
+
+                <!-- Stats embedded in About -->
+                <div class="stats-section">
+                    <div class="stat-item">
+                        <h3 class="counter" data-target="10">0</h3>
+                        <p>Years of Service</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 class="counter" data-target="100">0</h3>
+                        <p>Professional Development Events</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 class="counter" data-target="50">0</h3>
+                        <p>Symposium & Conf. Presentations</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Career Highlights Section -->
+            <section id="career" class="content-section">
+                <h2>Career Highlights</h2>
+                <div class="grid-container">
+                    <div class="card">
+                        <div class="card-icon">🎓</div>
+                        <h3>Academic Leadership</h3>
+                        <p>Leading national initiatives in cybersecurity education. Drives the strategic direction for academic programs that bridge the gap between K-12 education and workforce needs, overseeing grant-funded projects and curriculum standards.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">💼</div>
+                        <h3>Professional Leadership</h3>
+                        <p>Over two decades of industry experience combined with top-tier certifications (CISSP, CISA, CASP). A recognized voice in bridging practical industry security requirements with academic rigor.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🔬</div>
+                        <h3>Research and Development</h3>
+                        <p>Co-Principal Investigator for AI Innovation Grants and active researcher in Cyber Defense. Spearheads the development of cutting-edge educational frameworks and co-develops the RING (Regions Investing in the Next Generation) curriculum.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leadership Roles Section -->
+            <section id="leadership" class="content-section">
+                <h2>Leadership Roles</h2>
+                <div class="grid-container">
+                    <div class="card">
+                        <div class="card-icon">🏛️</div>
+                        <h3>EPNC Director</h3>
+                        <p>Leading the Education Pathway National Center to create robust pathways for future cyber professionals.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">💡</div>
+                        <h3>AI Innovation Grant Co-PI</h3>
+                        <p>Driving research and funding into the intersection of Artificial Intelligence and cybersecurity education.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🤝</div>
+                        <h3>NCL Board Member</h3>
+                        <p>Serving on the board of the National Cyber League to promote innovative, highly immersive learning throughout student competition.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Educational Activities Section -->
+            <section id="education" class="content-section">
+                <h2>Educational Activities</h2>
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>RING Curriculum</h3>
+                        <p>Development of the "Regions Investing in the Next Generation" (RING) curriculum, providing free, high-quality cybersecurity content to high schools nationwide to spark student interest.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Immersive Education</h3>
+                        <p>Leveraging game-based learning to introduce complex cybersecurity concepts. Creating immersive educational environments that engage K-12 students through familiar platforms.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Faculty Development</h3>
+                        <p>Conducting workshops and training sessions for educators across the country, equipping them with the tools and knowledge necessary to teach modern cybersecurity effectively.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Impact and Legacy Section -->
+            <section id="impact" class="content-section">
+                <h2>Impact and Legacy</h2>
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>Workforce Development</h3>
+                        <p>Building a sustainable pipeline of talent for the cybersecurity workforce by aligning educational outcomes with the real-world needs of employers and government agencies.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Community Building</h3>
+                        <p>Fostering a national community of practice among educators, industry professionals, and students. Creating networks that support continuous learning and professional growth in the cyber domain.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 style="color: var(--primary-blue);">Contact Information</h3>
+            <br>
+            <p><strong>Email:</strong> jirikj@morainevalley.edu</p>
+            <p><strong>Office:</strong> EPNC, Moraine Valley Community College</p>
+            <p><strong>LinkedIn:</strong> <a href="#" style="color:var(--accent-blue)">Connect on LinkedIn</a></p>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation Logic
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    // Add active class to clicked link
+                    link.classList.add('active');
+
+                    // Get target section id
+                    const targetId = link.getAttribute('href').substring(1);
+
+                    // Hide all sections
+                    sections.forEach(section => {
+                        section.classList.remove('active-section');
+                    });
+
+                    // Show target section
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.classList.add('active-section');
+                        
+                        // Check if we need to run counters (if switching to About)
+                        if (targetId === 'about') {
+                            runCounters();
+                        }
+                    }
+                });
+            });
+
+            // Counter Logic
+            const runCounters = () => {
+                const counters = document.querySelectorAll('.counter');
+                const speed = 50; // Faster speed for tab switching feel
+
+                counters.forEach(counter => {
+                    // Reset counter for animation effect on tab switch
+                    counter.innerText = '0'; 
+                    
+                    const updateCount = () => {
+                        const target = +counter.getAttribute('data-target');
+                        const count = +counter.innerText.replace('+', '');
+                        
+                        // Increment logic
+                        const inc = Math.ceil(target / speed);
+
+                        if (count < target) {
+                            counter.innerText = count + inc > target ? target + "+" : count + inc;
+                            setTimeout(updateCount, 15);
+                        } else {
+                            counter.innerText = target + "+";
+                        }
+                    };
+                    updateCount();
+                });
+            };
+
+            // Run counters initially on load since 'About' is default
+            runCounters();
+
+            // Dynamic Footer Date
+            const yearSpan = document.getElementById('current-year');
+            if(yearSpan) {
+                yearSpan.textContent = new Date().getFullYear();
+            }
+
+            // Modal Logic
+            const modal = document.getElementById("contactModal");
+            const btn = document.getElementById("contactBtn");
+            const span = document.getElementsByClassName("close")[0];
+
+            if(btn) {
+                btn.onclick = function() {
+                    modal.style.display = "block";
+                }
+            }
+            if(span) {
+                span.onclick = function() {
+                    modal.style.display = "none";
+                }
+            }
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
