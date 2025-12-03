@@ -180,7 +180,8 @@
         /* Card Grid System */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            /* Use minmax of 250px to ensure 3 cards fit on standard desktop views within the container */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
         }
 
@@ -190,6 +191,14 @@
             border-radius: 6px;
             transition: transform 0.3s, box-shadow 0.3s;
             border: 1px solid rgba(0,0,0,0.05);
+            /* Allow vertical expansion */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card p {
+            flex-grow: 1;
         }
 
         .card:hover {
@@ -465,7 +474,7 @@
             <br>
             <p><strong>Email:</strong> jirikj@morainevalley.edu</p>
             <p><strong>Office:</strong> EPNC, Moraine Valley Community College</p>
-            <p><strong>LinkedIn:</strong> <a href="#" style="color:var(--accent-blue)">Connect on LinkedIn</a></p>
+            <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/jiri-j-8b2a21174" target="_blank" style="color:var(--accent-blue)">Connect on LinkedIn</a></p>
         </div>
     </div>
 
