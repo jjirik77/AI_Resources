@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychology 101: Expanding the Mind (Baseline v4.2)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --dyslexic-font: 'Comic Sans MS', 'Chalkboard SE', 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f8fafc;
+            transition: font-family 0.3s ease;
+        }
+
+        .dyslexic-mode {
+            font-family: var(--dyslexic-font) !important;
+            line-height: 1.6;
+            letter-spacing: 0.05em;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+
+        .iceberg-container {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(to bottom, #7dd3fc 0%, #0c4a6e 100%);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .iceberg-top {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 60px solid transparent;
+            border-right: 60px solid transparent;
+            border-bottom: 100px solid white;
+            z-index: 2;
+        }
+
+        .iceberg-bottom {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 120px solid transparent;
+            border-right: 120px solid transparent;
+            border-top: 250px solid rgba(255, 255, 255, 0.8);
+            z-index: 1;
+        }
+
+        .wave {
+            position: absolute;
+            top: 32%;
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: 3;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stage-btn {
+            transition: all 0.2s ease;
+            min-width: 90px;
+        }
+        
+        .stage-btn.active {
+            background-color: #f43f5e;
+            color: white;
+            border-color: #f43f5e;
+        }
+
+        .quick-check {
+            border-left: 4px solid #6366f1;
+            background-color: #f5f3ff;
+        }
+
+        .mandela-option:hover {
+            border-color: #6366f1;
+            background-color: #f5f3ff;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Nav -->
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <span class="font-bold text-indigo-600 text-xl">PSYCH 101 <span class="text-[10px] bg-indigo-100 px-2 py-0.5 rounded ml-1 text-slate-800 uppercase tracking-widest">Baseline</span></span>
+                <button onclick="toggleDyslexic()" class="text-[10px] uppercase font-bold tracking-tighter bg-slate-100 px-2 py-1 rounded hover:bg-slate-200">Dyslexic Font Off</button>
+            </div>
+            
+            <div class="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
+                <span>Mastery Progress:</span>
+                <div class="flex gap-1" id="knowledge-map">
+                    <div class="w-4 h-4 rounded-full border-2 border-slate-200" id="step-1" title="Foundations"></div>
+                    <div class="w-4 h-4 rounded-full border-2 border-slate-200" id="step-2" title="Personality"></div>
+                    <div class="w-4 h-4 rounded-full border-2 border-slate-200" id="step-3" title="Memory"></div>
+                    <div class="w-4 h-4 rounded-full border-2 border-slate-200" id="step-4" title="Social/Learning"></div>
+                    <div class="w-4 h-4 rounded-full border-2 border-slate-200" id="step-5" title="Lifespan"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="gradient-bg text-white py-16 px-4 text-center">
+        <div class="max-w-5xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Expanding the Mind: From Unconscious Drives to Lifespan Development</h1>
+            <p class="text-indigo-100 text-lg max-w-4xl mx-auto leading-relaxed mb-12">A professional introductory lesson bridging practical phenomena with rigorous theory. We will apply the <strong>Biopsychosocial Model</strong> to understand the whole human experience.</p>
+            
+            <div class="grid md:grid-cols-3 gap-6 text-left max-w-5xl mx-auto">
+                <div class="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20">
+                    <span class="text-indigo-300 font-bold block mb-1">Learning Objective 1</span>
+                    <p class="text-[11px]">Explain the origins of psychology, the "iceberg effect" of the unconscious mind, and the three brain systems.</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20">
+                    <span class="text-indigo-300 font-bold block mb-1">Learning Objective 2</span>
+                    <p class="text-[11px]">Analyze personality using the Big Five model and evaluate the reconstructive nature of memory.</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20">
+                    <span class="text-indigo-300 font-bold block mb-1">Learning Objective 3</span>
+                    <p class="text-[11px]">Describe Erik Erikson's eight stages of psychosocial development and the conflicts that shape personality from infancy through late adulthood.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 space-y-24">
+
+        <!-- 01 FOUNDATIONS -->
+        <section id="foundations" class="scroll-mt-20">
+            <div class="flex flex-col lg:flex-row gap-12">
+                <div class="flex-1">
+                    <h2 class="text-3xl font-bold mb-6 flex items-center">
+                        <span class="bg-indigo-100 text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center mr-3 text-sm">01</span>
+                        Foundations & Brain Hardware
+                    </h2>
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        Psychology was born in <strong>Wilhelm Wundt's 1879 laboratory</strong> through the study of <strong>introspection</strong>. Freud later introduced the <strong>"iceberg effect,"</strong> revealing that conscious awareness represents only about <strong>1%</strong> of our mind's activity.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-indigo-600 mb-4 uppercase tracking-tighter text-xs text-slate-800">Biological Hardware:</h4>
+                            <div class="space-y-2">
+                                <button onclick="updateBrain('reptile'); completeStep(1);" class="w-full text-left p-3 hover:bg-white rounded-lg transition border border-transparent hover:border-indigo-200 shadow-sm flex items-center gap-4 group">
+                                    <span class="text-xl">🐢</span>
+                                    <div><strong class="text-xs group-hover:text-indigo-600">Reptilian:</strong> <span class="text-[10px] text-slate-500">Survival, heart rate, breathing.</span></div>
+                                </button>
+                                <button onclick="updateBrain('limbic'); completeStep(1);" class="w-full text-left p-3 hover:bg-white rounded-lg transition border border-transparent hover:border-indigo-200 shadow-sm flex items-center gap-4 group">
+                                    <span class="text-xl">🎭</span>
+                                    <div><strong class="text-xs group-hover:text-indigo-600">Limbic:</strong> <span class="text-[10px] text-slate-500">The "Drama Queen." Emotional reactions.</span></div>
+                                </button>
+                                <button onclick="updateBrain('cortex'); completeStep(1);" class="w-full text-left p-3 hover:bg-white rounded-lg transition border border-transparent hover:border-indigo-200 shadow-sm flex items-center gap-4 group">
+                                    <span class="text-xl">👔</span>
+                                    <div><strong class="text-xs group-hover:text-indigo-600">Rational Cortex:</strong> <span class="text-[10px] text-slate-500">The "CEO." Logic, planning, and judgment.</span></div>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="brain-detail" class="text-xs italic text-indigo-800 p-3 bg-indigo-50 rounded-lg hidden fade-in"></div>
+                        
+                        <div class="quick-check p-4 rounded-r-xl">
+                            <p class="text-xs font-bold text-indigo-800 mb-1 uppercase tracking-widest">Pulse Check:</p>
+                            <p class="text-[11px] mb-2">You hear a sudden loud noise and jump before you even think. Which brain part fired?</p>
+                            <div class="flex gap-2">
+                                <button onclick="showPulseFeedback(true)" class="px-3 py-1 bg-white border border-indigo-200 rounded text-[10px] hover:bg-indigo-50 font-bold">Reptilian/Limbic</button>
+                                <button onclick="showPulseFeedback(false)" class="px-3 py-1 bg-white border border-indigo-200 rounded text-[10px] hover:bg-indigo-50 font-bold">Rational Cortex</button>
+                            </div>
+                            <div id="pulse-feedback" class="hidden mt-2 p-2 rounded text-[10px] font-bold fade-in border"></div>
+                        </div>
+
+                        <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+                            <a href="https://www.apa.org/ethics/code" target="_blank" class="text-xs font-bold text-emerald-700 flex items-center gap-2">
+                                <span>⚖️ APA Ethics Code: Professional Standards</span>
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 flex flex-col items-center">
+                    <div class="iceberg-container shadow-xl w-full max-w-sm">
+                        <div class="iceberg-top"></div>
+                        <div class="wave"></div>
+                        <div class="iceberg-bottom"></div>
+                        <div class="absolute top-[15%] right-[5%] text-white font-bold bg-black/40 px-2 py-1 rounded text-[10px]">CONSCIOUS (1%)</div>
+                        <div class="absolute bottom-[20%] left-[5%] text-white font-bold bg-black/40 px-2 py-1 rounded text-[10px]">UNCONSCIOUS (99%)</div>
+                    </div>
+                    <p class="mt-4 text-[10px] text-slate-400 italic">Freud's Iceberg Model</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 02 PERSONALITY & TRAIT THEORY -->
+        <section id="personality" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-8 flex items-center">
+                <span class="bg-emerald-100 text-emerald-600 w-10 h-10 rounded-full flex items-center justify-center mr-3 text-sm">02</span>
+                The O.C.E.A.N. & The Jim Twins
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-semibold mb-2 text-emerald-700">Personality Spectrum</h3>
+                    <p class="text-xs text-slate-500 mb-6">Trait theory and the <strong>"Jim twins"</strong> prove Nature provides the architecture (~50%). The Big Five represent universal human traits.</p>
+                    
+                    <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100 mb-6">
+                        <h4 class="text-[10px] font-bold text-emerald-800 uppercase mb-3">Trait Breakdown</h4>
+                        <div class="space-y-3 text-[10px] text-slate-700">
+                            <p><strong>Openness:</strong> Creative/Curious scorers vs. Practical/Routine scorers.</p>
+                            <p><strong>Conscientiousness:</strong> Organized/Disciplined scorers vs. Spontaneous/Disorganized.</p>
+                            <p><strong>Extraversion:</strong> Social energy/Outgoing vs. Private/Reserved.</p>
+                            <p><strong>Agreeableness:</strong> Cooperative/Trusting vs. Competitive/Critical.</p>
+                            <p><strong>Neuroticism:</strong> Stress-reactive scorers vs. Calm/Stable scorers.</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6" id="personality-lab">
+                        <div>
+                            <div class="flex justify-between text-[10px] font-bold uppercase"><span>Extraversion</span><span id="e-score">50%</span></div>
+                            <input type="range" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500" oninput="updateTrait('e', this.value)">
+                            <p class="text-[9px] text-emerald-600 mt-1 font-bold italic" id="e-career">Career Fit: Team Lead / Collaborator</p>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[10px] font-bold uppercase"><span>Neuroticism</span><span id="n-score">50%</span></div>
+                            <input type="range" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500" oninput="updateTrait('n', this.value)">
+                            <p class="text-[9px] text-indigo-600 mt-1 font-bold italic" id="n-career">Mental Edge: Detail Orientated</p>
+                        </div>
+                        <button onclick="compareJimTwins(); completeStep(2);" class="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl text-xs hover:bg-emerald-700 transition shadow-md">Compare with Biological Baseline</button>
+                    </div>
+                    <div id="jim-feedback" class="hidden mt-4 p-4 bg-emerald-50 text-emerald-800 text-[10px] rounded-lg fade-in"></div>
+                </div>
+
+                <div class="flex flex-col justify-center bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                    <h4 class="font-bold mb-4 text-indigo-900">Psychology Fact: Nature vs. Nurture</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed italic">"Identical twins raised apart, like the Jim Twins, often share identical heart rates, IQs, and specific quirks, proving that personality is a biological blueprint edited by experience."</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03 MEMORY & INFORMATION PROCESSING -->
+        <section id="memory" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-8 flex items-center">
+                <span class="bg-rose-100 text-rose-600 w-10 h-10 rounded-full flex items-center justify-center mr-3 text-sm">03</span>
+                Information Processing Lab
+            </h2>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Systems Breakdown -->
+                <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl">
+                    <h3 class="text-xl font-semibold mb-6 text-indigo-300">Memory Systems</h3>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+                            <h5 class="text-indigo-400 text-[10px] font-bold uppercase mb-1">1. Sensory Memory (The Bouncer)</h5>
+                            <p class="text-[10px] text-slate-300 leading-relaxed">Acts as gatekeeper. High capacity but extremely short duration (1-2 seconds). If you don't pay attention, it's gone.</p>
+                        </div>
+                        <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+                            <h5 class="text-indigo-400 text-[10px] font-bold uppercase mb-1">2. Short-Term Memory (The Waiting Room)</h5>
+                            <p class="text-[10px] text-slate-300 leading-relaxed">Active conscious thought. Holds **7 +/- 2 items** (George Miller). Duration: ~20 seconds without rehearsal.</p>
+                        </div>
+                        <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+                            <h5 class="text-indigo-400 text-[10px] font-bold uppercase mb-1">3. Long-Term Memory (The Library)</h5>
+                            <p class="text-[10px] text-slate-300 leading-relaxed">Permanent storage. Retrieval depends on "search terms" or cues. Infinite capacity.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mandela Effect Visual Lab -->
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h4 class="text-[10px] font-bold text-rose-500 uppercase mb-4 text-center tracking-widest">Loftus Lab: Mandela Effect</h4>
+                    <p class="text-xs text-slate-600 mb-8 text-center leading-relaxed">Elizabeth Loftus proved memory is a <strong>reconstruction</strong>. Test your visual memory: Which Pikachu tail is correct?</p>
+                    
+                    <div class="grid grid-cols-2 gap-6 mb-6">
+                        <button onclick="mandelaResult(false)" class="mandela-option p-4 border border-slate-200 rounded-xl flex flex-col items-center gap-3 transition">
+                            <!-- Pikachu Black Tip -->
+                            <svg viewBox="0 0 100 100" class="w-16 h-16">
+                                <path d="M30,80 L50,50 L60,70 L90,40" stroke="#fbbf24" stroke-width="8" fill="none" />
+                                <path d="M80,53 L90,40" stroke="black" stroke-width="8" fill="none" />
+                                <circle cx="40" cy="40" r="25" fill="#fbbf24" />
+                                <circle cx="35" cy="35" r="3" fill="black" />
+                                <circle cx="45" cy="35" r="3" fill="black" />
+                            </svg>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Black Tip</span>
+                        </button>
+                        <button onclick="mandelaResult(true)" class="mandela-option p-4 border border-slate-200 rounded-xl flex flex-col items-center gap-3 transition">
+                            <!-- Pikachu Correct -->
+                            <svg viewBox="0 0 100 100" class="w-16 h-16">
+                                <path d="M30,80 L50,50 L60,70 L90,40" stroke="#fbbf24" stroke-width="8" fill="none" />
+                                <circle cx="40" cy="40" r="25" fill="#fbbf24" />
+                                <circle cx="35" cy="35" r="3" fill="black" />
+                                <circle cx="45" cy="35" r="3" fill="black" />
+                            </svg>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Solid Yellow</span>
+                        </button>
+                    </div>
+                    <div id="mandela-feedback" class="hidden p-4 bg-slate-50 border border-slate-200 rounded-xl text-[10px] leading-relaxed fade-in"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 04 SOCIAL & EMOTION -->
+        <section id="social" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-8 flex items-center">
+                <span class="bg-amber-100 text-amber-600 w-10 h-10 rounded-full flex items-center justify-center mr-3 text-sm">04</span>
+                Social Dynamics & Learning
+            </h2>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Social Influence -->
+                <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                    <h3 class="text-xl font-bold mb-4">Social Influence</h3>
+                    <p class="text-sm text-slate-600 mb-6 leading-relaxed">Group dynamics (Asch, Milgram) override individual logic. We see this in the <strong>Kitty Genovese case</strong> (Bystander Effect/Diffusion of Responsibility).</p>
+                    
+                    <div class="p-6 bg-slate-50 border-2 border-blue-100 rounded-2xl mb-6">
+                        <h4 class="font-bold text-blue-800 text-xs mb-4 uppercase">Asch Lab Simulation</h4>
+                        <p class="text-[11px] mb-4">A simple visual task is given. 10 people choose the wrong answer. It is your turn. Do you follow or stand alone?</p>
+                        <div class="flex gap-2">
+                            <button onclick="scenarioResult('conform'); completeStep(4);" class="flex-1 py-3 bg-white border border-slate-200 hover:bg-blue-100 rounded-lg text-[10px] font-bold transition">Conform</button>
+                            <button onclick="scenarioResult('truth'); completeStep(4);" class="flex-1 py-3 bg-white border border-slate-200 hover:bg-emerald-100 rounded-lg text-[10px] font-bold transition">Stand Alone</button>
+                        </div>
+                        <div id="scenario-feedback" class="hidden mt-4 p-4 bg-blue-50 text-[10px] italic rounded-lg border border-blue-200 text-blue-900"></div>
+                    </div>
+
+                    <div class="p-4 bg-amber-50 rounded-xl border border-amber-200">
+                        <h4 class="font-bold text-amber-800 text-xs mb-2">90-Second Reset (Paul Ekman)</h4>
+                        <div class="flex items-center gap-4">
+                            <button id="timer-btn" onclick="start90Timer()" class="px-4 py-2 bg-amber-500 text-white text-[10px] font-bold rounded-lg shadow hover:bg-amber-600">Start Rule</button>
+                            <span id="timer-val" class="text-3xl font-bold text-amber-900">90s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Superpowers / Scheduler -->
+                <div class="bg-indigo-900 text-white p-8 rounded-3xl shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold mb-6 text-indigo-200 uppercase tracking-widest">Learning Superpowers</h3>
+                        <div class="space-y-4 mb-8">
+                            <div class="p-3 bg-white/10 rounded-xl border border-white/10">
+                                <h5 class="text-[10px] font-bold text-indigo-300 uppercase">Mindset (Dweck)</h5>
+                                <p class="text-[10px] leading-relaxed">Embracing the power of <strong>"Yet."</strong> Effort is what grows the Prefrontal Cortex.</p>
+                            </div>
+                            <div class="p-3 bg-white/10 rounded-xl border border-white/10">
+                                <h5 class="text-[10px] font-bold text-indigo-300 uppercase">Conditioning (Pavlov)</h5>
+                                <p class="text-[10px] leading-relaxed">Classical association and Operant consequences (Reinforcement/Punishment).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                        <h4 class="text-xs font-bold text-indigo-300 mb-4 uppercase">Spacing Effect Scheduler</h4>
+                        <p class="text-[10px] text-slate-300 mb-4">When is your next big assessment? Spacing study time creates superior long-term retrieval cues.</p>
+                        <input type="date" id="exam-date" class="w-full bg-indigo-950 border border-indigo-700 p-2 rounded text-xs mb-3 text-white">
+                        <button onclick="calcSpacing()" class="w-full py-2 bg-indigo-500 text-white font-bold rounded-lg text-[10px] hover:bg-indigo-400">Generate Session Roadmap</button>
+                        <div id="spacing-results" class="hidden mt-4 space-y-2 fade-in"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 05 LIFESPAN DEVELOPMENT -->
+        <section id="lifespan" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-8 flex items-center">
+                <span class="bg-rose-100 text-rose-600 w-10 h-10 rounded-full flex items-center justify-center mr-3 text-sm">05</span>
+                Lifespan: Erikson's Stages
+            </h2>
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                <p class="text-slate-600 mb-8 text-sm leading-relaxed max-w-2xl mx-auto text-center">Erikson mapped development from birth to death. Success in each stage builds a <strong>human virtue</strong> that defines character.</p>
+                
+                <div class="flex flex-wrap gap-2 mb-8 justify-center border-b border-slate-100 pb-8">
+                    <button onclick="showStage(1)" id="st-1" class="stage-btn px-4 py-2 rounded-full border border-slate-200 text-[10px] font-bold hover:bg-rose-50 transition">Infancy</button>
+                    <button onclick="showStage(2)" id="st-2" class="stage-btn px-4 py-2 rounded-full border border-slate-200 text-[10px] font-bold hover:bg-rose-50 transition">Toddler</button>
+                    <button onclick="showStage(3)" id="st-3" class="stage-btn px-4 py-2 rounded-full border border-slate-200 text-[10px] font-bold hover:bg-rose-50 transition">Preschool</button>
+                    <button onclick="showStage(4)" id="st-4" class="stage-btn px-4 py-2 rounded-full border border-slate-200 text-[10px] font-bold hover:bg-rose-50 transition">School Age</button>
+                    <button onclick="showStage(5)" id="st-5" class="stage-btn px-4 py-2 rounded-full border border-slate-200 text-[10px] font-bold hover:bg-rose-50 transition">Adolescence</button>
+                    <button onclick="showStage(6)" id="st-6" class="stage-btn px-4 py-2 rounded-full border border-slate-200 text-[10px] font-bold hover:bg-rose-50 transition">Early Adult</button>
+                    <button onclick="showStage(7)" id="st-7" class="stage-btn px-4 py-2 rounded-full border border-slate-200 text-[10px] font-bold hover:bg-rose-50 transition">Middle Adult</button>
+                    <button onclick="showStage(8)" id="st-8" class="stage-btn px-4 py-2 rounded-full border border-slate-200 text-[10px] font-bold hover:bg-rose-50 transition">Late Adult</button>
+                </div>
+
+                <div id="stage-detail" class="p-12 bg-rose-50 text-rose-900 rounded-3xl min-h-[160px] flex flex-col items-center justify-center text-center fade-in">
+                    <p class="italic text-sm">Select a developmental milestone button above to explore.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assessment -->
+        <section class="bg-slate-900 text-white rounded-3xl p-8 md:p-16 shadow-2xl">
+            <div class="max-w-2xl mx-auto">
+                <div id="quiz-intro" class="text-center">
+                    <h2 class="text-3xl font-bold mb-4">Competency Verification</h2>
+                    <p class="text-slate-400 mb-8 leading-relaxed">Confirm your understanding of the Biopsychosocial Model and core psychological theories.</p>
+                    <button onclick="startFinalQuiz()" class="px-12 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500 transition shadow-xl">Begin Assessment</button>
+                </div>
+
+                <div id="quiz-engine" class="hidden">
+                    <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                        <span id="quiz-count" class="text-xs font-bold uppercase tracking-widest text-indigo-400">Question 1 of 6</span>
+                    </div>
+                    <div id="quiz-question-container">
+                        <h3 id="q-text" class="text-xl font-bold mb-8 leading-snug">Question loading...</h3>
+                        <div id="q-options" class="space-y-3"></div>
+                    </div>
+                    <div id="q-feedback" class="hidden mt-8 p-6 bg-white/10 rounded-2xl border border-white/20 fade-in">
+                        <div id="feedback-header" class="font-bold mb-2"></div>
+                        <div id="feedback-text" class="text-sm text-indigo-200 mb-6 leading-relaxed"></div>
+                        <button onclick="nextQuestion()" class="w-full py-3 bg-indigo-500 rounded-xl font-bold hover:bg-indigo-400 transition">Next Concept</button>
+                    </div>
+                </div>
+
+                <div id="quiz-final" class="hidden text-center">
+                    <div class="text-6xl mb-4">🏆</div>
+                    <h3 class="text-3xl font-bold mb-2">Psychology 101 Mastery</h3>
+                    <p id="final-score" class="text-indigo-300 mb-8"></p>
+                    <button onclick="location.reload()" class="px-8 py-3 bg-white text-indigo-900 font-bold rounded-full transition">Restart Lesson Module</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-100 py-12 border-t border-slate-200 text-center">
+        <p class="text-slate-500 text-xs uppercase tracking-widest font-bold">Psychology 101: Baseline Educational System v4.2</p>
+    </footer>
+
+    <script>
+        // --- DATA ---
+        const brainData = {
+            reptile: "Reptilian: The oldest system. Handles vital autonomic reflexes like breathing, heart rate, and temperature control.",
+            limbic: "Limbic System: The 'Drama Queen.' Processes primal emotions, fear responses, and immediate reactivity.",
+            cortex: "Rational Cortex: The 'CEO.' Handles logic, planning, problem-solving, and inhibitory control over the Limbic system."
+        };
+
+        const stageData = {
+            1: { c: "Trust vs. Mistrust", v: "Hope", d: "0-1 year. Success builds the belief that the world is a safe place." },
+            2: { c: "Autonomy vs. Shame", v: "Will", d: "1-3 years. Exploring physical independence and personal control." },
+            3: { c: "Initiative vs. Guilt", v: "Purpose", d: "3-6 years. Beginning to assert power and control through play and social interaction." },
+            4: { c: "Industry vs. Inferiority", v: "Competence", d: "6-12 years. Coping with new social and academic demands." },
+            5: { c: "Identity vs. Confusion", v: "Fidelity", d: "12-18 years. Developing a sense of self and personal identity." },
+            6: { c: "Intimacy vs. Isolation", v: "Love", d: "19-29 years. Forming intimate, loving relationships with other people." },
+            7: { c: "Generativity vs. Stagnation", v: "Care", d: "30-64 years. Creating or nurturing things that will outlast the individual." },
+            8: { c: "Integrity vs. Despair", v: "Wisdom", d: "65+ years. Looking back on life with a sense of fulfillment." }
+        };
+
+        const quizQuestions = [
+            {
+                q: "Which brain system handles basic survival functions like your heartbeat and breathing?",
+                options: ["Limbic System", "Rational Cortex", "Reptilian Brain", "Visual Cortex"],
+                correct: 2,
+                explanation: "The Reptilian brain is our autonomic hardware, firing reflexively for survival."
+            },
+            {
+                q: "What is the typical capacity of Short-Term Memory (The Waiting Room)?",
+                options: ["Infinite", "1-2 Seconds", "7 +/- 2 Items", "Permanent"],
+                correct: 2,
+                explanation: "George Miller's 'Magic Number 7' defines our working memory capacity."
+            },
+            {
+                q: "Elizabeth Loftus's research on Pikachu tails and eyewitnesses proves that memory is:",
+                options: ["A video recording", "A reconstructed edit", "Permanent and unchangeable", "Only subconscious"],
+                correct: 1,
+                explanation: "Memories are reconstructions that can be influenced by new, logical data."
+            },
+            {
+                q: "Success in Erikson's Stage 1 (Infancy) leads to which virtue?",
+                options: ["Fidelity", "Wisdom", "Hope", "Love"],
+                correct: 2,
+                explanation: "Building trust with caregivers establishes the primary virtue of Hope."
+            },
+            {
+                q: "The '90-Second Rule' refers to the time it takes for what process?",
+                options: ["Conditioning to occur", "Chemicals of an emotion to dissipate", "Cramming to fade", "Identity to form"],
+                correct: 1,
+                explanation: "After 90 seconds, any remaining feeling is caused by repetitive conscious thought (rumination)."
+            },
+            {
+                q: "The Kitty Genovese case led to the study of which social phenomenon?",
+                options: ["Conditioning", "Bystander Effect", "Mandela Effect", "Introversion"],
+                correct: 1,
+                explanation: "The case illustrates diffusion of responsibility when a group is present."
+            }
+        ];
+
+        // --- LOGIC ---
+        let currentQ = 0;
+        let score = 0;
+
+        function toggleDyslexic() {
+            document.body.classList.toggle('dyslexic-mode');
+            const btn = document.querySelector('button[onclick="toggleDyslexic()"]');
+            btn.innerText = document.body.classList.contains('dyslexic-mode') ? "Dyslexic Font On" : "Dyslexic Font Off";
+        }
+
+        function completeStep(index) {
+            document.getElementById(`step-${index}`).classList.add('bg-indigo-500', 'border-indigo-500');
+        }
+
+        function updateBrain(part) {
+            const el = document.getElementById('brain-detail');
+            el.innerText = brainData[part];
+            el.classList.remove('hidden');
+        }
+
+        function showPulseFeedback(isCorrect) {
+            const el = document.getElementById('pulse-feedback');
+            el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-700', 'bg-rose-100', 'text-rose-700', 'border-emerald-200', 'border-rose-200');
+            if (isCorrect) {
+                el.innerText = "✓ Correct! Primal reflexes fire before conscious thought.";
+                el.classList.add('bg-emerald-100', 'text-emerald-700', 'border-emerald-200');
+            } else {
+                el.innerText = "✗ Not quite. The Cortex is logical; reflexes happen automatically.";
+                el.classList.add('bg-rose-100', 'text-rose-700', 'border-rose-200');
+            }
+        }
+
+        function updateTrait(trait, val) {
+            document.getElementById(trait + '-score').innerText = val + '%';
+            if(trait === 'e') {
+                const c = document.getElementById('e-career');
+                c.innerText = val > 70 ? "Predictor: Group Roles / Active Social Settings" : (val < 30 ? "Predictor: Deep Focus / Solo Research" : "Predictor: Team Lead / Hybrid Settings");
+            }
+            if(trait === 'n') {
+                const c = document.getElementById('n-career');
+                c.innerText = val > 70 ? "Metal Edge: Highly Perceptive to Cues" : (val < 30 ? "Metal Edge: Extreme Stoic Stability" : "Metal Edge: Balanced Response");
+            }
+        }
+
+        function compareJimTwins() {
+            const el = document.getElementById('jim-feedback');
+            el.innerHTML = "<strong>Baseline Established:</strong> The twins showed identical O.C.E.A.N. profiles despite being separate for 39 years. Genetics determine about 50% of your current trait score.";
+            el.classList.remove('hidden');
+        }
+
+        function mandelaResult(isCorrect) {
+            const feedback = document.getElementById('mandela-feedback');
+            if (isCorrect) {
+                feedback.innerHTML = "<strong>Correct: Pikachu tail is solid yellow.</strong> You successfully resisted the Mandela Effect! This requires high-attention retrieval.";
+                feedback.className = "p-4 bg-emerald-50 text-emerald-800 rounded-xl text-[10px] leading-relaxed fade-in border border-emerald-200";
+            } else {
+                feedback.innerHTML = "<strong>Reconstructed Memory: Pikachu tail is solid yellow.</strong> If you remembered black, your brain 'logic-patched' the detail from his ears. Memory is a reconstruction!";
+                feedback.className = "p-4 bg-rose-50 text-rose-800 rounded-xl text-[10px] leading-relaxed fade-in border border-rose-200";
+            }
+            feedback.classList.remove('hidden');
+            completeStep(3);
+        }
+
+        function start90Timer() {
+            let t = 90;
+            const val = document.getElementById('timer-val');
+            const btn = document.getElementById('timer-btn');
+            btn.disabled = true;
+            const timer = setInterval(() => {
+                t--;
+                val.innerText = t + "s";
+                if(t <= 0) {
+                    clearInterval(timer);
+                    val.innerText = "DONE";
+                    btn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        function scenarioResult(choice) {
+            const f = document.getElementById('scenario-feedback');
+            f.classList.remove('hidden');
+            if(choice === 'conform') f.innerHTML = "<strong>Conformity (Asch):</strong> You matched the group. 75% of participants did this in the lab.";
+            else f.innerHTML = "<strong>Dissent:</strong> You stayed accurate. While brave, dissent triggers immediate physiological stress in group settings.";
+        }
+
+        function showStage(id) {
+            document.querySelectorAll('.stage-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`st-${id}`).classList.add('active');
+            const s = stageData[id];
+            document.getElementById('stage-detail').innerHTML = `
+                <div class="font-bold text-2xl text-rose-600 mb-1">${s.c}</div>
+                <div class="text-[11px] uppercase font-bold text-rose-400 mb-4 tracking-widest">Mastery Virtue: ${s.v}</div>
+                <p class="max-w-md mx-auto text-sm leading-relaxed text-slate-700">${s.d}</p>
+            `;
+            completeStep(5);
+        }
+
+        function calcSpacing() {
+            const d = document.getElementById('exam-date').value;
+            if(!d) return;
+            const target = new Date(d);
+            const today = new Date();
+            const res = document.getElementById('spacing-results');
+            res.innerHTML = '<p class="text-[10px] font-bold text-indigo-300 uppercase">Retention Roadmap:</p>';
+            res.classList.remove('hidden');
+            [0, 1, 4, 7].forEach((days, i) => {
+                const s = new Date(); s.setDate(today.getDate() + days);
+                if(s < target) res.innerHTML += `<div class="text-[9px] bg-white/10 p-2 rounded">Session ${i+1}: ${s.toDateString()}</div>`;
+            });
+        }
+
+        function startFinalQuiz() {
+            document.getElementById('quiz-intro').classList.add('hidden');
+            document.getElementById('quiz-engine').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = quizQuestions[currentQ];
+            document.getElementById('quiz-count').innerText = `Concept ${currentQ + 1} of ${quizQuestions.length}`;
+            document.getElementById('q-text').innerText = q.q;
+            document.getElementById('q-feedback').classList.add('hidden');
+            const optCont = document.getElementById('q-options');
+            optCont.innerHTML = '';
+            q.options.forEach((o, i) => {
+                const b = document.createElement('button');
+                b.className = "w-full p-4 bg-white/5 border border-white/20 rounded-xl text-left hover:bg-white/10 transition text-sm";
+                b.innerText = o;
+                b.onclick = () => handleQuizAnswer(i);
+                optCont.appendChild(b);
+            });
+        }
+
+        function handleQuizAnswer(i) {
+            const q = quizQuestions[currentQ];
+            const f = document.getElementById('q-feedback');
+            document.getElementById('feedback-header').innerText = (i === q.correct) ? "✅ MASTERY ACHIEVED" : "❌ RE-STUDY RECOMMENDED";
+            document.getElementById('feedback-header').className = (i === q.correct) ? "font-bold text-emerald-400 mb-2" : "font-bold text-rose-400 mb-2";
+            document.getElementById('feedback-text').innerText = q.explanation;
+            if(i === q.correct) score++;
+            f.classList.remove('hidden');
+            document.getElementById('q-options').querySelectorAll('button').forEach(b => b.disabled = true);
+        }
+
+        function nextQuestion() {
+            currentQ++;
+            if (currentQ < quizQuestions.length) renderQuestion();
+            else {
+                document.getElementById('quiz-engine').classList.add('hidden');
+                document.getElementById('quiz-final').classList.remove('hidden');
+                document.getElementById('final-score').innerText = `Module Mastery: ${score}/${quizQuestions.length} Competencies Verified.`;
+            }
+        }
+    </script>
+</body>
+</html>
