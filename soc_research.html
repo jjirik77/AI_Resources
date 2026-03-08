@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOCI 111: Social Research Methods Module</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #059669;
+            --secondary: #0891b2;
+            --accent: #f59e0b;
+            --bg-slate: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg-slate);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        .transition-screen {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        
+        .norm-click {
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+            padding: 0 2px;
+        }
+        .norm-click:hover {
+            background-color: #fef3c7;
+        }
+        .norm-found {
+            background-color: #fef3c7;
+            border: 1px dashed #f59e0b;
+            color: #b45309;
+            font-weight: 600;
+        }
+
+        .drag-item {
+            cursor: grab;
+            transition: all 0.2s ease;
+            touch-action: none;
+        }
+        .drag-item:active {
+            cursor: grabbing;
+            transform: scale(1.02);
+            z-index: 50;
+        }
+        .drop-zone.drag-over {
+            background-color: #fef3c7;
+            border-color: #f59e0b;
+        }
+
+        .animate-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen custom-scrollbar">
+    <!-- Chosen Palette: Warm Neutrals and Academic Emerald -->
+    <!-- Application Structure Plan: The application uses a dashboard-style architecture with a persistent contextual sidebar for the 'Research Journal'. This anchors the learning in the student's personal curiosity. The flow is designed to build literacy through active participation: visualizing complex logic (Experiments), identifying cognitive fallacies (Surveys), and interactive pattern recognition (Observation). An Ethics Gate serves as a mandatory mastery check before the final design synthesis and assessment. -->
+    
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-600 p-2 rounded-lg text-white font-bold text-xs">SOCI 111</div>
+                <h1 class="font-extrabold text-slate-900 text-lg leading-tight hidden sm:block">Social Research Module</h1>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                <span>Mastery: <span id="progressValHeader" class="text-emerald-600">0%</span></span>
+            </div>
+        </div>
+    </header>
+
+    <div id="app" class="max-w-6xl mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- SIDEBAR: RESEARCH JOURNAL -->
+            <aside class="lg:w-1/4">
+                <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-24 border border-slate-200">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-2xl">📓</span>
+                        <h2 class="font-bold text-lg text-slate-800 uppercase tracking-tight">Journal</h2>
+                    </div>
+                    
+                    <div id="journal-content" class="space-y-6">
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">My Topic</p>
+                            <p id="journal-question" class="text-sm italic text-slate-600">Enter a question to start...</p>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress</p>
+                                <span id="progressVal" class="text-[10px] font-bold text-emerald-600">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                <div id="mastery-progress" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <nav class="space-y-1 pt-4">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Sections</p>
+                            <div id="nav-items" class="space-y-1 text-sm font-medium">
+                                <!-- Navigation dynamic -->
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="lg:w-3/4 bg-white rounded-3xl shadow-sm p-8 md:p-12 border border-slate-200 relative overflow-hidden">
+                <div id="screen-container" class="transition-screen">
+                    <!-- Screens will be injected here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- UI Overlay for Modals/Feedback -->
+    <div id="feedback-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 text-center">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100">
+            <div id="feedback-emoji" class="text-5xl mb-4"></div>
+            <h3 id="feedback-title" class="text-xl font-bold mb-2"></h3>
+            <p id="feedback-text" class="text-slate-600 mb-6"></p>
+            <button onclick="closeFeedback()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA AND STATE ---
+        const state = {
+            currentScreen: 0,
+            studentQuestion: "",
+            masteryPoints: 0,
+            screensCompleted: [],
+            normsFound: 0,
+            ethicsPassed: false,
+            selectedMethod: null
+        };
+
+        const screens = [
+            { 
+                id: "welcome", 
+                title: "Inquiry & Curiosity", 
+                intro: "Sociological research is the systematic study of human behavior. Before we dive into the 'Big Three' methods, let's anchor this lesson in something you care about." 
+            },
+            { 
+                id: "precheck", 
+                title: "Pre-Check: Instincts", 
+                intro: "How do you naturally approach social problems? Imagine you want to know if students are satisfied with the new campus cafeteria. How would you start your investigation?" 
+            },
+            { 
+                id: "experiments", 
+                title: "Experiments: Proving Causality", 
+                intro: "Experiments are the gold standard for proving cause-and-effect. By isolating variables, sociologists ensure results aren't just a coincidence. Click on the elements below to learn how they work." 
+            },
+            { 
+                id: "surveys", 
+                title: "Surveys: Scale & Generalizability", 
+                intro: "Surveys allow us to generalize findings from a small sample to a massive population. But numbers can lie if we aren't careful about bias." 
+            },
+            { 
+                id: "observation", 
+                title: "Observation: Deep Context", 
+                intro: "Participant observation bridges the gap between what people SAY and what they actually DO. It uncovers the 'hidden rules' of social life." 
+            },
+            { 
+                id: "ethics", 
+                title: "Ethics Gate", 
+                intro: "Before you can finish your study design, you must pass the Institutional Review Board (IRB) ethics check." 
+            },
+            { 
+                id: "synthesis", 
+                title: "Synthesis: Final Choice", 
+                intro: "Marriage of your research question with a method. I'll evaluate your choice based on scientific best practices." 
+            },
+            { 
+                id: "quiz", 
+                title: "Final Mastery Assessment", 
+                intro: "Final check. Answer these correctly to earn your certification in Basic Social Research Methodology." 
+            }
+        ];
+
+        // --- CORE FUNCTIONS ---
+        function init() {
+            renderNav();
+            renderScreen();
+            updateMastery();
+        }
+
+        function renderNav() {
+            const nav = document.getElementById('nav-items');
+            if (!nav) return;
+            nav.innerHTML = screens.map((s, idx) => `
+                <button onclick="goToScreen(${idx})" 
+                    class="w-full text-left px-3 py-2 rounded-lg transition-all ${state.currentScreen === idx ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-slate-400 hover:text-slate-600'}"
+                    ${idx > 0 && !state.studentQuestion && state.currentScreen === 0 ? 'disabled' : ''}>
+                    ${idx + 1}. ${s.title}
+                </button>
+            `).join('');
+        }
+
+        function goToScreen(idx) {
+            if (idx === 0 || state.studentQuestion || idx < state.currentScreen) {
+                state.currentScreen = idx;
+                renderScreen();
+                renderNav();
+                updateMastery();
+            }
+        }
+
+        function renderScreen() {
+            const container = document.getElementById('screen-container');
+            if (!container) return;
+            const screen = screens[state.currentScreen];
+            
+            let content = `
+                <div class="animate-in">
+                    <span class="text-xs font-black text-emerald-500 uppercase tracking-widest mb-2 block">Step ${state.currentScreen + 1} of ${screens.length}</span>
+                    <h1 class="text-3xl font-extrabold text-slate-900 mb-4 tracking-tight">${screen.title}</h1>
+                    <p class="text-slate-600 text-lg mb-8 leading-relaxed">${screen.intro}</p>
+                    <div id="screen-content"></div>
+                    <div class="mt-12 flex justify-between items-center border-t border-slate-100 pt-8">
+                        <button onclick="prev()" class="px-6 py-2 text-slate-400 font-bold hover:text-slate-900 transition-all ${state.currentScreen === 0 ? 'invisible' : ''}">Back</button>
+                        <div id="screen-actions"></div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = content;
+            injectScreenContent();
+        }
+
+        function injectScreenContent() {
+            const inner = document.getElementById('screen-content');
+            const actions = document.getElementById('screen-actions');
+            
+            if (!inner || !actions) return;
+
+            switch(state.currentScreen) {
+                case 0: // Welcome
+                    inner.innerHTML = `
+                        <div class="space-y-6">
+                            <div class="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 shadow-sm">
+                                <label class="block font-bold text-emerald-800 mb-2">What is one social question you care about?</label>
+                                <textarea id="q-input" oninput="updateJournalPreview(this.value)" class="w-full bg-white border border-emerald-200 rounded-xl p-4 h-32 outline-none focus:ring-4 focus:ring-emerald-200 transition-all" placeholder="E.g. Does remote work affect the strength of workplace friendships?">${state.studentQuestion}</textarea>
+                            </div>
+                        </div>
+                    `;
+                    actions.innerHTML = `<button onclick="submitQuestion()" class="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 shadow-xl transition-all">Start Exploration</button>`;
+                    break;
+                
+                case 1: // Pre-Check
+                    inner.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <button onclick="showFeedback('📊', 'Survey Path', 'You naturally prefer asking people. This is great for broad scale!')" class="p-8 border-2 border-slate-100 rounded-3xl hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left">
+                                <div class="text-3xl mb-4">🙋‍♂️</div>
+                                <h3 class="font-bold mb-2">Ask them directly</h3>
+                                <p class="text-sm text-slate-500 italic">"I'd send a digital questionnaire to every student on campus."</p>
+                            </button>
+                            <button onclick="showFeedback('🧐', 'Observer Path', 'You prefer seeing behavior in the wild. This is great for context!')" class="p-8 border-2 border-slate-100 rounded-3xl hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left">
+                                <div class="text-3xl mb-4">🕵️‍♀️</div>
+                                <h3 class="font-bold mb-2">Observe from afar</h3>
+                                <p class="text-sm text-slate-500 italic">"I'd sit in the back of the campus cafe and take field notes."</p>
+                            </button>
+                        </div>
+                    `;
+                    actions.innerHTML = `<button onclick="next()" class="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700">Explore Experiments</button>`;
+                    break;
+
+                case 2: // Experiments
+                    inner.innerHTML = `
+                        <div class="space-y-10">
+                            <!-- Interactive Visual Logic Model -->
+                            <div class="relative py-8 bg-slate-50 rounded-2xl border border-slate-100 p-6">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 text-center">Interactive Logic Flow (Click Cards)</h4>
+                                <div class="grid grid-cols-5 gap-2 items-center text-center">
+                                    <div onclick="showExpExplanation('Initial Group', 'The starting pool of participants selected for the study. At this stage, they should represent the broader population you are interested in.')" 
+                                         class="bg-white border-2 border-slate-200 p-3 rounded-xl shadow-sm text-xs font-bold cursor-pointer hover:border-emerald-50 transition-all">Initial Group</div>
+                                    <div class="text-slate-300 font-bold text-xl leading-none">➔</div>
+                                    <div onclick="showExpExplanation('Random Assignment', 'The process of assigning participants to groups by chance. This ensures that personal traits (like intelligence or personality) are spread evenly, preventing bias.')"
+                                         class="bg-emerald-600 text-white p-2 rounded-lg text-[10px] font-black uppercase italic tracking-tighter cursor-pointer hover:scale-105 transition-all">Random Assignment</div>
+                                    <div class="text-slate-300 font-bold text-xl leading-none">➔</div>
+                                    <div class="space-y-3">
+                                        <div onclick="showExpExplanation('Treatment Group', 'The group that receives the actual experimental change (the Independent Variable). We want to see how this group differs from the baseline.')"
+                                             class="bg-emerald-50 border-2 border-emerald-200 p-2 rounded-lg text-[10px] font-bold cursor-pointer hover:bg-emerald-100 transition-all text-emerald-800">Treatment Group</div>
+                                        <div onclick="showExpExplanation('Control Group', 'The baseline group that receives NO change. They serve as a comparison to see if the treatment actually worked or if results were random.')"
+                                             class="bg-white border-2 border-slate-200 p-2 rounded-lg text-[10px] font-bold text-slate-400 cursor-pointer hover:bg-slate-100 transition-all">Control Group</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900 rounded-3xl p-8 text-white shadow-xl">
+                                <p class="text-emerald-400 font-bold mb-4 uppercase tracking-widest text-xs">Drag and Drop Designer:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div id="expInventory" class="bg-slate-800 p-4 rounded-2xl space-y-2 min-h-[150px]" ondrop="drop(event)" ondragover="allowDrop(event)">
+                                        <div id="drag-iv" draggable="true" ondragstart="drag(event)" class="drag-item bg-white text-slate-900 p-2 rounded-lg text-xs font-bold shadow-md">Positive Feedback Applied</div>
+                                        <div id="drag-dv" draggable="true" ondragstart="drag(event)" class="drag-item bg-white text-slate-900 p-2 rounded-lg text-xs font-bold shadow-md">Participation Counts</div>
+                                        <div id="drag-cg" draggable="true" ondragstart="drag(event)" class="drag-item bg-white text-slate-900 p-2 rounded-lg text-xs font-bold shadow-md">Group getting No Feedback</div>
+                                    </div>
+                                    <div class="space-y-3 text-slate-300">
+                                        <div class="drop-zone border-2 border-dashed border-slate-700 rounded-2xl p-3 flex flex-col items-center justify-center min-h-[60px]" ondrop="drop(event)" ondragover="allowDrop(event)" data-target="iv">
+                                            <span class="text-[10px] uppercase font-bold text-slate-500">Independent Variable</span>
+                                        </div>
+                                        <div class="drop-zone border-2 border-dashed border-slate-700 rounded-2xl p-3 flex flex-col items-center justify-center min-h-[60px]" ondrop="drop(event)" ondragover="allowDrop(event)" data-target="dv">
+                                            <span class="text-[10px] uppercase font-bold text-slate-500">Dependent Variable</span>
+                                        </div>
+                                        <div class="drop-zone border-2 border-dashed border-slate-700 rounded-2xl p-3 flex flex-col items-center justify-center min-h-[60px]" ondrop="drop(event)" ondragover="allowDrop(event)" data-target="cg">
+                                            <span class="text-[10px] uppercase font-bold text-slate-500">Control Group</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="expFeedback" class="mt-4 p-3 rounded-xl hidden text-sm font-bold"></div>
+                            </div>
+                        </div>
+                    `;
+                    actions.innerHTML = `<button onclick="checkExperiment()" class="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700">Check Variables & Continue</button>`;
+                    break;
+
+                case 3: // Surveys
+                    inner.innerHTML = `
+                        <div class="space-y-8">
+                            <div class="chart-container bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                <canvas id="surveyChart"></canvas>
+                            </div>
+                            <div class="bg-white border rounded-3xl p-8 shadow-sm">
+                                <p class="font-bold text-slate-800 mb-2">Spot the Bias Challenge:</p>
+                                <p class="text-slate-600 italic mb-8 p-4 bg-slate-50 rounded-xl border border-slate-100">"Don't you agree that student fees are too high and should be lowered immediately?"</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <button onclick="surveyBias(true)" class="p-5 bg-slate-50 rounded-2xl hover:bg-emerald-50 text-sm font-bold text-left border border-transparent hover:border-emerald-200 transition-all group">
+                                        Leading Question
+                                        <span class="block text-xs font-normal text-slate-500 mt-1">It pushes the respondent toward a specific 'correct' answer.</span>
+                                    </button>
+                                    <button onclick="surveyBias(true)" class="p-5 bg-slate-50 rounded-2xl hover:bg-emerald-50 text-sm font-bold text-left border border-transparent hover:border-emerald-200 transition-all group">
+                                        Double-Barreled
+                                        <span class="block text-xs font-normal text-slate-500 mt-1 text-wrap">It asks about two different things (fairness AND immediate action).</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    setTimeout(initSurveyChart, 100);
+                    actions.innerHTML = `<button onclick="next()" class="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-200">Go to Observation</button>`;
+                    break;
+
+                case 4: // Observation
+                    inner.innerHTML = `
+                        <div class="bg-white border-2 border-emerald-100 rounded-3xl p-8 relative shadow-sm">
+                            <h4 class="text-xs font-black uppercase text-emerald-600 mb-4 tracking-widest">Skill Check: Spot the Unspoken Norm</h4>
+                            <p class="text-slate-500 text-sm mb-8 leading-relaxed">Anthropological skills require seeing 'norms'—the hidden rules of behavior. Click the 3 segments below that describe a **social rule** rather than a simple physical fact.</p>
+                            
+                            <div id="simulation-text" class="text-xl leading-loose font-serif text-slate-800 select-none">
+                                <span class="norm-click" onclick="checkNorm(this, false)">A student enters the quiet study hall.</span> 
+                                <span class="norm-click" onclick="checkNorm(this, true)">Even though the room is nearly empty, the student chooses a desk at least two rows away from any other person to avoid an 'unwanted interaction'.</span> 
+                                <span class="norm-click" onclick="checkNorm(this, false)">A ceiling fan spins slowly above.</span> 
+                                <span class="norm-click" onclick="checkNorm(this, true)">Two friends who were talking loudly in the hall immediately whisper as they pass through the doorway.</span> 
+                                <span class="norm-click" onclick="checkNorm(this, false)">Sunlight creates shadows on the floor.</span>
+                                <span class="norm-click" onclick="checkNorm(this, true)">A student leaves their laptop unattended but places a sweater on the chair to 'claim' the space in their absence.</span>
+                            </div>
+                            
+                            <div class="mt-10 flex justify-center">
+                                <div class="flex gap-3">
+                                    <div id="norm-1" class="w-4 h-4 rounded-full bg-slate-200 transition-all duration-300"></div>
+                                    <div id="norm-2" class="w-4 h-4 rounded-full bg-slate-200 transition-all duration-300"></div>
+                                    <div id="norm-3" class="w-4 h-4 rounded-full bg-slate-200 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                            
+                            <p id="normFeedback" class="hidden mt-6 p-4 rounded-xl text-xs font-bold border animate-in"></p>
+                        </div>
+                    `;
+                    actions.innerHTML = `<button id="obs-next" disabled class="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg opacity-30 transition-all">Clear Observation Skill</button>`;
+                    break;
+
+                case 5: // Ethics Gate
+                    inner.innerHTML = `
+                        <div class="p-8 bg-red-50 border border-red-200 rounded-3xl shadow-xl">
+                            <div class="flex gap-4 items-start mb-8">
+                                <div class="text-4xl">🛑</div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-red-900 leading-tight">Ethics Gate: Institutional Review Board</h3>
+                                    <p class="text-red-700 text-sm">Research must prioritize safety and consent over data.</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-8 rounded-2xl shadow-sm border border-red-100 mb-8">
+                                <p class="font-bold text-red-900 mb-4 uppercase text-xs tracking-widest">The Scenario</p>
+                                <p class="text-slate-600 leading-relaxed italic text-lg">"You want to study student stress. You decide to bypass a survey and instead gain access to private pharmacy records to see who is on anxiety medication without their knowledge. Is this ethical?"</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button onclick="solveEthics(false)" class="p-5 bg-white border border-slate-200 rounded-2xl hover:bg-red-50 transition-all text-left">
+                                    <span class="font-bold block mb-1">Yes, it's efficient.</span>
+                                    <span class="text-xs text-slate-400">Scientific truth is the highest goal.</span>
+                                </button>
+                                <button onclick="solveEthics(true)" class="p-5 bg-white border border-slate-200 rounded-2xl hover:bg-emerald-50 transition-all text-left">
+                                    <span class="font-bold block mb-1">No, it's a violation.</span>
+                                    <span class="text-xs text-slate-400 text-wrap">It ignores informed consent and privacy rights.</span>
+                                </button>
+                            </div>
+                            <p id="ethicsFeedback" class="hidden mt-6 p-4 rounded-xl text-sm font-bold border animate-in"></p>
+                        </div>
+                    `;
+                    actions.innerHTML = `<button id="ethics-next" disabled class="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg opacity-30 transition-all">Proceed to Summary</button>`;
+                    break;
+
+                case 6: // Synthesis
+                    inner.innerHTML = `
+                        <div class="space-y-10">
+                            <div class="bg-slate-900 text-white rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+                                <div class="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                                <h3 class="text-emerald-400 font-black uppercase text-xs tracking-widest mb-6">Final Study Design</h3>
+                                <p class="text-2xl font-serif italic mb-10 leading-tight">"${state.studentQuestion}"</p>
+                                
+                                <p class="text-xs text-slate-400 font-bold mb-4 uppercase tracking-wider">Choose your methodological fit:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <button onclick="setMethod('Experiment')" class="p-4 rounded-xl border border-slate-700 hover:bg-emerald-900 transition-all ${state.selectedMethod === 'Experiment' ? 'bg-emerald-900 border-emerald-500' : ''}">Experiment</button>
+                                    <button onclick="setMethod('Survey')" class="p-4 rounded-xl border border-slate-700 hover:bg-cyan-900 transition-all ${state.selectedMethod === 'Survey' ? 'bg-cyan-900 border-cyan-500' : ''}">Survey</button>
+                                    <button onclick="setMethod('Observation')" class="p-4 rounded-xl border border-slate-700 hover:bg-amber-900 transition-all ${state.selectedMethod === 'Observation' ? 'bg-amber-900 border-amber-500' : ''}">Observation</button>
+                                </div>
+
+                                <div id="dynamic-evaluator" class="mt-10 pt-10 border-t border-slate-700 ${state.selectedMethod ? '' : 'hidden'}">
+                                    <!-- Dynamic content -->
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    actions.innerHTML = `<button onclick="next()" class="px-10 py-4 bg-emerald-600 text-white rounded-xl font-black uppercase tracking-tighter shadow-xl hover:bg-emerald-700">Final Mastery Quiz</button>`;
+                    if (state.selectedMethod) updateEvaluator();
+                    break;
+
+                case 7: // Quiz
+                    inner.innerHTML = `
+                        <div class="space-y-6 text-left">
+                            <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm">
+                                <p class="font-bold text-slate-900 mb-6 text-lg">1. To definitively prove that study music CAUSES better focus, I must use:</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q1" value="exp" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">An Experiment</span>
+                                    </label>
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q1" value="sur" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">A Survey</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm">
+                                <p class="font-bold text-slate-900 mb-6 text-lg">2. Which method allows you to see the gap between what people SAY on a survey and what they ACTUALLY DO?</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q2" value="obs" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">Participant Observation</span>
+                                    </label>
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q2" value="sur" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">Large Scale Survey</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm">
+                                <p class="font-bold text-slate-900 mb-6 text-lg">3. In an experiment, the variable that the researcher intentionally manipulates or changes is the:</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q3" value="dv" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">Dependent Variable</span>
+                                    </label>
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q3" value="iv" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">Independent Variable</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm">
+                                <p class="font-bold text-slate-900 mb-6 text-lg">4. If 90% of a sample says they love studying, but exam scores are failing, what bias is likely present?</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q4" value="sdb" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">Social Desirability Bias</span>
+                                    </label>
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q4" value="conf" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">Confirmation Bias</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm">
+                                <p class="font-bold text-slate-900 mb-6 text-lg">5. Before studying human subjects, a researcher must get their participants to understand and agree to the study. This is called:</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q5" value="ic" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">Informed Consent</span>
+                                    </label>
+                                    <label class="flex items-center gap-4 p-4 bg-slate-50 border rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all">
+                                        <input type="radio" name="q5" value="an" class="w-5 h-5 accent-emerald-600"> 
+                                        <span class="font-semibold">Anonymity</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    actions.innerHTML = `<button onclick="finishModule()" class="px-12 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all">Grade Final Assessment</button>`;
+                    break;
+            }
+        }
+
+        // --- INTERACTION LOGIC ---
+
+        function updateJournalPreview(val) {
+            const jText = document.getElementById('journal-question');
+            if (jText) jText.innerText = val || "Pending input...";
+        }
+
+        function submitQuestion() {
+            const val = document.getElementById('q-input').value.trim();
+            if (val.length < 10) {
+                const err = document.getElementById('welcomeErr');
+                if (err) err.classList.remove('hidden');
+                return;
+            }
+            state.studentQuestion = val;
+            state.masteryPoints += 10;
+            next();
+        }
+
+        function updateMastery() {
+            const bar = document.getElementById('mastery-progress');
+            const valSpan = document.getElementById('progressVal');
+            const valHeader = document.getElementById('progressValHeader');
+            
+            const progress = (state.currentScreen / (screens.length - 1)) * 100;
+            
+            if (bar) bar.style.width = `${progress}%`;
+            if (valSpan) valSpan.innerText = `${Math.round(progress)}%`;
+            if (valHeader) valHeader.innerText = `${Math.round(progress)}%`;
+        }
+
+        function next() {
+            if (state.currentScreen < screens.length - 1) {
+                state.currentScreen++;
+                renderScreen();
+                renderNav();
+                updateMastery();
+            }
+        }
+
+        function prev() {
+            if (state.currentScreen > 0) {
+                state.currentScreen--;
+                renderScreen();
+                renderNav();
+                updateMastery();
+            }
+        }
+
+        function showFeedback(emoji, title, text) {
+            const overlay = document.getElementById('feedback-overlay');
+            const eSpan = document.getElementById('feedback-emoji');
+            const tSpan = document.getElementById('feedback-title');
+            const txtSpan = document.getElementById('feedback-text');
+            
+            if (eSpan) eSpan.innerText = emoji;
+            if (tSpan) tSpan.innerText = title;
+            if (txtSpan) txtSpan.innerText = text;
+            if (overlay) overlay.classList.remove('hidden');
+        }
+
+        function closeFeedback() {
+            const overlay = document.getElementById('feedback-overlay');
+            if (overlay) overlay.classList.add('hidden');
+        }
+
+        function showExpExplanation(title, text) {
+            showFeedback('💡', title, text);
+        }
+
+        function checkExperiment() {
+            const slots = document.querySelectorAll('.drop-zone');
+            let correct = 0;
+            slots.forEach(slot => {
+                const child = slot.querySelector('.drag-item');
+                if (child && child.id === `drag-${slot.getAttribute('data-target')}`) correct++;
+            });
+            const fb = document.getElementById('expFeedback');
+            
+            if (correct === 3) {
+                if (fb) {
+                    fb.innerText = "✅ Mastery Confirmed: You successfully identified the Independent Variable, Dependent Variable, and Control Group.";
+                    fb.className = "mt-4 p-4 rounded-xl bg-emerald-900 text-emerald-400 text-sm font-bold border border-emerald-500 animate-in";
+                    fb.classList.remove('hidden');
+                }
+                setTimeout(next, 2000);
+            } else {
+                if (fb) {
+                    fb.innerText = "❌ Logic Gap: Re-read the interactive cards. Remember: IV is the manipulation, DV is the measure, Control is the baseline.";
+                    fb.className = "mt-4 p-4 rounded-xl bg-red-900 text-red-200 text-sm font-bold border border-red-500 animate-in";
+                    fb.classList.remove('hidden');
+                }
+            }
+        }
+
+        function surveyBias(correct) {
+            if (correct) {
+                showFeedback('🧐', 'Bias Identified', 'Leading questions push respondents toward an answer. Double-barreled questions confuse them by asking two things at once. Both ruin survey validity!');
+            }
+        }
+
+        function initSurveyChart() {
+            const canvas = document.getElementById('surveyChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['True Opinion', 'Survey Result'],
+                    datasets: [{
+                        label: 'Admitting to Bad Habits',
+                        data: [82, 21],
+                        backgroundColor: ['#10b981', '#f59e0b'],
+                        borderRadius: 12
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: { y: { beginAtZero: true, max: 100 } },
+                    plugins: { 
+                        legend: { display: false },
+                        title: { display: true, text: 'The Social Desirability Gap (%)' }
+                    }
+                }
+            });
+        }
+
+        function checkNorm(el, isCorrect) {
+            if (el.classList.contains('norm-found')) return;
+            
+            if (isCorrect) {
+                el.classList.add('norm-found');
+                state.normsFound++;
+                const dot = document.getElementById(`norm-${state.normsFound}`);
+                if (dot) {
+                    dot.classList.remove('bg-slate-200');
+                    dot.classList.add('bg-emerald-500', 'scale-125');
+                }
+                
+                if (state.normsFound === 3) {
+                    const btn = document.getElementById('obs-next');
+                    const fb = document.getElementById('normFeedback');
+                    if (fb) {
+                        fb.innerText = "Mastery Verified: You can distinguish between physical data and unspoken behavioral rules.";
+                        fb.className = "mt-6 p-4 rounded-xl bg-emerald-900 text-emerald-400 text-sm font-bold border border-emerald-500 animate-in";
+                        fb.classList.remove('hidden');
+                    }
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-30', 'cursor-not-allowed');
+                        btn.classList.add('hover:bg-emerald-700', 'shadow-emerald-200');
+                        btn.onclick = next;
+                    }
+                }
+            } else {
+                el.classList.add('text-red-500');
+                setTimeout(() => el.classList.remove('text-red-500'), 500);
+            }
+        }
+
+        function solveEthics(correct) {
+            const fb = document.getElementById('ethicsFeedback');
+            const btn = document.getElementById('ethics-next');
+            
+            if (fb) fb.classList.remove('hidden');
+            
+            if (correct) {
+                if (fb) {
+                    fb.innerHTML = "✅ IRB Approval Granted: Privacy and consent are non-negotiable. Scientific accuracy never justifies an ethical breach.";
+                    fb.className = "mt-6 p-4 rounded-xl bg-emerald-900 text-emerald-400 text-sm font-bold border border-emerald-500 animate-in";
+                }
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-30', 'cursor-not-allowed');
+                    btn.classList.add('hover:bg-emerald-700', 'shadow-emerald-200');
+                    btn.onclick = next;
+                }
+            } else {
+                if (fb) {
+                    fb.innerHTML = "❌ Ethics Breach Detected: The Institutional Review Board (IRB) would halt this study immediately.";
+                    fb.className = "mt-6 p-4 rounded-xl bg-red-900 text-red-200 text-sm font-bold border border-red-500 animate-in";
+                }
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-30', 'cursor-not-allowed');
+                }
+            }
+        }
+
+        function setMethod(m) {
+            state.selectedMethod = m;
+            const badge = document.getElementById('methodBadge');
+            if (badge) {
+                badge.innerText = m;
+                badge.classList.remove('hidden', 'bg-amber-100', 'text-amber-700');
+                badge.classList.add('bg-emerald-600', 'text-white', 'border-emerald-700');
+            }
+            renderScreen();
+        }
+
+        function updateEvaluator() {
+            const div = document.getElementById('dynamic-evaluator');
+            if (!div) return;
+            const q = state.studentQuestion.toLowerCase();
+            const m = state.selectedMethod;
+            
+            let evaluation = "";
+            let match = false;
+
+            const causationKeywords = ['cause', 'effect', 'lead to', 'if', 'impact', 'influence', 'change', 'increase', 'decrease', 'affect', 'result'];
+            const distributionKeywords = ['many', 'percent', 'how much', 'most', 'trend', 'frequency', 'demographic', 'population', 'opinion', 'average', 'who', 'statistics'];
+            const cultureKeywords = ['feel', 'meaning', 'culture', 'unspoken', 'why', 'behavior', 'interaction', 'ritual', 'norm', 'experience', 'context', 'social'];
+
+            if (m === 'Experiment' && causationKeywords.some(k => q.includes(k))) match = true;
+            if (m === 'Survey' && distributionKeywords.some(k => q.includes(k))) match = true;
+            if (m === 'Observation' && cultureKeywords.some(k => q.includes(k))) match = true;
+
+            if (match) {
+                evaluation = `<div class="bg-emerald-900/50 p-6 rounded-2xl border border-emerald-500 animate-in text-left">
+                    <p class="text-emerald-400 font-bold mb-2">✅ Excellent Methodological Fit!</p>
+                    <p class="text-slate-300 text-sm leading-relaxed">Your choice of **${m}** aligns with your research question. You are correctly prioritizing ${m === 'Experiment' ? 'causal proof' : m === 'Survey' ? 'scale and generalizability' : 'cultural depth and context'}.</p>
+                </div>`;
+            } else {
+                evaluation = `<div class="bg-amber-900/50 p-6 rounded-2xl border border-amber-500 animate-in text-left">
+                    <p class="text-amber-400 font-bold mb-2">⚠️ Methodological Mismatch Detected</p>
+                    <p class="text-slate-300 text-sm leading-relaxed">Your question seems interested in ${m === 'Experiment' ? 'meanings' : 'cause and effect'}, but **${m}** is built for ${m === 'Survey' ? 'finding patterns' : 'testing variables'}. Consider if this method might limit your ability to answer your 'why' or 'how much'.</p>
+                </div>`;
+            }
+            div.innerHTML = evaluation;
+        }
+
+        function finishModule() {
+            const q1 = document.querySelector('input[name="q1"]:checked')?.value;
+            const q2 = document.querySelector('input[name="q2"]:checked')?.value;
+            const q3 = document.querySelector('input[name="q3"]:checked')?.value;
+            const q4 = document.querySelector('input[name="q4"]:checked')?.value;
+            const q5 = document.querySelector('input[name="q5"]:checked')?.value;
+
+            if (q1 === 'exp' && q2 === 'obs' && q3 === 'iv' && q4 === 'sdb' && q5 === 'ic') {
+                showFeedback('🎓', 'Module Complete!', 'You have successfully distinguished the Big Three social methods and passed the IRB ethics gate.');
+                state.masteryPoints = 100;
+                updateMastery();
+                const container = document.getElementById('screen-container');
+                container.innerHTML = `<div class="text-center py-12 animate-in">
+                    <div class="text-7xl mb-6">🎓</div>
+                    <h1 class="text-4xl font-black mb-4 tracking-tight">Certification Earned</h1>
+                    <p class="text-slate-500 mb-8 max-w-md mx-auto">You have completed the Foundations of Social Research Methodology. You are now prepared to draft scientific research proposals.</p>
+                    <button onclick="location.reload()" class="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-black transition-all">Restart New Study</button>
+                </div>`;
+            } else {
+                showFeedback('🧐', 'Review Required', 'Your final assessment scores show gaps in understanding. Correct all items to reach 100% mastery.');
+            }
+        }
+
+        // --- Drag and Drop Logic ---
+        function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            var data = ev.dataTransfer.getData("text");
+            const draggedElement = document.getElementById(data);
+            if (draggedElement) ev.currentTarget.appendChild(draggedElement);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
