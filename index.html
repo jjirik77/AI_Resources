@@ -1,1104 +1,265 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI Educational Library – Instructor Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="Professional development hub for instructors exploring AI in teaching, AI‑resistant assessment design, cybersecurity, and emerging tools."
-  />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>AI Educational Library</title>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #f3f4f6;
-      --bg-elevated: #ffffff;
-      --bg-subtle: #f9fafb;
-      --accent: #4f46e5;
-      --accent-soft: rgba(79, 70, 229, 0.12);
-      --accent-strong: #a855f7;
-      --text-main: #111827;
-      --text-muted: #6b7280;
-      --border-subtle: #e5e7eb;
-      --radius-lg: 16px;
-      --radius-md: 12px;
-      --radius-sm: 999px;
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.18);
-      --shadow-subtle: 0 8px 24px rgba(15, 23, 42, 0.12);
-      --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      --max-width: 1120px;
-      --transition-fast: 0.16s ease-out;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f5f6fa;
       margin: 0;
-      font-family: var(--font-body);
-      background:
-        radial-gradient(circle at top, #e5e7eb 0, #f9fafb 55%, #f3f4f6 100%);
-      color: var(--text-main);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
+      color: #222;
     }
-
-    a {
-      color: inherit;
-      text-decoration: none;
+    header {
+      background: linear-gradient(90deg, #275cff 0%, #3d9eeb 100%);
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 10px #0002;
     }
-
-    a:focus-visible,
-    button:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
+    header h1 {
+      margin: 0 0 .5rem 0;
+      font-size: 2.5rem;
+      letter-spacing: -2px;
     }
-
-    /* Layout */
-
-    .page-shell {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+    header p {
+      margin: 0;
+      font-size: 1.2rem;
+      opacity: 0.95;
     }
-
-    .nav {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      backdrop-filter: blur(16px);
-      background: rgba(249, 250, 251, 0.9);
-      border-bottom: 1px solid rgba(209, 213, 219, 0.9);
-    }
-
-    .nav-inner {
-      max-width: var(--max-width);
+    .container {
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 0.65rem 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
+      padding: 0 1rem;
     }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      color: #111827;
+    section {
+      margin-bottom: 32px;
     }
-
-    .nav-dot {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      background: conic-gradient(from 180deg at 50% 50%, #4f46e5, #22c55e, #0ea5e9, #4f46e5);
-      box-shadow: 0 0 24px rgba(79, 70, 229, 0.7);
-    }
-
-    .nav-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-left: auto;
-    }
-
-    .nav-link {
-      padding: 0.35rem 0.8rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      color: #4b5563;
-      border: 1px solid transparent;
-      transition: background var(--transition-fast), color var(--transition-fast),
-        border-color var(--transition-fast), transform var(--transition-fast);
-    }
-
-    .nav-link:hover {
-      background: rgba(229, 231, 235, 0.9);
-      border-color: rgba(209, 213, 219, 0.9);
-      color: #111827;
-      transform: translateY(-1px);
-    }
-
-    .nav-link-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      color: #f9fafb;
-      box-shadow: 0 10px 28px rgba(79, 70, 229, 0.45);
-      border-color: rgba(191, 219, 254, 0.8);
-    }
-
-    .nav-link-primary:hover {
-      filter: brightness(1.04);
-      transform: translateY(-1px);
-    }
-
-    main {
-      flex: 1;
-    }
-
-    .hero {
-      max-width: var(--max-width);
-      margin: 1.8rem auto 1.5rem;
-      padding: 1.75rem 1.25rem 0.5rem;
-      display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2.5fr);
-      gap: 2.25rem;
-      align-items: center;
-    }
-
-    @media (max-width: 880px) {
-      .hero {
-        grid-template-columns: minmax(0, 1fr);
-        margin-top: 1.2rem;
-      }
-      .nav-inner {
-        flex-wrap: wrap;
-      }
-      .nav-links {
-        margin-left: 0;
-      }
-    }
-
-    .hero-heading {
-      font-size: clamp(2.1rem, 3vw, 2.6rem);
-      font-weight: 650;
-      letter-spacing: -0.03em;
-      margin: 0 0 0.75rem;
-      color: #111827;
-    }
-
-    .hero-gradient {
-      background: linear-gradient(135deg, #111827, #4f46e5, #6366f1);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .hero-subtitle {
-      margin: 0 0 1rem;
-      color: var(--text-muted);
-      max-width: 32rem;
-      font-size: 0.97rem;
-    }
-
-    .hero-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .tag-pill {
-      font-size: 0.76rem;
-      padding: 0.25rem 0.7rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid #e5e7eb;
-      color: #4b5563;
-      background: #ffffff;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem;
-      align-items: center;
-      margin-bottom: 1.2rem;
-    }
-
-    .btn {
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      padding: 0.6rem 1.1rem;
-      border: 1px solid #d1d5db;
-      background: #ffffff;
-      color: #111827;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      transition: background var(--transition-fast), border-color var(--transition-fast),
-        transform var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
-    }
-
-    .btn:hover {
-      background: #f3f4f6;
-      border-color: #9ca3af;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-subtle);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      border-color: transparent;
-      color: #f9fafb;
-      box-shadow: 0 18px 45px rgba(79, 70, 229, 0.5);
-    }
-
-    .btn-primary:hover {
-      filter: brightness(1.04);
-      transform: translateY(-1px);
-    }
-
-    .hero-note {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .hero-panel {
-      border-radius: var(--radius-lg);
-      background:
-        radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 55%),
-        radial-gradient(circle at top right, rgba(56, 189, 248, 0.14), transparent 55%),
-        #ffffff;
-      border: 1px solid #e5e7eb;
-      padding: 1.25rem 1.3rem 1.3rem;
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.7rem;
-    }
-
-    .status-pill {
-      font-size: 0.72rem;
-      padding: 0.22rem 0.8rem;
-      border-radius: 999px;
-      background: rgba(22, 163, 74, 0.08);
-      color: #15803d;
-      border: 1px solid rgba(74, 222, 128, 0.6);
-    }
-
-    .hero-microcopy {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-bottom: 0.7rem;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 1.1fr;
-      gap: 0.6rem;
-      font-size: 0.78rem;
-    }
-
-    @media (max-width: 480px) {
-      .hero-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .hero-chip {
-      padding: 0.55rem 0.7rem;
-      border-radius: 10px;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-      display: flex;
-      flex-direction: column;
-      gap: 0.12rem;
-    }
-
-    .hero-chip-label {
-      color: #111827;
-      font-weight: 500;
-    }
-
-    .hero-chip-meta {
-      font-size: 0.74rem;
-      color: var(--text-muted);
-    }
-
-    .hero-glow {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 10% 0, rgba(59, 130, 246, 0.22), transparent 60%);
-      opacity: 0.8;
-      mix-blend-mode: screen;
-      pointer-events: none;
-    }
-
-    /* Sections */
-
-    .section {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0.4rem 1.25rem 1.6rem;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 1rem;
-      margin-bottom: 0.85rem;
-    }
-
     .section-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #4b5563;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #275cff;
+      margin-bottom: 14px;
     }
-
-    .section-subtitle {
-      margin: 0;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      max-width: 32rem;
-    }
-
-    .section-link {
-      font-size: 0.82rem;
-      color: #4f46e5;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
-      white-space: nowrap;
-    }
-
-    .section-link:hover {
-      text-decoration: underline;
-    }
-
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.9rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
     }
-
-    @media (max-width: 960px) {
-      .card-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-    @media (max-width: 640px) {
-      .card-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
     .card {
-      border-radius: var(--radius-md);
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      padding: 0.85rem 0.9rem 0.9rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
-      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
-        border-color var(--transition-fast), background var(--transition-fast);
+      background: #fff;
+      padding: 1.25rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px #0001;
+      transition: box-shadow .18s;
+      border-left: 4px solid #275cff;
     }
-
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
-      border-color: rgba(79, 70, 229, 0.7);
-      background: #f9fafb;
+    .card a {
+      color: #3d9eeb;
+      text-decoration: none;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
     }
-
-    .card-label {
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #6366f1;
-    }
-
-    .card-title {
-      font-size: 0.96rem;
-      font-weight: 560;
-      margin: 0;
-      color: #111827;
-    }
-
-    .card-body {
-      font-size: 0.83rem;
-      color: var(--text-muted);
-    }
-
-    .card-links {
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-      margin-top: 0.3rem;
-    }
-
-    .card-link a {
-      font-size: 0.82rem;
-      color: #4f46e5;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
-    }
-
-    .card-link a:hover {
+    .card a:hover {
       text-decoration: underline;
+      color: #275cff;
     }
-
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.25rem;
-      margin-top: 0.3rem;
-    }
-
-    .pill {
-      font-size: 0.7rem;
-      padding: 0.12rem 0.55rem;
-      border-radius: 999px;
-      border: 1px solid #e5e7eb;
-      color: #6b7280;
-      background: #f9fafb;
-    }
-
-    /* Footer */
-
-    footer {
-      border-top: 1px solid #e5e7eb;
-      margin-top: 1rem;
-      padding: 0.9rem 1.25rem 1.2rem;
-      background: #f9fafb;
-    }
-
-    .footer-inner {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    .footer-links a {
-      color: #4b5563;
-    }
-
-    .footer-links a:hover {
-      color: #111827;
-      text-decoration: underline;
+    @media (max-width: 650px) {
+      header h1 { font-size: 1.6rem; }
+      .section-title { font-size: 1.1rem; }
+      .container { padding: 0 .5rem; }
     }
   </style>
 </head>
-
 <body>
-  <div class="page-shell">
-    <header class="nav">
-      <div class="nav-inner">
-        <div class="nav-brand">
-          <span class="nav-dot"></span>
-          <span>AI Educational Library</span>
-        </div>
-        <nav class="nav-links">
-          <a href="#ai-teaching" class="nav-link">Teaching with AI</a>
-          <a href="#ai-resistant" class="nav-link">AI‑Resistant Design</a>
-          <a href="#cybersecurity" class="nav-link">Cybersecurity & Careers</a>
-          <a href="#llms" class="nav-link">LLMs & Tools</a>
-          <a href="#dashboards" class="nav-link">Dashboards</a>
-          <a href="#about" class="nav-link nav-link-primary">For Instructors</a>
-        </nav>
+  <header>
+    <h1>AI Educational Library</h1>
+    <p>Empowering Education Through Adoption of AI Learning Tools</p>
+    <p style="margin-top:.5rem;font-size:.99rem;">Comprehensive curated resources for teaching and learning with AI</p>
+  </header>
+  <div class="container">
+    <section>
+      <div class="section-title">Personal Information</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/bio.html">Profile Jirik</a></div>
       </div>
-    </header>
-
-    <main>
-      <!-- HERO -->
-      <section class="hero" id="about">
-        <div>
-          <p class="hero-heading">
-            <span class="hero-gradient">Professional development hub for instructors</span>
-          </p>
-          <p class="hero-subtitle">
-            Explore concrete examples, workshop‑ready activities, and research‑informed frameworks for teaching with AI, 
-            designing AI‑resistant assessments, and supporting cybersecurity career pathways.
-          </p>
-          <div class="hero-tags">
-            <span class="tag-pill">Higher‑ed faculty</span>
-            <span class="tag-pill">AI pedagogy</span>
-            <span class="tag-pill">Assessment design</span>
-            <span class="tag-pill">Cybersecurity education</span>
-          </div>
-          <div class="hero-actions">
-            <a href="#ai-teaching" class="btn btn-primary">
-              Start with AI in your course →
-            </a>
-            <a href="https://jjirik77.github.io/AI_Resources/bio.html" class="btn">
-              View creator profile
-            </a>
-          </div>
-          <p class="hero-note">
-            Designed for instructors exploring AI adoption, policy, and practice across disciplines.
-          </p>
-        </div>
-
-        <aside class="hero-panel" aria-label="Quick start pathways">
-          <div class="hero-glow"></div>
-          <div class="hero-panel-header">
-            <span style="font-size:0.8rem;color:#111827;font-weight:500">
-              Where would you like to begin?
-            </span>
-            <span class="status-pill">Curated instructor pathways</span>
-          </div>
-          <p class="hero-microcopy">
-            Choose a starting point based on your current goals. Each path links to ready‑to‑use examples and workshop materials.
-          </p>
-          <div class="hero-grid">
-            <div class="hero-chip">
-              <span class="hero-chip-label">Integrate AI into a course</span>
-              <span class="hero-chip-meta">
-                Begin with classroom AI examples, Azure AI workshop, and AI for Math resources.
-              </span>
-            </div>
-            <div class="hero-chip">
-              <span class="hero-chip-label">Make assessments AI‑resistant</span>
-              <span class="hero-chip-meta">
-                Use the AI Assessment Scale (AIAS), discipline‑specific examples, and policy templates.
-              </span>
-            </div>
-            <div class="hero-chip">
-              <span class="hero-chip-label">Support cybersecurity careers</span>
-              <span class="hero-chip-meta">
-                Leverage the CCAEI toolkit, CISM workshop, and CMMC case studies in class.
-              </span>
-            </div>
-            <div class="hero-chip">
-              <span class="hero-chip-label">Compare AI tools</span>
-              <span class="hero-chip-meta">
-                Explore LLM and agentic browsers via the comparative analysis and tool‑specific guides.
-              </span>
-            </div>
-          </div>
-        </aside>
-      </section>
-
-      <!-- TEACHING WITH AI -->
-      <section class="section" id="ai-teaching">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Teaching with AI</h2>
-            <p class="section-subtitle">
-              Classroom‑ready examples and workshop resources for introducing AI literacy and productive AI use across disciplines.
-            </p>
-          </div>
-        </div>
-
-        <div class="card-grid">
-          <article class="card">
-            <div class="card-label">Examples</div>
-            <h3 class="card-title">AI Classroom Examples</h3>
-            <p class="card-body">
-              Short, discipline‑agnostic activities that illustrate how AI can clarify concepts, visualize ideas, and support student practice.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/class/m1.html">Velocity of Money</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/class/ac.html">HVAC Systems</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/class/nouns.html">Types of Nouns</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/class/diagrams.html">AI‑Generated Diagrams</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/class/rationale.html">Rationale for Teaching AI</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Activity ideas</span>
-              <span class="pill">Any discipline</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Workshop</div>
-            <h3 class="card-title">Azure AI Workshop</h3>
-            <p class="card-body">
-              Modular workshop sequence introducing AI concepts, ethics, and practical applications using Azure AI services.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/azure/ethics.html">Ethics & Responsible AI</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/azure/levels.html">AI Levels Overview</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/azure/ai_concepts.html">Core AI Concepts</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/azure/provenance.html">Digital Provenance</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/azure/image.html">Image Processing & CNNs</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Workshop‑ready</span>
-              <span class="pill">Slides & demos</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Math</div>
-            <h3 class="card-title">AI for Mathematics</h3>
-            <p class="card-body">
-              Strategies and examples for using AI to support problem solving, explanation, and visualization in mathematics courses.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Math/ai_math.html">AI for Math Resources</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">STEM</span>
-              <span class="pill">Conceptual support</span>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- AI-RESISTANT DESIGN -->
-      <section class="section" id="ai-resistant">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">AI‑Resistant Assessment Design</h2>
-          <p class="section-subtitle">
-              Frameworks, exemplars, and policy resources to help you redesign assessments in ways that value process, higher‑order thinking, and authentic work.
-            </p>
-          </div>
-          <a href="https://jjirik77.github.io/ai_resistant/aias.html" class="section-link">
-            View AIAS framework
-          </a>
-        </div>
-
-        <div class="card-grid">
-          <article class="card">
-            <div class="card-label">Framework</div>
-            <h3 class="card-title">AI Assessment Scale (AIAS)</h3>
-            <p class="card-body">
-              A structured framework for evaluating how susceptible an assignment is to AI completion and how to redesign it toward richer learning outcomes.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/landscape.html">Current Landscape</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/aias.html">AI Assessment Scale (AIAS)</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/process_product.html">Process vs Product</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/strategies.html">Design Strategies</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Rubric‑style tool</span>
-              <span class="pill">Assignment redesign</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Examples</div>
-            <h3 class="card-title">Discipline‑Specific Examples</h3>
-            <p class="card-body">
-              Concrete illustrations of AI‑resistant assignments across major subject areas, with prompts you can adapt for your own courses.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/social.html">Social Science</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/health.html">Healthcare</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/business.html">Business</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/math.html">Mathematics</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/stem.html">STEM & CTE</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Prompt templates</span>
-              <span class="pill">Cross‑disciplinary</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Policy</div>
-            <h3 class="card-title">Policies, Ethics, & Surveys</h3>
-            <p class="card-body">
-              Resources to support course and institutional policy decisions, including AI policies, student surveys, and ethical considerations.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/pedagogy.html">Pedagogical Foundations</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/policy.html">AI Policy Examples</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/implement.html">Implementation Plans</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/detection.html">AI Detection Limits</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ai_resistant/pre_survey.html">Pre‑Survey</a>,
-                <a href="https://jjirik77.github.io/ai_resistant/post_survey.html">Post‑Survey</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Policy language</span>
-              <span class="pill">Faculty workshops</span>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- CYBERSECURITY & CAREERS -->
-      <section class="section" id="cybersecurity">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Cybersecurity & Career Pathways</h2>
-            <p class="section-subtitle">
-              Use these toolkits, activities, and cases to introduce students to cybersecurity principles and career opportunities.
-            </p>
-          </div>
-          <a href="https://jjirik77.github.io/ccaei/toolkit.html" class="section-link">
-            Explore CCAEI toolkit
-          </a>
-        </div>
-
-        <div class="card-grid">
-          <article class="card">
-            <div class="card-label">Advising</div>
-            <h3 class="card-title">Cybersecurity Career Advisor Exploration Initiative</h3>
-            <p class="card-body">
-              Advisor‑ and instructor‑facing materials that help students explore cybersecurity pathways, skills, and roles in a structured way.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ccaei/toolkit.html">CCAEI Toolkit</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ccaei/assessment.html">Career Assessment</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Career exploration</span>
-              <span class="pill">Advising support</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Activities</div>
-            <h3 class="card-title">Hands‑On Cybersecurity Learning</h3>
-            <p class="card-body">
-              Interactive modules that illustrate secure coding, privacy implications, and security operations in ways students can experience directly.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/sec_code/interactive.html">Secure Coding Activity</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/sec_code/privacy.html">Privacy Implications</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/ring_ai/soc.html">SOC in a Box</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Interactive labs</span>
-              <span class="pill">Technical & non‑technical</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Cases</div>
-            <h3 class="card-title">CMMC & CISM Resources</h3>
-            <p class="card-body">
-              Use realistic compliance reports and domain‑based content to simulate professional cybersecurity work and governance scenarios.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/cmmc/sar.html">Security Assessment Report</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/cmmc/cmp.html">Configuration Management Plan</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/cmmc/vsr.html">Vulnerability Scan Report</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/cmmc/case_studio.html">DefenseCore Case</a>,
-                <a href="https://jjirik77.github.io/cmmc/case_gem.html">Stratum Defense Case</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/CISM/blue_home.html">CISM Workshop</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Case studies</span>
-              <span class="pill">Governance & risk</span>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- SOCIAL SCIENCE & CLASSROOM RESOURCES -->
-      <section class="section" id="classroom">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Social Science & Classroom Resources</h2>
-            <p class="section-subtitle">
-              Examples, visuals, and utilities you can plug directly into psychology, sociology, and general education courses.
-            </p>
-          </div>
-        </div>
-
-        <div class="card-grid">
-          <article class="card">
-            <div class="card-label">Social sciences</div>
-            <h3 class="card-title">Psych & Soci Course Materials</h3>
-            <p class="card-body">
-              Ready‑made pages and graphics that illustrate core concepts in psychology and sociology with AI‑supported visuals.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/psych_101.html">Psychology 101 – Intro</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/personalities.html">Psychology 101 – Personalities</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/soc_research.html">Sociology 111 – Social Research</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/graphics/social_research.png">Social Research Comparison</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Intro courses</span>
-              <span class="pill">Concept visuals</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Classroom tools</div>
-            <h3 class="card-title">Timers & Flashcards</h3>
-            <p class="card-body">
-              Lightweight tools to support active learning, retrieval practice, and structured classroom timing.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/timer.html">Classroom Timer</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/flashcards.html">3‑D Flashcards</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/career_asses.html">Career Aptitude Assessment</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Active learning</span>
-              <span class="pill">Low‑prep tools</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Ethics</div>
-            <h3 class="card-title">AI Ethics in the Classroom</h3>
-            <p class="card-body">
-              Discussion‑oriented materials to help students wrestle with ethical dilemmas and the broader impact of AI systems.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/AI_Ethics.html">AI Ethical Dilemmas</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Discussion prompts</span>
-              <span class="pill">Ethics & society</span>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- LLMs & TOOLS -->
-      <section class="section" id="llms">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">LLMs & Agentic Tools</h2>
-            <p class="section-subtitle">
-              Guides and comparative views of leading LLM interfaces and agentic browsers to inform your teaching and policy decisions.
-            </p>
-          </div>
-          <a href="https://jjirik77.github.io/AI_Resources/Comparative_Analysis.html" class="section-link">
-            Open comparative analysis
-          </a>
-        </div>
-
-        <div class="card-grid">
-          <article class="card">
-            <div class="card-label">Overview</div>
-            <h3 class="card-title">Comparative Analysis</h3>
-            <p class="card-body">
-              High‑level comparison of features, strengths, and limitations across popular AI tools and agentic browsers.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/Comparative_Analysis.html">LLM & Tool Comparison</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Landscape view</span>
-              <span class="pill">Faculty briefing</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Tool guides</div>
-            <h3 class="card-title">Individual Tool Pages</h3>
-            <p class="card-body">
-              Focused overviews of specific AI tools, suitable for instructor orientation or student demonstrations.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/Perplexity_AI.html">Perplexity</a>,
-                <a href="https://jjirik77.github.io/AI_Resources/Gemini_AI.html">Gemini</a>,
-                <a href="https://jjirik77.github.io/AI_Resources/ChatGPT_AI.html">ChatGPT</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/Claude_AI.html">Claude</a>,
-                <a href="https://jjirik77.github.io/AI_Resources/Copilot_AI.html">Copilot</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/Deepseek_AI.html">DeepSeek</a>,
-                <a href="https://jjirik77.github.io/AI_Resources/Grok_AI.html">Grok</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Tool literacy</span>
-              <span class="pill">Demonstrations</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Agentic</div>
-            <h3 class="card-title">Comet & Agentic Browsers</h3>
-            <p class="card-body">
-              Resources for exploring agentic browsing workflows, including example traces that show how these tools orchestrate multi‑step tasks.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/comet.html">Comet Overview</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/AI_Resources/comet_ex.html">Comet Example</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Agentic workflows</span>
-              <span class="pill">Use‑case demos</span>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- DASHBOARDS & REPORTS -->
-      <section class="section" id="dashboards">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Dashboards & Reports</h2>
-            <p class="section-subtitle">
-              Program‑level views and reports you can reference in planning conversations, grant proposals, and institutional strategy.
-            </p>
-          </div>
-        </div>
-
-        <div class="card-grid">
-          <article class="card">
-            <div class="card-label">Dashboards</div>
-            <h3 class="card-title">Program & Initiative Dashboards</h3>
-            <p class="card-body">
-              Visual summaries of key initiatives and outcomes related to AI and education.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/reports/epnc.html">EPNC Dashboard</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/reports/ramps.html">Illinois RAMPS Report</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Program data</span>
-              <span class="pill">Decision support</span>
-            </div>
-          </article>
-
-          <article class="card">
-            <div class="card-label">Reports</div>
-            <h3 class="card-title">AI & Innovation Reports</h3>
-            <p class="card-body">
-              Narrative reports and summaries about AI implementation and educational innovation efforts.
-            </p>
-            <div class="card-links">
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/reports/ai_report.html">MS AI Azure Report</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/reports/ai_ilc.html">AI ILC Report</a>
-              </div>
-              <div class="card-link">
-                <a href="https://jjirik77.github.io/reports/ed_innovation.html">Education Innovation</a>
-              </div>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Narrative reports</span>
-              <span class="pill">Strategic planning</span>
-            </div>
-          </article>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <div class="footer-inner">
-        <div>
-          AI Educational Library • Instructor‑focused professional development hub.
-        </div>
-        <div class="footer-links">
-          <a href="https://jjirik77.github.io/AI_Resources/bio.html">About the creator</a>
-          <a href="#about">About this site</a>
-          <span>Last updated: 2026</span>
-        </div>
+    </section>
+    <section>
+      <div class="section-title">Graphics</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/graphics/social_research.png">SOCI 111 - Social Research Methods Comparasement</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/graphics/research_methods.png">SOCI 111 - Research Methods Decision Tree</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/graphics/personalities.png">PSYCH 101 - Theories of Personality</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/graphics/Jordan_example.png">PSYCH 101 - Jordan Example</a></div>
       </div>
-    </footer>
+    </section> 
+    <section>
+      <div class="section-title">Cybersecurity Career Advisor Exploration Initiative (CCAEI)</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/ccaei/toolkit.html">Toolkit</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ccaei/assessment.html">Career Assessment</a></div>
+      </div>
+    </section> 
+    <section>
+      <div class="section-title">RING AI</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/ring_ai/vectors.html">Vectors</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ring_ai/probability.html">Probability in Prediction</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ring_ai/mirror.html">Privacy and Digital Adds</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ring_ai/cia.html">CIA Triad</a></div>
+      </div>
+    </section> 
+    <section>
+      <div class="section-title">Social Sciences</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/psych_101.html">Psychology 101 - Intro</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/soc_research.html">Sociology 111 - Social Research</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/personalities.html">Psychology 101 - Personalities</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">AI Examples</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/class/m1.html">Velocity of Money</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/class/ac.html">HVAC</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/class/nouns.html">Types of Nouns</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/class/diagrams.html">Diagrams</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/class/rationale.html">Rationale for Teaching AI</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/class/state.html">State of AI in 2026</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/class/tokens.html">Decoding Tokens</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/class/token_limit.html">Master AI Token Limitation</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">AI Resistant Assignments</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/pre_survey.html">Pre-survey</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/landscape.html">Current Lanscape</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/reasoning.html">Reasons for AI Resistant Assignments</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/aias.html">AI Assessment Scale (AIAS) Framework</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/process_product.html">Process vs Product</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/strategies.html">Strategies</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/pedagogy.html">Pedagogical Foundation</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/pedagogy2.html">Pedagogical Foundation Sources</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/policy.html">AI Policies</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/implement.html">Implementation Plans</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/social.html">Social Science Example</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/health.html">Healthcare Example</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/business.html">Business Example</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/physics.html">Physical Science Example</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/cte.html">Career Technical Education Example</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/humanities.html">Humanities Example</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/arts.html">Fine Arts Example</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/math.html">Mathematics Example</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/stem.html">STEM Example</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/detection.html">AI Detection Limits</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/ai_resistant/post_survey.html">Post-survey</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">Dashboards & Reports</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/reports/epnc.html">EPNC Dashboard</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/reports/ai_report.html">MS AI Azure Report</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/reports/ramps.html">Illinois RAMPS Report</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/reports/ai_ilc.html">AI ILC</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/reports/ed_innovation.html">Education Innovation</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">Classroom Resources</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/timer.html">Timer</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/flashcards.html">3-D Flashcards</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/career_asses.html">Career Aptitude Assessment</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/class/m1.html">Career Aptitude Assessment</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/class/ac.html">Career Aptitude Assessment</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">Azure AI Workshop</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/azure/ethics.html">Ethics</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/levels.html">AI Levels</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/ai_concepts.html">AI Concepts</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/provenance.html">Digital Provenance</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/image.html">Image Processing</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/cnn.html">Convolutional Neural Networks</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/azure/ocr.html">Optical Character Recognition</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">AI Ethics</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/AI_Ethics.html">AI Ethical Dilemmas</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">Cybersecurity</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/sec_code/interactive.html">Secure Coding</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/sec_code/privacy.html">Privacy Implications</a></div>
+         <div class="card"><a href="https://jjirik77.github.io/ring_ai/soc.html">SOC in a Box</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">CISM Workshop</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_home.html">CISM Comprehensive</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_d1.html">Domain 1</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_d2.html">Domain 2</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_d3.html">Domain 3</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_d4.html">Domain 4</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/blue_asses.html">Assessment</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">CISA Workshop</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/cisa/cisa_all.html">CISM Comprehensive</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/domain1.html">Domain 1</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/domain2.html">Domain 2</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/domain3.html">Domain 3</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/domain4.html">Domain 4</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/CISM/domain5.html">Domain 5</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">AI for Math</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Math/ai_math.html">Resources</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">CMMC</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/sar.html">Security Assessment Report</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/cmp.html">Configuration Management Plan</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/vsr.html">Vulnerability Scan Report</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/case_studio.html">DefenseCore Manufacturing Case</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/cmmc/case_gem.html">Statum Defense Case</a></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">LLM Interfaces & Agentic Browsers</div>
+      <div class="card-grid">
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Comparative_Analysis.html">Comparative Analysis</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Perplexity_AI.html">Perplexity</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Gemini_AI.html">Gemini</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/ChatGPT_AI.html">ChatGPT</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Claude_AI.html">Claude</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Copilot_AI.html">Copilot</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Deepseek_AI.html">DeepSeek</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/Grok_AI.html">Grok</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/comet.html">Comet</a></div>
+        <div class="card"><a href="https://jjirik77.github.io/AI_Resources/comet_ex.html">Comet Example</a></div>
+      </div>
+    </section>
   </div>
 </body>
 </html>
